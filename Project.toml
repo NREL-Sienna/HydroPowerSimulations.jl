@@ -1,6 +1,6 @@
 name = "HydroPowerSimulations"
 uuid = "fc1677e0-6ad7-4515-bf3a-bd6bf20a0b1b"
-authors = ["Nongchao Guo <43042596+Nongchao@users.noreply.github.com>"]
+authors = ["Nongchao Guo <43042596+Nongchao@users.noreply.github.com>", "sourabhdalvi <sourabh.p.dalvi@gmail.com>"]
 version = "0.1.1"
 
 [deps]
