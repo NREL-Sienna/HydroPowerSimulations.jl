@@ -7,10 +7,7 @@ function PSI.construct_device!(
     sys::PSY.System,
     model::PSI.DeviceModel{H, HydroDispatchRunOfRiverCascade},
     ::Type{S},
-) where {
-    H <: HydroCascade,
-    S <: PM.AbstractPowerModel,
-}
+) where {H <: HydroCascade, S <: PM.AbstractPowerModel}
     devices = PSI.get_available_components(H, sys)
 
     if !PSI.validate_available_devices(H, devices)
@@ -21,7 +18,6 @@ function PSI.construct_device!(
     PSI.add_variables!(psi_container, PSI.ActivePowerVariable, devices)
     PSI.add_variables!(psi_container, PSI.ReactivePowerVariable, devices)
     PSI.add_variables!(psi_container, PSI.SpillageVariable, devices)
-
 
     #Constraints
     PSI.add_constraints!(
@@ -42,8 +38,13 @@ function PSI.construct_device!(
         S,
         PSI.get_feedforward(model),
     )
-    flow_balance_cascade_constraint!(psi_container, devices, model, S, PSI.get_feedforward(model))
-
+    flow_balance_cascade_constraint!(
+        psi_container,
+        devices,
+        model,
+        S,
+        PSI.get_feedforward(model),
+    )
 
     PSI.feedforward!(psi_container, devices, model, PSI.get_feedforward(model))
 
@@ -62,10 +63,7 @@ function PSI.construct_device!(
     sys::PSY.System,
     model::PSI.DeviceModel{H, HydroDispatchRunOfRiverCascade},
     ::Type{S},
-) where {
-    H <: HydroCascade,
-    S <: PM.AbstractActivePowerModel,
-}
+) where {H <: HydroCascade, S <: PM.AbstractActivePowerModel}
     devices = PSI.get_available_components(H, sys)
 
     if !PSI.validate_available_devices(H, devices)
@@ -75,7 +73,6 @@ function PSI.construct_device!(
     #Variables
     PSI.add_variables!(psi_container, PSI.ActivePowerVariable, devices)
     PSI.add_variables!(psi_container, PSI.SpillageVariable, devices)
-
 
     #Constraints
     PSI.add_constraints!(
@@ -87,7 +84,13 @@ function PSI.construct_device!(
         S,
         PSI.get_feedforward(model),
     )
-    flow_balance_cascade_constraint!(psi_container, devices, model, S, PSI.get_feedforward(model))
+    flow_balance_cascade_constraint!(
+        psi_container,
+        devices,
+        model,
+        S,
+        PSI.get_feedforward(model),
+    )
 
     PSI.feedforward!(psi_container, devices, model, PSI.get_feedforward(model))
 

@@ -3,7 +3,6 @@ struct HydroDispatchRunOfRiverCascade <: PSI.AbstractHydroDispatchFormulation en
 # Constraint name
 const CASCADING_FLOW = "cascading_flow"
 
-
 function flow_balance_external_input_param_cascade(
     psi_container::PSI.PSIContainer,
     inflow_data::Vector{PSI.DeviceTimeSeriesConstraintInfo},
@@ -21,11 +20,13 @@ function flow_balance_external_input_param_cascade(
     varspill = PSI.get_variable(psi_container, var_names[1])
     varout = PSI.get_variable(psi_container, var_names[2])
 
-    container_inflow = PSI.add_param_container!(psi_container, param_reference, name_index, time_steps)
+    container_inflow =
+        PSI.add_param_container!(psi_container, param_reference, name_index, time_steps)
     param_inflow = PSI.get_parameter_array(container_inflow)
     multiplier_inflow = PSI.get_multiplier_array(container_inflow)
 
-    flow_constraint = PSI.add_cons_container!(psi_container, cons_name, name_index, time_steps)
+    flow_constraint =
+        PSI.add_cons_container!(psi_container, cons_name, name_index, time_steps)
 
     for (ix, d) in enumerate(inflow_data)
         name = PSI.get_component_name(d)
@@ -49,12 +50,15 @@ function flow_balance_external_input_param_cascade(
                 PJ.add_parameter(psi_container.JuMPmodel, d.timeseries[t])
 
             if !isempty(upstream_devices)
-                exp = d.multiplier * param_inflow[name, t] - varspill[name, t-1] - varout[name, t-1]
+                exp =
+                    d.multiplier * param_inflow[name, t] - varspill[name, t - 1] -
+                    varout[name, t - 1]
                 for j in upstream_devices
                     JuMP.add_to_expression!(exp, varspill[IS.get_name(j), t])
                     JuMP.add_to_expression!(exp, varout[IS.get_name(j), t])
                 end
-                flow_constraint[name, t] = JuMP.@constraint(psi_container.JuMPmodel, exp == 0.0)
+                flow_constraint[name, t] =
+                    JuMP.@constraint(psi_container.JuMPmodel, exp == 0.0)
             end
         end
     end
@@ -100,10 +104,11 @@ function flow_balance_external_input_cascade(
             if !isempty(upstream_devices)
                 exp = d.multiplier * d.timeseries[t] - varspill[name, t] - varout[name, t]
                 for j in upstream_devices
-                    JuMP.add_to_expression!(exp, varspill[IS.get_name(j), t-1])
-                    JuMP.add_to_expression!(exp, varout[IS.get_name(j), t-1])
+                    JuMP.add_to_expression!(exp, varspill[IS.get_name(j), t - 1])
+                    JuMP.add_to_expression!(exp, varout[IS.get_name(j), t - 1])
                 end
-                flow_constraint[name, t] = JuMP.@constraint(psi_container.JuMPmodel, exp == 0.0)
+                flow_constraint[name, t] =
+                    JuMP.@constraint(psi_container.JuMPmodel, exp == 0.0)
             end
         end
     end
@@ -121,12 +126,17 @@ function flow_balance_cascade_constraint!(
     use_forecast_data = PSI.model_uses_forecasts(psi_container)
 
     inflow_forecast_label = "get_max_active_power"
-    constraint_infos_inflow = Vector{PSI.DeviceTimeSeriesConstraintInfo}(undef, length(devices))
+    constraint_infos_inflow =
+        Vector{PSI.DeviceTimeSeriesConstraintInfo}(undef, length(devices))
     upstream_data = Vector{Vector{HydroCascade}}(undef, length(devices))
 
     for (ix, d) in enumerate(devices)
         ts_vector_inflow = PSI.get_time_series(psi_container, d, inflow_forecast_label)
-        constraint_info_inflow =  PSI.DeviceTimeSeriesConstraintInfo(d, x -> PSY.get_max_active_power(x), ts_vector_inflow)
+        constraint_info_inflow = PSI.DeviceTimeSeriesConstraintInfo(
+            d,
+            x -> PSY.get_max_active_power(x),
+            ts_vector_inflow,
+        )
         PSI.add_device_services!(constraint_info_inflow.range, d, model)
         constraint_infos_inflow[ix] = constraint_info_inflow
         upstream_data[ix] = get_upstream(d)

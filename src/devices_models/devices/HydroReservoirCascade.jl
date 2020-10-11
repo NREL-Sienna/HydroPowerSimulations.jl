@@ -3,9 +3,12 @@ struct HydroDispatchReservoirCascade <: PSI.AbstractHydroReservoirFormulation en
 function energy_balance_external_input_param_cascade(
     psi_container::PSI.PSIContainer,
     initial_conditions::Vector{PSI.InitialCondition},
-    time_series_data::Tuple{Vector{PSI.DeviceTimeSeriesConstraintInfo},Vector{PSI.DeviceTimeSeriesConstraintInfo}},
+    time_series_data::Tuple{
+        Vector{PSI.DeviceTimeSeriesConstraintInfo},
+        Vector{PSI.DeviceTimeSeriesConstraintInfo},
+    },
     upstream::Vector{Vector{HydroCascade}},
-    cons_names::Tuple{Symbol,Symbol},
+    cons_names::Tuple{Symbol, Symbol},
     var_names::Tuple{Symbol, Symbol, Symbol},
     param_references::Tuple{PSI.UpdateRef, PSI.UpdateRef},
 )
@@ -27,17 +30,28 @@ function energy_balance_external_input_param_cascade(
     balance_param_reference = param_references[1]
     target_param_reference = param_references[2]
 
-    container_inflow = PSI.add_param_container!(psi_container, balance_param_reference, name_index, time_steps)
+    container_inflow = PSI.add_param_container!(
+        psi_container,
+        balance_param_reference,
+        name_index,
+        time_steps,
+    )
     param_inflow = PSI.get_parameter_array(container_inflow)
     multiplier_inflow = PSI.get_multiplier_array(container_inflow)
 
-    container_target = PSI.add_param_container!(psi_container, target_param_reference, name_index, time_steps)
+    container_target = PSI.add_param_container!(
+        psi_container,
+        target_param_reference,
+        name_index,
+        time_steps,
+    )
     param_target = PSI.get_parameter_array(container_target)
     multiplier_target = PSI.get_multiplier_array(container_target)
 
-    balance_constraint = PSI.add_cons_container!(psi_container, balance_cons_name, name_index, time_steps)
-    target_constraint = PSI.add_cons_container!(psi_container, target_cons_name, name_index, 1)
-
+    balance_constraint =
+        PSI.add_cons_container!(psi_container, balance_cons_name, name_index, time_steps)
+    target_constraint =
+        PSI.add_cons_container!(psi_container, target_cons_name, name_index, 1)
 
     for (ix, d) in enumerate(inflow_data)
         name = PSI.get_component_name(d)
@@ -75,8 +89,16 @@ function energy_balance_external_input_param_cascade(
 
             if !isempty(upstream_devices)
                 for j in upstream_devices
-                    JuMP.add_to_expression!(exp, varspill[IS.get_name(j), t-1], fraction_of_hour)
-                    JuMP.add_to_expression!(exp, varout[IS.get_name(j), t-1], fraction_of_hour)
+                    JuMP.add_to_expression!(
+                        exp,
+                        varspill[IS.get_name(j), t - 1],
+                        fraction_of_hour,
+                    )
+                    JuMP.add_to_expression!(
+                        exp,
+                        varout[IS.get_name(j), t - 1],
+                        fraction_of_hour,
+                    )
                 end
             end
 
@@ -88,11 +110,13 @@ function energy_balance_external_input_param_cascade(
     for (ix, d) in enumerate(target_data)
         name = PSI.get_component_name(d)
         for t in time_steps
-            param_target[name, t] = PJ.add_parameter(psi_container.JuMPmodel, d.timeseries[t])
+            param_target[name, t] =
+                PJ.add_parameter(psi_container.JuMPmodel, d.timeseries[t])
         end
         target_constraint[name, 1] = JuMP.@constraint(
             psi_container.JuMPmodel,
-            varenergy[name, time_steps[end]] >= d.multiplier * param_target[name, time_steps[end]]
+            varenergy[name, time_steps[end]] >=
+            d.multiplier * param_target[name, time_steps[end]]
         )
     end
 
@@ -102,9 +126,12 @@ end
 function energy_balance_external_input_cascade(
     psi_container::PSI.PSIContainer,
     initial_conditions::Vector{PSI.InitialCondition},
-    time_series_data::Tuple{Vector{PSI.DeviceTimeSeriesConstraintInfo},Vector{PSI.DeviceTimeSeriesConstraintInfo}},
+    time_series_data::Tuple{
+        Vector{PSI.DeviceTimeSeriesConstraintInfo},
+        Vector{PSI.DeviceTimeSeriesConstraintInfo},
+    },
     upstream::Vector{Vector{HydroCascade}},
-    cons_names::Tuple{Symbol,Symbol},
+    cons_names::Tuple{Symbol, Symbol},
     var_names::Tuple{Symbol, Symbol, Symbol},
 )
     time_steps = PSI.model_time_steps(psi_container)
@@ -125,15 +152,17 @@ function energy_balance_external_input_cascade(
 
     balance_constraint =
         PSI.add_cons_container!(psi_container, balance_cons_name, name_index, time_steps)
-    target_constraint = PSI.add_cons_container!(psi_container, target_cons_name, name_index, 1)
+    target_constraint =
+        PSI.add_cons_container!(psi_container, target_cons_name, name_index, 1)
 
     for (ix, d) in enumerate(inflow_data)
         name = PSI.get_component_name(d)
         upstream_devices = upstream[ix]
 
-        exp = initial_conditions[ix].value +
-        (d.multiplier * d.timeseries[1] - varspill[name, 1] - varout[name, 1]) *
-        fraction_of_hour
+        exp =
+            initial_conditions[ix].value +
+            (d.multiplier * d.timeseries[1] - varspill[name, 1] - varout[name, 1]) *
+            fraction_of_hour
 
         if !isempty(upstream_devices)
             for j in upstream_devices
@@ -142,30 +171,33 @@ function energy_balance_external_input_cascade(
             end
         end
 
-        balance_constraint[name, 1] = JuMP.@constraint(
-            psi_container.JuMPmodel,
-            varenergy[name, 1] == exp
-        )
+        balance_constraint[name, 1] =
+            JuMP.@constraint(psi_container.JuMPmodel, varenergy[name, 1] == exp)
 
         for t in time_steps[2:end]
-
-            exp = varenergy[name, t - 1] +
-            (d.multiplier * d.timeseries[t] - varspill[name, t] - varout[name, t]) * fraction_of_hour
+            exp =
+                varenergy[name, t - 1] +
+                (d.multiplier * d.timeseries[t] - varspill[name, t] - varout[name, t]) *
+                fraction_of_hour
 
             if !isempty(upstream_devices)
                 for j in upstream_devices
-                    JuMP.add_to_expression!(exp, varspill[IS.get_name(j), t], fraction_of_hour)
-                    JuMP.add_to_expression!(exp, varout[IS.get_name(j), t], fraction_of_hour)
+                    JuMP.add_to_expression!(
+                        exp,
+                        varspill[IS.get_name(j), t],
+                        fraction_of_hour,
+                    )
+                    JuMP.add_to_expression!(
+                        exp,
+                        varout[IS.get_name(j), t],
+                        fraction_of_hour,
+                    )
                 end
             end
 
-            balance_constraint[name, t] = JuMP.@constraint(
-                psi_container.JuMPmodel,
-                varenergy[name, t] == exp
-            )
-
+            balance_constraint[name, t] =
+                JuMP.@constraint(psi_container.JuMPmodel, varenergy[name, t] == exp)
         end
-
     end
 
     for (ix, d) in enumerate(target_data)
@@ -197,20 +229,28 @@ function energy_balance_cascade_constraint!(
 
     inflow_forecast_label = "get_inflow"
     target_forecast_label = "get_storage_target"
-    constraint_infos_inflow = Vector{PSI.DeviceTimeSeriesConstraintInfo}(undef, length(devices))
-    constraint_infos_target = Vector{PSI.DeviceTimeSeriesConstraintInfo}(undef, length(devices))
+    constraint_infos_inflow =
+        Vector{PSI.DeviceTimeSeriesConstraintInfo}(undef, length(devices))
+    constraint_infos_target =
+        Vector{PSI.DeviceTimeSeriesConstraintInfo}(undef, length(devices))
     upstream_data = Vector{Vector{HydroCascade}}(undef, length(devices))
 
     for (ix, d) in enumerate(devices)
         ts_vector_inflow = PSI.get_time_series(psi_container, d, inflow_forecast_label)
-        constraint_info_inflow =
-            PSI.DeviceTimeSeriesConstraintInfo(d, x -> PSY.get_inflow(x) * PSY.get_conversion_factor(x), ts_vector_inflow)
+        constraint_info_inflow = PSI.DeviceTimeSeriesConstraintInfo(
+            d,
+            x -> PSY.get_inflow(x) * PSY.get_conversion_factor(x),
+            ts_vector_inflow,
+        )
         PSI.add_device_services!(constraint_info_inflow.range, d, model)
         constraint_infos_inflow[ix] = constraint_info_inflow
 
         ts_vector_target = PSI.get_time_series(psi_container, d, target_forecast_label)
-        constraint_info_target =
-            PSI.DeviceTimeSeriesConstraintInfo(d, x -> PSY.get_storage_target(x) * PSY.get_storage_capacity(x), ts_vector_target)
+        constraint_info_target = PSI.DeviceTimeSeriesConstraintInfo(
+            d,
+            x -> PSY.get_storage_target(x) * PSY.get_storage_capacity(x),
+            ts_vector_target,
+        )
         PSI.add_device_services!(constraint_info_target.range, d, model)
         constraint_infos_target[ix] = constraint_info_target
 
@@ -223,13 +263,19 @@ function energy_balance_cascade_constraint!(
             PSI.get_initial_conditions(psi_container, key),
             (constraint_infos_inflow, constraint_infos_target),
             upstream_data,
-            (PSI.make_constraint_name(PSI.ENERGY_CAPACITY, H),PSI.make_constraint_name(PSI.ENERGY_TARGET, H)),
+            (
+                PSI.make_constraint_name(PSI.ENERGY_CAPACITY, H),
+                PSI.make_constraint_name(PSI.ENERGY_TARGET, H),
+            ),
             (
                 PSI.make_variable_name(PSI.SPILLAGE, H),
                 PSI.make_variable_name(PSI.ACTIVE_POWER, H),
                 PSI.make_variable_name(PSI.ENERGY, H),
             ),
-            (PSI.UpdateRef{H}(PSI.INFLOW, inflow_forecast_label),PSI.UpdateRef{H}(PSI.TARGET, target_forecast_label)),
+            (
+                PSI.UpdateRef{H}(PSI.INFLOW, inflow_forecast_label),
+                PSI.UpdateRef{H}(PSI.TARGET, target_forecast_label),
+            ),
         )
     else
         energy_balance_external_input_cascade(
@@ -237,7 +283,10 @@ function energy_balance_cascade_constraint!(
             PSI.get_initial_conditions(psi_container, key),
             (constraint_infos_inflow, constraint_infos_target),
             upstream_data,
-            (PSI.make_constraint_name(PSI.ENERGY_CAPACITY, H),PSI.make_constraint_name(PSI.ENERGY_TARGET, H)),
+            (
+                PSI.make_constraint_name(PSI.ENERGY_CAPACITY, H),
+                PSI.make_constraint_name(PSI.ENERGY_TARGET, H),
+            ),
             (
                 PSI.make_variable_name(PSI.SPILLAGE, H),
                 PSI.make_variable_name(PSI.ACTIVE_POWER, H),

@@ -18,7 +18,13 @@ function PSI.construct_device!(
     #Initial Conditions
     PSI.storage_energy_init(psi_container, devices)
 
-    energy_balance_cascade_constraint!(psi_container, devices, model, S, PSI.get_feedforward(model))
+    energy_balance_cascade_constraint!(
+        psi_container,
+        devices,
+        model,
+        S,
+        PSI.get_feedforward(model),
+    )
     PSI.feedforward!(psi_container, devices, model, PSI.get_feedforward(model))
 
     #Cost Function
@@ -39,7 +45,6 @@ function PSI.construct_device!(
         return
     end
 
-
     #Variables
     PSI.add_variables!(psi_container, PSI.ActivePowerVariable, devices)
     PSI.add_variables!(psi_container, PSI.EnergyVariable, devices)
@@ -50,7 +55,13 @@ function PSI.construct_device!(
     PSI.storage_energy_init(psi_container, devices)
 
     #Constraints
-    energy_balance_cascade_constraint!(psi_container, devices, model, S, PSI.get_feedforward(model))
+    energy_balance_cascade_constraint!(
+        psi_container,
+        devices,
+        model,
+        S,
+        PSI.get_feedforward(model),
+    )
     PSI.feedforward!(psi_container, devices, model, PSI.get_feedforward(model))
 
     #Cost Function
