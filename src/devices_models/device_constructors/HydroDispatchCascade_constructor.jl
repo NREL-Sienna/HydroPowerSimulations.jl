@@ -23,21 +23,13 @@ function PSI.construct_device!(
     PSI.add_constraints!(
         psi_container,
         PSI.RangeConstraint,
-        PSI.ActivePowerVariable,
-        devices,
-        model,
-        S,
-        PSI.get_feedforward(model),
-    )
-    PSI.add_constraints!(
-        psi_container,
-        PSI.RangeConstraint,
         PSI.ReactivePowerVariable,
         devices,
         model,
         S,
         PSI.get_feedforward(model),
     )
+
     flow_balance_cascade_constraint!(
         psi_container,
         devices,
@@ -75,15 +67,6 @@ function PSI.construct_device!(
     PSI.add_variables!(psi_container, PSI.SpillageVariable, devices)
 
     #Constraints
-    PSI.add_constraints!(
-        psi_container,
-        PSI.RangeConstraint,
-        PSI.ActivePowerVariable,
-        devices,
-        model,
-        S,
-        PSI.get_feedforward(model),
-    )
     flow_balance_cascade_constraint!(
         psi_container,
         devices,

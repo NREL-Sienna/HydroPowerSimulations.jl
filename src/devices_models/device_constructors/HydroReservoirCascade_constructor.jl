@@ -18,6 +18,7 @@ function PSI.construct_device!(
     #Initial Conditions
     PSI.storage_energy_init(psi_container, devices)
 
+    #Constraints
     energy_balance_cascade_constraint!(
         psi_container,
         devices,
@@ -55,6 +56,15 @@ function PSI.construct_device!(
     PSI.storage_energy_init(psi_container, devices)
 
     #Constraints
+    PSI.add_constraints!(
+        psi_container,
+        PSI.RangeConstraint,
+        PSI.ReactivePowerVariable,
+        devices,
+        model,
+        S,
+        PSI.get_feedforward(model),
+    )
     energy_balance_cascade_constraint!(
         psi_container,
         devices,
