@@ -54,8 +54,8 @@ function flow_balance_external_input_param_cascade(
                     d.multiplier * param_inflow[name, t] - varspill[name, t - 1] -
                     varout[name, t - 1]
                 for j in upstream_devices
-                    JuMP.add_to_expression!(exp, varspill[IS.get_name(j), t])
-                    JuMP.add_to_expression!(exp, varout[IS.get_name(j), t])
+                    JuMP.add_to_expression!(exp, varspill[IS.get_name(j), t-1])
+                    JuMP.add_to_expression!(exp, varout[IS.get_name(j), t-1])
                 end
                 flow_constraint[name, t] =
                     JuMP.@constraint(psi_container.JuMPmodel, exp == 0.0)
