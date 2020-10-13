@@ -34,16 +34,17 @@ function flow_balance_external_input_param_cascade(
         multiplier_inflow[name, 1] = d.multiplier
         param_inflow[name, 1] = PJ.add_parameter(psi_container.JuMPmodel, d.timeseries[1])
 
+        exp = multiplier_inflow[name, 1] * param_inflow[name, 1] - varspill[name, 1] - varout[name, 1] #+ initial_conditions[ix].value
         #= spillage isn't an initial condition because it's not stored in the struct, so we can't make the cascading flow constrainits for the first periiod.
         if !isempty(upstream_devices)
-            exp = initial_conditions[ix].value + multiplier_inflow[name, 1] * param_inflow[name, 1] - varspill[name, 1] - varout[name, 1]
             for j in upstream_devices
                 JuMP.add_to_expression!(exp, varspill[IS.get_name(j), 1])
                 JuMP.add_to_expression!(exp, varout[IS.get_name(j), 1])
             end
-            flow_constraint[name, 1] = JuMP.@constraint(psi_container.JuMPmodel, exp == 0.0)
         end
         =#
+        flow_constraint[name, 1] = JuMP.@constraint(psi_container.JuMPmodel, exp == 0.0)
+
 
         for t in time_steps[2:end]
             param_inflow[name, t] =
@@ -89,16 +90,16 @@ function flow_balance_external_input_cascade(
         name = PSI.get_component_name(d)
         upstream_devices = upstream[ix]
 
+        exp = d.multiplier * d.timeseries[1] - varspill[name, 1] - varout[name, 1] #+ initial_conditions[ix].value
         #= spillage isn't an initial condition because it's not stored in the struct, so we can't make the cascading flow constrainits for the first periiod.
         if !isempty(upstream_devices)
-            exp = initial_conditions[ix].value + d.multiplier * d.timeseries[1] - varspill[name, 1] - varout[name, 1]
             for j in upstream_devices
                 JuMP.add_to_expression!(exp, varspill[IS.get_name(j), 1])
                 JuMP.add_to_expression!(exp, varout[IS.get_name(j), 1])
             end
-            flow_constraint[name, 1] = JuMP.@constraint(psi_container.JuMPmodel, exp == 0.0)
         end
         =#
+        flow_constraint[name, 1] = JuMP.@constraint(psi_container.JuMPmodel, exp == 0.0)
 
         for t in time_steps[2:end]
             if !isempty(upstream_devices)
