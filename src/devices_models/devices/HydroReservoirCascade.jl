@@ -164,12 +164,14 @@ function energy_balance_external_input_cascade(
             (d.multiplier * d.timeseries[1] - varspill[name, 1] - varout[name, 1]) *
             fraction_of_hour
 
+        #= This is commented out because it constrains the cascading inflow in period 1 to upstream outflows in period 1 instead of
         if !isempty(upstream_devices)
             for j in upstream_devices
                 JuMP.add_to_expression!(exp, varspill[IS.get_name(j), 1], fraction_of_hour)
                 JuMP.add_to_expression!(exp, varout[IS.get_name(j), 1], fraction_of_hour)
             end
         end
+        =#
 
         balance_constraint[name, 1] =
             JuMP.@constraint(psi_container.JuMPmodel, varenergy[name, 1] == exp)
@@ -184,12 +186,12 @@ function energy_balance_external_input_cascade(
                 for j in upstream_devices
                     JuMP.add_to_expression!(
                         exp,
-                        varspill[IS.get_name(j), t],
+                        varspill[IS.get_name(j), t - 1],
                         fraction_of_hour,
                     )
                     JuMP.add_to_expression!(
                         exp,
-                        varout[IS.get_name(j), t],
+                        varout[IS.get_name(j), t - 1],
                         fraction_of_hour,
                     )
                 end
