@@ -34,33 +34,27 @@ function flow_balance_external_input_param_cascade(
         multiplier_inflow[name, 1] = d.multiplier
         param_inflow[name, 1] = PJ.add_parameter(psi_container.JuMPmodel, d.timeseries[1])
 
-        exp = multiplier_inflow[name, 1] * param_inflow[name, 1] - varspill[name, 1] - varout[name, 1] #+ initial_conditions[ix].value
+        exp =
+            multiplier_inflow[name, 1] * param_inflow[name, 1] - varspill[name, 1] -
+            varout[name, 1] #+ initial_conditions[ix].value
         #= spillage isn't an initial condition because it's not stored in the struct, so we can't make the cascading flow constrainits for the first periiod.
-        if !isempty(upstream_devices)
             for j in upstream_devices
                 JuMP.add_to_expression!(exp, varspill[IS.get_name(j), 1])
                 JuMP.add_to_expression!(exp, varout[IS.get_name(j), 1])
             end
-        end
         =#
         flow_constraint[name, 1] = JuMP.@constraint(psi_container.JuMPmodel, exp == 0.0)
-
 
         for t in time_steps[2:end]
             param_inflow[name, t] =
                 PJ.add_parameter(psi_container.JuMPmodel, d.timeseries[t])
 
-            if !isempty(upstream_devices)
-                exp =
-                    d.multiplier * param_inflow[name, t] - varspill[name, t] -
-                    varout[name, t]
-                for j in upstream_devices
-                    JuMP.add_to_expression!(exp, varspill[IS.get_name(j), t - 1])
-                    JuMP.add_to_expression!(exp, varout[IS.get_name(j), t - 1])
-                end
-                flow_constraint[name, t] =
-                    JuMP.@constraint(psi_container.JuMPmodel, exp == 0.0)
+            exp = d.multiplier * param_inflow[name, t] - varspill[name, t] - varout[name, t]
+            for j in upstream_devices
+                JuMP.add_to_expression!(exp, varspill[IS.get_name(j), t - 1])
+                JuMP.add_to_expression!(exp, varout[IS.get_name(j), t - 1])
             end
+            flow_constraint[name, t] = JuMP.@constraint(psi_container.JuMPmodel, exp == 0.0)
         end
     end
 
@@ -92,25 +86,21 @@ function flow_balance_external_input_cascade(
 
         exp = d.multiplier * d.timeseries[1] - varspill[name, 1] - varout[name, 1] #+ initial_conditions[ix].value
         #= spillage isn't an initial condition because it's not stored in the struct, so we can't make the cascading flow constrainits for the first periiod.
-        if !isempty(upstream_devices)
             for j in upstream_devices
                 JuMP.add_to_expression!(exp, varspill[IS.get_name(j), 1])
                 JuMP.add_to_expression!(exp, varout[IS.get_name(j), 1])
             end
-        end
         =#
         flow_constraint[name, 1] = JuMP.@constraint(psi_container.JuMPmodel, exp == 0.0)
 
         for t in time_steps[2:end]
-            if !isempty(upstream_devices)
-                exp = d.multiplier * d.timeseries[t] - varspill[name, t] - varout[name, t]
-                for j in upstream_devices
-                    JuMP.add_to_expression!(exp, varspill[IS.get_name(j), t - 1])
-                    JuMP.add_to_expression!(exp, varout[IS.get_name(j), t - 1])
-                end
-                flow_constraint[name, t] =
-                    JuMP.@constraint(psi_container.JuMPmodel, exp == 0.0)
+            exp = d.multiplier * d.timeseries[t] - varspill[name, t] - varout[name, t]
+
+            for j in upstream_devices
+                JuMP.add_to_expression!(exp, varspill[IS.get_name(j), t - 1])
+                JuMP.add_to_expression!(exp, varout[IS.get_name(j), t - 1])
             end
+            flow_constraint[name, t] = JuMP.@constraint(psi_container.JuMPmodel, exp == 0.0)
         end
     end
     return
