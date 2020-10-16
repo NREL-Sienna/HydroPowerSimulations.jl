@@ -18,7 +18,7 @@ This file is auto-generated. Do not edit.
         operation_cost::PSY.OperationalCost
         storage_target::Float64
         conversion_factor::Float64
-        upstream::NamedTuple{(:unit, :lag, :multiplier), Tuple{Vector{PSY.HydroGen}, Vector{Int64}, Vector{Float64}}}
+        upstream::Vector{NamedTuple{(:unit, :lag, :multiplier), Tuple{PSY.HydroGen, Int64, Float64}}}
         services::Vector{PSY.Service}
         dynamic_injector::Union{Nothing, PSY.DynamicInjection}
         ext::Dict{String, Any}
@@ -44,7 +44,7 @@ This file is auto-generated. Do not edit.
 - `operation_cost::PSY.OperationalCost`: Operation Cost of Generation [`OperationalCost`](@ref)
 - `storage_target::Float64`: Storage target at the end of simulation as ratio of storage capacity.
 - `conversion_factor::Float64`: Conversion factor from flow/volume to energy: m^3 -> p.u-hr.
-- `upstream::NamedTuple{(:unit, :lag, :multiplier), Tuple{Vector{PSY.HydroGen}, Vector{Int64}, Vector{Float64}}}`: Upstream units, water lag, energy multiplier
+- `upstream::Vector{NamedTuple{(:unit, :lag, :multiplier), Tuple{PSY.HydroGen, Int64, Float64}}}`: Upstream units, water lag, energy multiplier
 - `services::Vector{PSY.Service}`: Services that this device contributes to
 - `dynamic_injector::Union{Nothing, PSY.DynamicInjection}`: corresponding dynamic injection device
 - `ext::Dict{String, Any}`
@@ -76,7 +76,7 @@ mutable struct HydroDispatchCascade <: HydroCascade
     "Conversion factor from flow/volume to energy: m^3 -> p.u-hr."
     conversion_factor::Float64
     "Upstream units, water lag, energy multiplier"
-    upstream::NamedTuple{(:unit, :lag, :multiplier), Tuple{Vector{PSY.HydroGen}, Vector{Int64}, Vector{Float64}}}
+    upstream::Vector{NamedTuple{(:unit, :lag, :multiplier), Tuple{PSY.HydroGen, Int64, Float64}}}
     "Services that this device contributes to"
     services::Vector{PSY.Service}
     "corresponding dynamic injection device"
@@ -88,11 +88,11 @@ mutable struct HydroDispatchCascade <: HydroCascade
     internal::IS.InfrastructureSystemsInternal
 end
 
-function HydroDispatchCascade(name, available, bus, active_power, reactive_power, rating, prime_mover, active_power_limits, reactive_power_limits, ramp_limits, time_limits, base_power, operation_cost=PSY.TwoPartCost(0.0, 0.0), storage_target=1.0, conversion_factor=1.0, upstream=(unit=Vector{PSY.HydroGen}(), lag=Vector{Int64}(), multiplier=Vector{Float64}()), services=PSY.Device[], dynamic_injector=nothing, ext=Dict{String, Any}(), forecasts=InfrastructureSystems.Forecasts(), )
+function HydroDispatchCascade(name, available, bus, active_power, reactive_power, rating, prime_mover, active_power_limits, reactive_power_limits, ramp_limits, time_limits, base_power, operation_cost=PSY.TwoPartCost(0.0, 0.0), storage_target=1.0, conversion_factor=1.0, upstream=NamedTuple{(:unit, :lag, :multiplier), Tuple{PSY.HydroGen, Int64, Float64}}[], services=PSY.Device[], dynamic_injector=nothing, ext=Dict{String, Any}(), forecasts=InfrastructureSystems.Forecasts(), )
     HydroDispatchCascade(name, available, bus, active_power, reactive_power, rating, prime_mover, active_power_limits, reactive_power_limits, ramp_limits, time_limits, base_power, operation_cost, storage_target, conversion_factor, upstream, services, dynamic_injector, ext, forecasts, IS.InfrastructureSystemsInternal(), )
 end
 
-function HydroDispatchCascade(; name, available, bus, active_power, reactive_power, rating, prime_mover, active_power_limits, reactive_power_limits, ramp_limits, time_limits, base_power, operation_cost=PSY.TwoPartCost(0.0, 0.0), storage_target=1.0, conversion_factor=1.0, upstream=(unit=Vector{PSY.HydroGen}(), lag=Vector{Int64}(), multiplier=Vector{Float64}()), services=PSY.Device[], dynamic_injector=nothing, ext=Dict{String, Any}(), forecasts=InfrastructureSystems.Forecasts(), internal=IS.InfrastructureSystemsInternal(), )
+function HydroDispatchCascade(; name, available, bus, active_power, reactive_power, rating, prime_mover, active_power_limits, reactive_power_limits, ramp_limits, time_limits, base_power, operation_cost=PSY.TwoPartCost(0.0, 0.0), storage_target=1.0, conversion_factor=1.0, upstream=NamedTuple{(:unit, :lag, :multiplier), Tuple{PSY.HydroGen, Int64, Float64}}[], services=PSY.Device[], dynamic_injector=nothing, ext=Dict{String, Any}(), forecasts=InfrastructureSystems.Forecasts(), internal=IS.InfrastructureSystemsInternal(), )
     HydroDispatchCascade(name, available, bus, active_power, reactive_power, rating, prime_mover, active_power_limits, reactive_power_limits, ramp_limits, time_limits, base_power, operation_cost, storage_target, conversion_factor, upstream, services, dynamic_injector, ext, forecasts, internal, )
 end
 
@@ -114,7 +114,7 @@ function HydroDispatchCascade(::Nothing)
         operation_cost=PSY.TwoPartCost(nothing),
         storage_target=0.0,
         conversion_factor=0.0,
-        upstream=(unit=Vector{PSY.HydroGen}(), lag=Vector{Int64}(), multiplier=Vector{Float64}()),
+        upstream=NamedTuple{(:unit, :lag, :multiplier), Tuple{PSY.HydroGen, Int64, Float64}}[],
         services=PSY.Device[],
         dynamic_injector=nothing,
         ext=Dict{String, Any}(),

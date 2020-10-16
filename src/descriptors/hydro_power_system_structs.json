@@ -174,9 +174,9 @@
                 {
                     "name": "upstream",
                     "comment": "Upstream units, water lag, energy multiplier",
-                    "null_value": "(unit=Vector{PSY.HydroGen}(), lag=Vector{Int64}(), multiplier=Vector{Float64}())",
-                    "default": "(unit=Vector{PSY.HydroGen}(), lag=Vector{Int64}(), multiplier=Vector{Float64}())",
-                    "data_type": "NamedTuple{(:unit, :lag, :multiplier), Tuple{Vector{PSY.HydroGen}, Vector{Int64}, Vector{Float64}}}"
+                    "null_value": "NamedTuple{(:unit, :lag, :multiplier), Tuple{PSY.HydroGen, Int64, Float64}}[]",
+                    "default": "NamedTuple{(:unit, :lag, :multiplier), Tuple{PSY.HydroGen, Int64, Float64}}[]",
+                    "data_type": "Vector{NamedTuple{(:unit, :lag, :multiplier), Tuple{PSY.HydroGen, Int64, Float64}}}"
                 },
                 {
                     "name": "services",
@@ -356,9 +356,9 @@
                 {
                     "name": "upstream",
                     "comment": "Upstream units, water lag, energy multiplier",
-                    "null_value": "(unit=Vector{PSY.HydroGen}(), lag=Vector{Int64}(), multiplier=Vector{Float64}())",
-                    "default": "(unit=Vector{PSY.HydroGen}(), lag=Vector{Int64}(), multiplier=Vector{Float64}())",
-                    "data_type": "NamedTuple{(:unit, :lag, :multiplier), Tuple{Vector{PSY.HydroGen}, Vector{Int64}, Vector{Float64}}}"
+                    "null_value": "NamedTuple{(:unit, :lag, :multiplier), Tuple{PSY.HydroGen, Int64, Float64}}[]",
+                    "default": "NamedTuple{(:unit, :lag, :multiplier), Tuple{PSY.HydroGen, Int64, Float64}}[]",
+                    "data_type": "Vector{NamedTuple{(:unit, :lag, :multiplier), Tuple{PSY.HydroGen, Int64, Float64}}}"
                 },
                 {
                     "name": "services",
