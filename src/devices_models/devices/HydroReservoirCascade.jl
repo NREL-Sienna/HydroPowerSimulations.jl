@@ -7,7 +7,7 @@ function energy_balance_external_input_param_cascade(
         Vector{PSI.DeviceTimeSeriesConstraintInfo},
         Vector{PSI.DeviceTimeSeriesConstraintInfo},
     },
-    upstream::Vector{Vector{HydroCascade}},
+    upstream::Vector{NamedTuple{(:unit, :lag, :multiplier), Tuple{Vector{HydroCascade}, Vector{Int64}, Vector{Float64}}}},
     cons_names::Tuple{Symbol, Symbol},
     var_names::Tuple{Symbol, Symbol, Symbol},
     param_references::Tuple{PSI.UpdateRef, PSI.UpdateRef},
@@ -55,7 +55,10 @@ function energy_balance_external_input_param_cascade(
 
     for (ix, d) in enumerate(inflow_data)
         name = PSI.get_component_name(d)
-        upstream_devices = upstream[ix]
+        upstream_devices = upstream[ix].unit
+        upstream_lags = upstream[ix].lag
+        upstream_multipliers = upstream[ix].multiplier
+
         multiplier_inflow[name, 1] = d.multiplier
         param_inflow[name, 1] = PJ.add_parameter(psi_container.JuMPmodel, d.timeseries[1])
         exp =
@@ -88,17 +91,19 @@ function energy_balance_external_input_param_cascade(
                 ) * fraction_of_hour
 
             if !isempty(upstream_devices)
-                for j in upstream_devices
-                    JuMP.add_to_expression!(
-                        exp,
-                        varspill[IS.get_name(j), t - 1],
-                        fraction_of_hour,
-                    )
-                    JuMP.add_to_expression!(
-                        exp,
-                        varout[IS.get_name(j), t - 1],
-                        fraction_of_hour,
-                    )
+                for (i,j) in enumerate(upstream_devices)
+                    if t - upstream_lags[i] >= 1
+                        JuMP.add_to_expression!(
+                            exp,
+                            varspill[IS.get_name(j), t - upstream_lags[i]],
+                            upstream_multipliers[i]*fraction_of_hour,
+                        )
+                        JuMP.add_to_expression!(
+                            exp,
+                            varout[IS.get_name(j), t - upstream_lags[i]],
+                            upstream_multipliers[i]*fraction_of_hour,
+                        )
+                    end
                 end
             end
 
@@ -130,7 +135,7 @@ function energy_balance_external_input_cascade(
         Vector{PSI.DeviceTimeSeriesConstraintInfo},
         Vector{PSI.DeviceTimeSeriesConstraintInfo},
     },
-    upstream::Vector{Vector{HydroCascade}},
+    upstream::Vector{NamedTuple{(:unit, :lag, :multiplier), Tuple{Vector{HydroCascade}, Vector{Int64}, Vector{Float64}}}},
     cons_names::Tuple{Symbol, Symbol},
     var_names::Tuple{Symbol, Symbol, Symbol},
 )
@@ -157,7 +162,9 @@ function energy_balance_external_input_cascade(
 
     for (ix, d) in enumerate(inflow_data)
         name = PSI.get_component_name(d)
-        upstream_devices = upstream[ix]
+        upstream_devices = upstream[ix].unit
+        upstream_lags = upstream[ix].lag
+        upstream_multipliers = upstream[ix].multiplier
 
         exp =
             initial_conditions[ix].value +
@@ -183,17 +190,19 @@ function energy_balance_external_input_cascade(
                 fraction_of_hour
 
             if !isempty(upstream_devices)
-                for j in upstream_devices
-                    JuMP.add_to_expression!(
-                        exp,
-                        varspill[IS.get_name(j), t - 1],
-                        fraction_of_hour,
-                    )
-                    JuMP.add_to_expression!(
-                        exp,
-                        varout[IS.get_name(j), t - 1],
-                        fraction_of_hour,
-                    )
+                for (i,j) in enumerate(upstream_devices)
+                    if t - upstream_lags[i] >= 1
+                        JuMP.add_to_expression!(
+                            exp,
+                            varspill[IS.get_name(j), t - upstream_lags[i]],
+                            upstream_multipliers[i]*fraction_of_hour,
+                        )
+                        JuMP.add_to_expression!(
+                            exp,
+                            varout[IS.get_name(j), t - upstream_lags[i]],
+                            upstream_multipliers[i]*fraction_of_hour,
+                        )
+                    end
                 end
             end
 
@@ -235,7 +244,7 @@ function energy_balance_cascade_constraint!(
         Vector{PSI.DeviceTimeSeriesConstraintInfo}(undef, length(devices))
     constraint_infos_target =
         Vector{PSI.DeviceTimeSeriesConstraintInfo}(undef, length(devices))
-    upstream_data = Vector{Vector{HydroCascade}}(undef, length(devices))
+    upstream_data = Vector{NamedTuple{(:unit, :lag, :multiplier), Tuple{Vector{HydroCascade}, Vector{Int64}, Vector{Float64}}}}(undef, length(devices))
 
     for (ix, d) in enumerate(devices)
         ts_vector_inflow = PSI.get_time_series(psi_container, d, inflow_forecast_label)

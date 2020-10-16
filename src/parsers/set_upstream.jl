@@ -1,3 +1,4 @@
+#=
 function set_upstream(sys::PSY.System, mapping::DataFrames.DataFrame)
     make_array(x) = ismissing(x) ? [] : split(strip(x, ['(', ')']), ",")
     for device in PSY.get_components(HydroEnergyCascade, sys)
@@ -12,3 +13,4 @@ function set_upstream(sys::PSY.System, mapping::DataFrames.DataFrame)
         end
     end
 end
+=#
