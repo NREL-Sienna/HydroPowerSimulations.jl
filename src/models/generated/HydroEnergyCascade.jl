@@ -50,7 +50,7 @@ This file is auto-generated. Do not edit.
 - `operation_cost::PSY.OperationalCost`: Operation Cost of Generation [`OperationalCost`](@ref)
 - `storage_target::Float64`: Storage target at the end of simulation as ratio of storage capacity.
 - `conversion_factor::Float64`: Conversion factor from flow/volume to energy: m^3 -> p.u-hr.
-- `upstream::Vector{NamedTuple{(:unit, :lag, :multiplier), Tuple{PSY.HydroGen, Int64, Float64}}}`: Upstream units, water lag, energy multiplier
+- `upstream::Vector{NamedTuple{(:unit, :lag, :multiplier), Tuple{PSY.HydroGen, Int64, Float64}}}`: unit: upstream units; lag: duration in number of periods between upstream release and downstream availability; multiplier: relationship between upstream energy release and downstream energy availability
 - `services::Vector{PSY.Service}`: Services that this device contributes to
 - `dynamic_injector::Union{Nothing, PSY.DynamicInjection}`: corresponding dynamic injection device
 - `ext::Dict{String, Any}`
@@ -87,7 +87,7 @@ mutable struct HydroEnergyCascade <: HydroCascade
     storage_target::Float64
     "Conversion factor from flow/volume to energy: m^3 -> p.u-hr."
     conversion_factor::Float64
-    "Upstream units, water lag, energy multiplier"
+    "unit: upstream units; lag: duration in number of periods between upstream release and downstream availability; multiplier: relationship between upstream energy release and downstream energy availability"
     upstream::Vector{NamedTuple{(:unit, :lag, :multiplier), Tuple{PSY.HydroGen, Int64, Float64}}}
     "Services that this device contributes to"
     services::Vector{PSY.Service}
