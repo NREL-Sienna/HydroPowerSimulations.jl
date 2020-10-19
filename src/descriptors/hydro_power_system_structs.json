@@ -173,10 +173,10 @@
                 },
                 {
                     "name": "upstream",
-                    "comment": "Upstream units",
-                    "null_value": "Vector{PSY.HydroGen}()",
-                    "default": "Vector{PSY.HydroGen}()",
-                    "data_type": "Vector{PSY.HydroGen}"
+                    "comment": "unit: upstream units; lag: duration in number of periods between upstream release and downstream availability; multiplier: relationship between upstream energy release and downstream energy availability",
+                    "null_value": "NamedTuple{(:unit, :lag, :multiplier), Tuple{PSY.HydroGen, Int64, Float64}}[]",
+                    "default": "NamedTuple{(:unit, :lag, :multiplier), Tuple{PSY.HydroGen, Int64, Float64}}[]",
+                    "data_type": "Vector{NamedTuple{(:unit, :lag, :multiplier), Tuple{PSY.HydroGen, Int64, Float64}}}"
                 },
                 {
                     "name": "services",
@@ -355,10 +355,10 @@
                 },
                 {
                     "name": "upstream",
-                    "comment": "Upstream units",
-                    "null_value": "Vector{PSY.HydroGen}()",
-                    "default": "Vector{PSY.HydroGen}()",
-                    "data_type": "Vector{PSY.HydroGen}"
+                    "comment": "unit: upstream units; lag: duration in number of periods between upstream release and downstream availability; multiplier: relationship between upstream energy release and downstream energy availability",
+                    "null_value": "NamedTuple{(:unit, :lag, :multiplier), Tuple{PSY.HydroGen, Int64, Float64}}[]",
+                    "default": "NamedTuple{(:unit, :lag, :multiplier), Tuple{PSY.HydroGen, Int64, Float64}}[]",
+                    "data_type": "Vector{NamedTuple{(:unit, :lag, :multiplier), Tuple{PSY.HydroGen, Int64, Float64}}}"
                 },
                 {
                     "name": "services",

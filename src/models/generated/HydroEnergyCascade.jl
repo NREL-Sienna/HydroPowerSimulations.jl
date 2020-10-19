@@ -21,7 +21,7 @@ This file is auto-generated. Do not edit.
         operation_cost::PSY.OperationalCost
         storage_target::Float64
         conversion_factor::Float64
-        upstream::Vector{PSY.HydroGen}
+        upstream::Vector{NamedTuple{(:unit, :lag, :multiplier), Tuple{PSY.HydroGen, Int64, Float64}}}
         services::Vector{PSY.Service}
         dynamic_injector::Union{Nothing, PSY.DynamicInjection}
         ext::Dict{String, Any}
@@ -50,7 +50,7 @@ This file is auto-generated. Do not edit.
 - `operation_cost::PSY.OperationalCost`: Operation Cost of Generation [`OperationalCost`](@ref)
 - `storage_target::Float64`: Storage target at the end of simulation as ratio of storage capacity.
 - `conversion_factor::Float64`: Conversion factor from flow/volume to energy: m^3 -> p.u-hr.
-- `upstream::Vector{PSY.HydroGen}`: Upstream units
+- `upstream::Vector{NamedTuple{(:unit, :lag, :multiplier), Tuple{PSY.HydroGen, Int64, Float64}}}`: unit: upstream units; lag: duration in number of periods between upstream release and downstream availability; multiplier: relationship between upstream energy release and downstream energy availability
 - `services::Vector{PSY.Service}`: Services that this device contributes to
 - `dynamic_injector::Union{Nothing, PSY.DynamicInjection}`: corresponding dynamic injection device
 - `ext::Dict{String, Any}`
@@ -87,8 +87,10 @@ mutable struct HydroEnergyCascade <: HydroCascade
     storage_target::Float64
     "Conversion factor from flow/volume to energy: m^3 -> p.u-hr."
     conversion_factor::Float64
-    "Upstream units"
-    upstream::Vector{PSY.HydroGen}
+    "unit: upstream units; lag: duration in number of periods between upstream release and downstream availability; multiplier: relationship between upstream energy release and downstream energy availability"
+    upstream::Vector{
+        NamedTuple{(:unit, :lag, :multiplier), Tuple{PSY.HydroGen, Int64, Float64}},
+    }
     "Services that this device contributes to"
     services::Vector{PSY.Service}
     "corresponding dynamic injection device"
@@ -119,7 +121,7 @@ function HydroEnergyCascade(
     operation_cost = PSY.TwoPartCost(0.0, 0.0),
     storage_target = 1.0,
     conversion_factor = 1.0,
-    upstream = Vector{PSY.HydroGen}(),
+    upstream = NamedTuple{(:unit, :lag, :multiplier), Tuple{PSY.HydroGen, Int64, Float64}}[],
     services = PSY.Device[],
     dynamic_injector = nothing,
     ext = Dict{String, Any}(),
@@ -172,7 +174,7 @@ function HydroEnergyCascade(;
     operation_cost = PSY.TwoPartCost(0.0, 0.0),
     storage_target = 1.0,
     conversion_factor = 1.0,
-    upstream = Vector{PSY.HydroGen}(),
+    upstream = NamedTuple{(:unit, :lag, :multiplier), Tuple{PSY.HydroGen, Int64, Float64}}[],
     services = PSY.Device[],
     dynamic_injector = nothing,
     ext = Dict{String, Any}(),
@@ -228,7 +230,10 @@ function HydroEnergyCascade(::Nothing)
         operation_cost = PSY.TwoPartCost(nothing),
         storage_target = 0.0,
         conversion_factor = 0.0,
-        upstream = Vector{PSY.HydroGen}(),
+        upstream = NamedTuple{
+            (:unit, :lag, :multiplier),
+            Tuple{PSY.HydroGen, Int64, Float64},
+        }[],
         services = PSY.Device[],
         dynamic_injector = nothing,
         ext = Dict{String, Any}(),
