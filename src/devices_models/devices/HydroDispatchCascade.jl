@@ -6,7 +6,9 @@ const CASCADING_FLOW = "cascading_flow"
 function flow_balance_external_input_param_cascade(
     psi_container::PSI.PSIContainer,
     inflow_data::Vector{PSI.DeviceTimeSeriesConstraintInfo},
-    upstream::Vector{Vector{NamedTuple{(:unit, :lag, :multiplier), Tuple{PSY.HydroGen, Int64, Float64}}}},
+    upstream::Vector{
+        Vector{NamedTuple{(:unit, :lag, :multiplier), Tuple{PSY.HydroGen, Int64, Float64}}},
+    },
     cons_name::Symbol,
     var_names::Tuple{Symbol, Symbol},
     param_reference::PSI.UpdateRef,
@@ -53,8 +55,16 @@ function flow_balance_external_input_param_cascade(
             exp = d.multiplier * param_inflow[name, t] - varspill[name, t] - varout[name, t]
             for j in upstream_devices
                 if t - j.lag >= 1
-                    JuMP.add_to_expression!(exp, varspill[IS.get_name(j.unit), t - j.lag], j.multiplier)
-                    JuMP.add_to_expression!(exp, varout[IS.get_name(j.unit), t - j.lag], j.multiplier)
+                    JuMP.add_to_expression!(
+                        exp,
+                        varspill[IS.get_name(j.unit), t - j.lag],
+                        j.multiplier,
+                    )
+                    JuMP.add_to_expression!(
+                        exp,
+                        varout[IS.get_name(j.unit), t - j.lag],
+                        j.multiplier,
+                    )
                 end
             end
             flow_constraint[name, t] = JuMP.@constraint(psi_container.JuMPmodel, exp == 0.0)
@@ -67,7 +77,9 @@ end
 function flow_balance_external_input_cascade(
     psi_container::PSI.PSIContainer,
     inflow_data::Vector{PSI.DeviceTimeSeriesConstraintInfo},
-    upstream::Vector{Vector{NamedTuple{(:unit, :lag, :multiplier), Tuple{PSY.HydroGen, Int64, Float64}}}},
+    upstream::Vector{
+        Vector{NamedTuple{(:unit, :lag, :multiplier), Tuple{PSY.HydroGen, Int64, Float64}}},
+    },
     cons_name::Symbol,
     var_names::Tuple{Symbol, Symbol},
 )
@@ -101,8 +113,16 @@ function flow_balance_external_input_cascade(
 
             for j in upstream_devices
                 if t - j.lag >= 1
-                    JuMP.add_to_expression!(exp, varspill[IS.get_name(j.unit), t - j.lag], j.multiplier)
-                    JuMP.add_to_expression!(exp, varout[IS.get_name(j.unit), t - j.lag], j.multiplier)
+                    JuMP.add_to_expression!(
+                        exp,
+                        varspill[IS.get_name(j.unit), t - j.lag],
+                        j.multiplier,
+                    )
+                    JuMP.add_to_expression!(
+                        exp,
+                        varout[IS.get_name(j.unit), t - j.lag],
+                        j.multiplier,
+                    )
                 end
             end
             flow_constraint[name, t] = JuMP.@constraint(psi_container.JuMPmodel, exp == 0.0)
@@ -124,7 +144,12 @@ function flow_balance_cascade_constraint!(
     inflow_forecast_label = "get_max_active_power"
     constraint_infos_inflow =
         Vector{PSI.DeviceTimeSeriesConstraintInfo}(undef, length(devices))
-    upstream_data = Vector{Vector{NamedTuple{(:unit, :lag, :multiplier), Tuple{PSY.HydroGen, Int64, Float64}}}}(undef, length(devices))
+    upstream_data = Vector{
+        Vector{NamedTuple{(:unit, :lag, :multiplier), Tuple{PSY.HydroGen, Int64, Float64}}},
+    }(
+        undef,
+        length(devices),
+    )
 
     for (ix, d) in enumerate(devices)
         ts_vector_inflow = PSI.get_time_series(psi_container, d, inflow_forecast_label)

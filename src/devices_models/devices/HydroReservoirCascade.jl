@@ -7,7 +7,9 @@ function energy_balance_external_input_param_cascade(
         Vector{PSI.DeviceTimeSeriesConstraintInfo},
         Vector{PSI.DeviceTimeSeriesConstraintInfo},
     },
-    upstream::Vector{Vector{NamedTuple{(:unit, :lag, :multiplier), Tuple{PSY.HydroGen, Int64, Float64}}}},
+    upstream::Vector{
+        Vector{NamedTuple{(:unit, :lag, :multiplier), Tuple{PSY.HydroGen, Int64, Float64}}},
+    },
     cons_names::Tuple{Symbol, Symbol},
     var_names::Tuple{Symbol, Symbol, Symbol},
     param_references::Tuple{PSI.UpdateRef, PSI.UpdateRef},
@@ -94,12 +96,12 @@ function energy_balance_external_input_param_cascade(
                         JuMP.add_to_expression!(
                             exp,
                             varspill[IS.get_name(j.unit), t - j.lag],
-                            j.multiplier*fraction_of_hour,
+                            j.multiplier * fraction_of_hour,
                         )
                         JuMP.add_to_expression!(
                             exp,
                             varout[IS.get_name(j.unit), t - j.lag],
-                            j.multiplier*fraction_of_hour,
+                            j.multiplier * fraction_of_hour,
                         )
                     end
                 end
@@ -133,7 +135,9 @@ function energy_balance_external_input_cascade(
         Vector{PSI.DeviceTimeSeriesConstraintInfo},
         Vector{PSI.DeviceTimeSeriesConstraintInfo},
     },
-    upstream::Vector{Vector{NamedTuple{(:unit, :lag, :multiplier), Tuple{PSY.HydroGen, Int64, Float64}}}},
+    upstream::Vector{
+        Vector{NamedTuple{(:unit, :lag, :multiplier), Tuple{PSY.HydroGen, Int64, Float64}}},
+    },
     cons_names::Tuple{Symbol, Symbol},
     var_names::Tuple{Symbol, Symbol, Symbol},
 )
@@ -191,12 +195,12 @@ function energy_balance_external_input_cascade(
                         JuMP.add_to_expression!(
                             exp,
                             varspill[IS.get_name(j.unit), t - j.lag],
-                            j.multiplier*fraction_of_hour,
+                            j.multiplier * fraction_of_hour,
                         )
                         JuMP.add_to_expression!(
                             exp,
                             varout[IS.get_name(j.unit), t - j.lag],
-                            j.multiplier*fraction_of_hour,
+                            j.multiplier * fraction_of_hour,
                         )
                     end
                 end
@@ -240,7 +244,12 @@ function energy_balance_cascade_constraint!(
         Vector{PSI.DeviceTimeSeriesConstraintInfo}(undef, length(devices))
     constraint_infos_target =
         Vector{PSI.DeviceTimeSeriesConstraintInfo}(undef, length(devices))
-    upstream_data = Vector{Vector{NamedTuple{(:unit, :lag, :multiplier), Tuple{PSY.HydroGen, Int64, Float64}}}}(undef, length(devices))
+    upstream_data = Vector{
+        Vector{NamedTuple{(:unit, :lag, :multiplier), Tuple{PSY.HydroGen, Int64, Float64}}},
+    }(
+        undef,
+        length(devices),
+    )
 
     for (ix, d) in enumerate(devices)
         ts_vector_inflow = PSI.get_time_series(psi_container, d, inflow_forecast_label)
