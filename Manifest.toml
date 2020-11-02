@@ -27,12 +27,6 @@ git-tree-sha1 = "9e62e66db34540a0c919d72172cc2f642ac71260"
 uuid = "6e4b80f9-dd63-53aa-95a3-0cdb28fa8baf"
 version = "0.5.0"
 
-[[BinaryProvider]]
-deps = ["Libdl", "Logging", "SHA"]
-git-tree-sha1 = "ecdec412a9abc8db54c0efc5548c64dfce072058"
-uuid = "b99e7846-7c00-51b0-8f62-c81ae34c0232"
-version = "0.5.10"
-
 [[Blosc]]
 deps = ["Blosc_jll"]
 git-tree-sha1 = "84cf7d0f8fd46ca6f1b3e0305b4b4a37afe50fd6"
@@ -50,11 +44,6 @@ deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
 git-tree-sha1 = "c3598e525718abcc440f69cc6d5f60dda0a1b61e"
 uuid = "6e34b625-4abd-537c-b88f-471c36dfa7a0"
 version = "1.0.6+5"
-
-[[CEnum]]
-git-tree-sha1 = "215a9aa4a1f23fbd05b92769fdd62559488d70e9"
-uuid = "fa961155-64e5-5f13-b03f-caf6b980ea82"
-version = "0.4.1"
 
 [[CSV]]
 deps = ["CategoricalArrays", "DataFrames", "Dates", "Mmap", "Parsers", "PooledArrays", "SentinelArrays", "Tables", "Unicode"]
@@ -74,36 +63,6 @@ git-tree-sha1 = "2ac27f59196a68070e132b25713f9a5bbc5fa0d2"
 uuid = "324d7699-5711-5eae-9e2f-1d82baa6b597"
 version = "0.8.3"
 
-[[Cbc]]
-deps = ["BinaryProvider", "CEnum", "Cbc_jll", "Libdl", "MathOptInterface", "SparseArrays"]
-git-tree-sha1 = "929d0500c50387e7ac7ae9956ca7d7ce5312c90d"
-uuid = "9961bab8-2fa3-5c5a-9d89-47fab24efd76"
-version = "0.7.1"
-
-[[Cbc_jll]]
-deps = ["Cgl_jll", "Clp_jll", "CoinUtils_jll", "CompilerSupportLibraries_jll", "Libdl", "OpenBLAS32_jll", "Osi_jll", "Pkg"]
-git-tree-sha1 = "16b8ffa56b3ded6b201aa2f50623f260448aa205"
-uuid = "38041ee0-ae04-5750-a4d2-bb4d0d83d27d"
-version = "2.10.3+4"
-
-[[Cgl_jll]]
-deps = ["Clp_jll", "CompilerSupportLibraries_jll", "Libdl", "Pkg"]
-git-tree-sha1 = "32be20ec1e4c40e5c5d1bbf949ba9918a92a7569"
-uuid = "3830e938-1dd0-5f3e-8b8e-b3ee43226782"
-version = "0.60.2+5"
-
-[[Clp_jll]]
-deps = ["CoinUtils_jll", "CompilerSupportLibraries_jll", "Libdl", "OpenBLAS32_jll", "Osi_jll", "Pkg"]
-git-tree-sha1 = "79263d9383ca89b35f31c33ab5b880536a8413a4"
-uuid = "06985876-5285-5a41-9fcb-8948a742cc53"
-version = "1.17.6+6"
-
-[[CodeTracking]]
-deps = ["InteractiveUtils", "UUIDs"]
-git-tree-sha1 = "ce725fcc331618c422e5561a5183baab6a00482c"
-uuid = "da1fd8a2-8d9e-5ec2-8556-3022fb5608a2"
-version = "1.0.4"
-
 [[CodecBzip2]]
 deps = ["Bzip2_jll", "Libdl", "TranscodingStreams"]
 git-tree-sha1 = "2e62a725210ce3c3c2e1a3080190e7ca491f18d7"
@@ -115,12 +74,6 @@ deps = ["TranscodingStreams", "Zlib_jll"]
 git-tree-sha1 = "ded953804d019afa9a3f98981d99b33e3db7b6da"
 uuid = "944b1d66-785c-5afd-91f1-9de20f533193"
 version = "0.7.0"
-
-[[CoinUtils_jll]]
-deps = ["CompilerSupportLibraries_jll", "Libdl", "OpenBLAS32_jll", "Pkg"]
-git-tree-sha1 = "ee1f06ab89337b7f194c29377ab174e752cdf60d"
-uuid = "be027038-0da8-5614-b30d-e42594cb92df"
-version = "2.11.3+3"
 
 [[CommonSubexpressions]]
 deps = ["MacroTools", "Test"]
@@ -219,9 +172,6 @@ deps = ["Arrow", "CategoricalArrays", "DataFrames", "Dates", "FlatBuffers", "Mma
 git-tree-sha1 = "846701282ceaf20440394a36e00ff9d1b9aa195e"
 uuid = "becb17da-46f6-5d3c-ad1b-1c5fe96bc73c"
 version = "0.5.6"
-
-[[FileWatching]]
-uuid = "7b1f6079-737a-58dc-b8bc-7a2ca5c1b5ee"
 
 [[FiniteDiff]]
 deps = ["ArrayInterface", "LinearAlgebra", "Requires", "SparseArrays", "StaticArrays"]
@@ -333,12 +283,6 @@ git-tree-sha1 = "57c17a221a55f81890aabf00f478886859e25eaf"
 uuid = "4076af6c-e467-56ae-b986-b466b2749572"
 version = "0.21.5"
 
-[[JuliaInterpreter]]
-deps = ["CodeTracking", "InteractiveUtils", "Random", "UUIDs"]
-git-tree-sha1 = "8f1c59bbca30b0d293f4b2436af49ef4c9c4d601"
-uuid = "aa1ae85d-cabe-5617-a682-6adf51b2e16a"
-version = "0.8.2"
-
 [[LibGit2]]
 deps = ["Printf"]
 uuid = "76f85450-5226-5b5a-8eaa-529ad045b433"
@@ -364,12 +308,6 @@ uuid = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 
 [[Logging]]
 uuid = "56ddb016-857b-54e1-b83d-db4d58db5568"
-
-[[LoweredCodeUtils]]
-deps = ["JuliaInterpreter"]
-git-tree-sha1 = "92b9819125eac5013c99070f696ec0ec5fc66436"
-uuid = "6f1432cf-f94c-5a45-995e-cdbf5db27b0b"
-version = "1.2.4"
 
 [[Lz4_jll]]
 deps = ["Libdl", "Pkg"]
@@ -455,12 +393,6 @@ git-tree-sha1 = "c84c576296d0e2fbb3fc134d3e09086b3ea617cd"
 uuid = "77ba4419-2d1f-58cd-9bb1-8ffee604a2e3"
 version = "0.3.4"
 
-[[OpenBLAS32_jll]]
-deps = ["Artifacts", "CompilerSupportLibraries_jll", "JLLWrappers", "Libdl", "Pkg"]
-git-tree-sha1 = "19c33675cdeb572c1b17f96c492459d4f4958036"
-uuid = "656ef2d0-ae68-5445-9ca0-591084a874a2"
-version = "0.3.10+0"
-
 [[OpenSpecFun_jll]]
 deps = ["Artifacts", "CompilerSupportLibraries_jll", "JLLWrappers", "Libdl", "Pkg"]
 git-tree-sha1 = "9db77584158d0ab52307f8c04f8e7c08ca76b5b3"
@@ -471,12 +403,6 @@ version = "0.5.3+4"
 git-tree-sha1 = "16c08bf5dba06609fe45e30860092d6fa41fde7b"
 uuid = "bac558e1-5e72-5ebc-8fee-abe8a469f55d"
 version = "1.3.1"
-
-[[Osi_jll]]
-deps = ["CoinUtils_jll", "CompilerSupportLibraries_jll", "Libdl", "OpenBLAS32_jll", "Pkg"]
-git-tree-sha1 = "bd436a97280df40938e66ae8d18e57aceb072856"
-uuid = "7da25872-d9ce-5375-a4d3-7a845f58efdd"
-version = "0.108.5+3"
 
 [[ParameterJuMP]]
 deps = ["JuMP", "MathOptInterface", "MutableArithmetics", "SparseArrays"]
@@ -562,12 +488,6 @@ deps = ["UUIDs"]
 git-tree-sha1 = "2fc2e1ab606a5dca7bbad9036a694553c3a57926"
 uuid = "ae029012-a4dd-5104-9daa-d747884805df"
 version = "1.0.3"
-
-[[Revise]]
-deps = ["CodeTracking", "Distributed", "FileWatching", "JuliaInterpreter", "LibGit2", "LoweredCodeUtils", "OrderedCollections", "Pkg", "REPL", "Requires", "UUIDs", "Unicode"]
-git-tree-sha1 = "bfe3d98de018f96d472029b00f6a14478a042171"
-uuid = "295af30f-e4ad-537b-8983-00126c2a3abe"
-version = "3.1.6"
 
 [[SHA]]
 uuid = "ea8e919c-243c-51af-8825-aaa63cd721ce"
