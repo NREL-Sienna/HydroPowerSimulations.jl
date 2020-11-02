@@ -132,7 +132,8 @@
                         "max": null
                     },
                     "validation_action": "error",
-                    "accessor_module": "PowerSystems"
+                    "accessor_module": "PowerSystems",
+                    "needs_conversion": true
                 },
                 {
                     "name": "initial_storage",
