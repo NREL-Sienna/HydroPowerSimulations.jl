@@ -204,19 +204,20 @@
                     "accessor_module": "PowerSystems"
                 },
                 {
-                    "name": "forecasts",
+                    "name": "time_series_container",
                     "accessor_module": "InfrastructureSystems",
-                    "comment": "internal forecast storage",
-                    "null_value": "InfrastructureSystems.Forecasts()",
-                    "data_type": "InfrastructureSystems.Forecasts",
-                    "default": "InfrastructureSystems.Forecasts()"
+                    "comment": "internal time_series storage",
+                    "null_value": "InfrastructureSystems.TimeSeriesContainer()",
+                    "data_type": "InfrastructureSystems.TimeSeriesContainer",
+                    "default": "InfrastructureSystems.TimeSeriesContainer()"
                 },
                 {
                     "name": "internal",
                     "comment": "power system internal reference, do not modify",
                     "data_type": "IS.InfrastructureSystemsInternal",
                     "internal_default": "IS.InfrastructureSystemsInternal()",
-                    "accessor_module": "PowerSystems"
+                    "accessor_module": "PowerSystems",
+                    "exclude_setter": true
                 }
             ],
             "supertype": "HydroCascade"
@@ -386,19 +387,20 @@
                     "accessor_module": "PowerSystems"
                 },
                 {
-                    "name": "forecasts",
+                    "name": "time_series_container",
                     "accessor_module": "InfrastructureSystems",
-                    "comment": "internal forecast storage",
-                    "null_value": "InfrastructureSystems.Forecasts()",
-                    "data_type": "InfrastructureSystems.Forecasts",
-                    "default": "InfrastructureSystems.Forecasts()"
+                    "comment": "internal time_series storage",
+                    "null_value": "InfrastructureSystems.TimeSeriesContainer()",
+                    "data_type": "InfrastructureSystems.TimeSeriesContainer",
+                    "default": "InfrastructureSystems.TimeSeriesContainer()"
                 },
                 {
                     "name": "internal",
                     "comment": "power system internal reference, do not modify",
                     "data_type": "IS.InfrastructureSystemsInternal",
                     "internal_default": "IS.InfrastructureSystemsInternal()",
-                    "accessor_module": "PowerSystems"
+                    "accessor_module": "PowerSystems",
+                    "exclude_setter": true
                 }
             ],
             "supertype": "HydroCascade"

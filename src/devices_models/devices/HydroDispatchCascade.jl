@@ -141,7 +141,7 @@ function flow_balance_cascade_constraint!(
     parameters = PSI.model_has_parameters(psi_container)
     use_forecast_data = PSI.model_uses_forecasts(psi_container)
 
-    inflow_forecast_label = "get_max_active_power"
+    inflow_forecast_label = "max_active_power"
     constraint_infos_inflow =
         Vector{PSI.DeviceTimeSeriesConstraintInfo}(undef, length(devices))
     upstream_data = Vector{

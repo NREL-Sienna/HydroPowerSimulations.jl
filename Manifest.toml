@@ -208,10 +208,10 @@ uuid = "f67ccb44-e63f-5c2f-98bd-6dc0ccc4ba2f"
 version = "0.13.6"
 
 [[HDF5_jll]]
-deps = ["Libdl", "Pkg", "Zlib_jll"]
-git-tree-sha1 = "3dbc683172cb53428907485a4bb98a29d3874083"
+deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg", "Zlib_jll"]
+git-tree-sha1 = "bc9c3d43ffd4d8988bfa372b86d4bdbd26860e95"
 uuid = "0234f1f7-429e-5d53-9886-15a909be8d59"
-version = "1.10.5+6"
+version = "1.10.5+7"
 
 [[HTTP]]
 deps = ["Base64", "Dates", "IniFile", "MbedTLS", "Sockets"]
@@ -226,12 +226,10 @@ uuid = "2030c09a-7f63-5d83-885d-db604e0e9cc0"
 version = "0.5.3"
 
 [[InfrastructureSystems]]
-deps = ["CSV", "DataFrames", "Dates", "DocStringExtensions", "HDF5", "InteractiveUtils", "JSON3", "Logging", "Mustache", "PrettyTables", "Test", "TimeSeries", "UUIDs", "YAML"]
-git-tree-sha1 = "9a417f8c8b1c7ce3729f55cc71b12a34651da3d6"
-repo-rev = "v0.15.5"
-repo-url = "https://github.com/NREL-SIIP/InfrastructureSystems.jl.git"
+deps = ["CSV", "DataFrames", "DataStructures", "Dates", "DocStringExtensions", "HDF5", "InteractiveUtils", "JSON3", "Logging", "Mustache", "Pkg", "PrettyTables", "Random", "Test", "TimeSeries", "UUIDs", "YAML"]
+git-tree-sha1 = "c6f9ad0e14ee2a042e1c367a248cb02c01a2880e"
 uuid = "2cd47ed4-ca9b-11e9-27f2-ab636a7671f1"
-version = "0.15.5"
+version = "1.0.1"
 
 [[IniFile]]
 deps = ["Test"]
@@ -338,10 +336,10 @@ uuid = "739be429-bea8-5141-9913-cc70e7f3736d"
 version = "1.0.2"
 
 [[MbedTLS_jll]]
-deps = ["Libdl", "Pkg"]
-git-tree-sha1 = "c0b1286883cac4e2b617539de41111e0776d02e8"
+deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
+git-tree-sha1 = "0eef589dd1c26a3ac9d753fe1a8bcad63f956fa6"
 uuid = "c8ffd9c3-330d-5841-b78e-0817d7145fa1"
-version = "2.16.8+0"
+version = "2.16.8+1"
 
 [[Memento]]
 deps = ["Dates", "Distributed", "JSON", "Serialization", "Sockets", "Syslogs", "Test", "TimeZones", "UUIDs"]
@@ -440,19 +438,15 @@ version = "0.17.3"
 
 [[PowerSimulations]]
 deps = ["CSV", "DataFrames", "Dates", "Feather", "InfrastructureSystems", "JSON", "JuMP", "LinearAlgebra", "Logging", "MathOptInterface", "ParameterJuMP", "Pkg", "PowerModels", "PowerSystems", "SHA", "Serialization", "TimeSeries", "TimerOutputs"]
-git-tree-sha1 = "ef73d23dd5f64a2d7135b6e56ae81bab8f05bbb5"
-repo-rev = "cb/phes"
-repo-url = "https://github.com/NREL-SIIP/PowerSimulations.jl.git"
+git-tree-sha1 = "6fb865f688067273cd6db93aa7604d83e008b8b6"
 uuid = "e690365d-45e2-57bb-ac84-44ba829e73c4"
-version = "0.6.4"
+version = "0.7.0"
 
 [[PowerSystems]]
 deps = ["CSV", "DataFrames", "Dates", "DocStringExtensions", "InfrastructureSystems", "InteractiveUtils", "JSON3", "LinearAlgebra", "Logging", "NLsolve", "SparseArrays", "TimeSeries", "UUIDs", "YAML"]
-git-tree-sha1 = "a97e508e066679b0a970444661fe5ccc480f1516"
-repo-rev = "post-28-1"
-repo-url = "https://github.com/NREL-SIIP/PowerSystems.jl.git"
+git-tree-sha1 = "2d401348cf743eb9f85b72cdbbb2daddb35eb52f"
 uuid = "bcd98974-b02a-5e2f-9ee0-a103f5c450dd"
-version = "0.28.1"
+version = "1.0.0"
 
 [[PrettyTables]]
 deps = ["Crayons", "Formatting", "Parameters", "Reexport", "Tables"]
@@ -576,9 +570,9 @@ version = "1.4.0"
 
 [[TimerOutputs]]
 deps = ["Printf"]
-git-tree-sha1 = "f458ca23ff80e46a630922c555d838303e4b9603"
+git-tree-sha1 = "3318281dd4121ecf9713ce1383b9ace7d7476fdd"
 uuid = "a759f4b9-e2f1-59dc-863e-4aeb61b1ea8f"
-version = "0.5.6"
+version = "0.5.7"
 
 [[TranscodingStreams]]
 deps = ["Random", "Test"]
