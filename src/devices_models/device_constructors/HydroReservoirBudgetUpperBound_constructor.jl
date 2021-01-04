@@ -14,7 +14,13 @@ function PSI.construct_device!(
     PSI.add_variables!(psi_container, PSI.ActivePowerVariable, devices)
 
     # Energy Budget Constraint
-    PSI.energy_budget_constraints!(psi_container, devices, model, S, PSI.get_feedforward(model))
+    PSI.energy_budget_constraints!(
+        psi_container,
+        devices,
+        model,
+        S,
+        PSI.get_feedforward(model),
+    )
 
     # Range Constraints
     PSI.add_constraints!(

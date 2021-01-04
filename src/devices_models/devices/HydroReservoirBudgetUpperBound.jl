@@ -28,7 +28,11 @@ function PSI.DeviceRangeConstraintSpec(
 
     return PSI.DeviceRangeConstraintSpec(;
         timeseries_range_constraint_spec = PSI.TimeSeriesConstraintSpec(
-            constraint_name = PSI.make_constraint_name(PSI.RangeConstraint, PSI.ActivePowerVariable, T),
+            constraint_name = PSI.make_constraint_name(
+                PSI.RangeConstraint,
+                PSI.ActivePowerVariable,
+                T,
+            ),
             variable_name = PSI.make_variable_name(PSI.ActivePowerVariable, T),
             parameter_name = use_parameters ? PSI.ACTIVE_POWER : nothing,
             forecast_label = "storage_target",
