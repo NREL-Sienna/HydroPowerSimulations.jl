@@ -35,8 +35,8 @@ function PSI.DeviceRangeConstraintSpec(
             ),
             variable_name = PSI.make_variable_name(PSI.ActivePowerVariable, T),
             parameter_name = use_parameters ? PSI.ACTIVE_POWER : nothing,
-            forecast_label = "storage_target",
-            multiplier_func = x -> PSY.get_storage_capacity(x),
+            forecast_label = "max_hourly_hydro_budget",
+            multiplier_func = x -> PSY.get_max_active_power(x),
             constraint_func = use_parameters ? PSI.device_timeseries_param_ub! :
                               PSI.device_timeseries_ub!,
         ),
