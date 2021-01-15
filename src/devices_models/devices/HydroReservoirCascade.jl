@@ -235,11 +235,15 @@ function energy_balance_cascade_constraint!(
     use_forecast_data = PSI.model_uses_forecasts(psi_container)
 
     if !PSI.has_initial_conditions(psi_container.initial_conditions, key)
-        throw(IS.DataFormatError("Initial Conditions for $(H) Energy Constraints not in the model"))
+        throw(
+            IS.DataFormatError(
+                "Initial Conditions for $(H) Energy Constraints not in the model",
+            ),
+        )
     end
 
-    inflow_forecast_label = "get_inflow"
-    target_forecast_label = "get_storage_target"
+    inflow_forecast_label = "inflow"
+    target_forecast_label = "storage_target"
     constraint_infos_inflow =
         Vector{PSI.DeviceTimeSeriesConstraintInfo}(undef, length(devices))
     constraint_infos_target =
