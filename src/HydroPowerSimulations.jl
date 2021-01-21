@@ -17,7 +17,6 @@ import TimeZones
 import PowerSimulations
 import PowerModels
 import JuMP
-import Cbc
 import CSV
 import DataFrames
 import ParameterJuMP
