@@ -54,7 +54,7 @@
                     "name": "prime_mover",
                     "comment": "Prime mover technology according to EIA 923",
                     "null_value": "PSY.PrimeMovers.HY",
-                    "data_type": "PSY.PrimeMovers.PrimeMover",
+                    "data_type": "PSY.PrimeMovers",
                     "accessor_module": "PowerSystems"
                 },
                 {
@@ -276,7 +276,7 @@
                     "name": "prime_mover",
                     "comment": "Prime mover technology according to EIA 923",
                     "null_value": "PSY.PrimeMovers.HY",
-                    "data_type": "PSY.PrimeMovers.PrimeMover",
+                    "data_type": "PSY.PrimeMovers",
                     "accessor_module": "PowerSystems"
                 },
                 {
