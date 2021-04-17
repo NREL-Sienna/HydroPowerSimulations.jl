@@ -5,9 +5,9 @@ Construct model for HydroGen with RunOfRiver Dispatch Formulation
 function PSI.construct_device!(
     optimization_container::PSI.OptimizationContainer,
     sys::PSY.System,
-    model::PSI.DeviceModel{H,D},
+    model::PSI.DeviceModel{H, D},
     ::Type{S},
-) where {H<:HydroCascade,D<:HydroDispatchRunOfRiverCascade,S<:PM.AbstractPowerModel}
+) where {H <: HydroCascade, D <: HydroDispatchRunOfRiverCascade, S <: PM.AbstractPowerModel}
     devices = PSI.get_available_components(H, sys)
 
     if !PSI.validate_available_devices(H, devices)
@@ -62,9 +62,13 @@ with only Active Power.
 function PSI.construct_device!(
     optimization_container::PSI.OptimizationContainer,
     sys::PSY.System,
-    model::PSI.DeviceModel{H,D},
+    model::PSI.DeviceModel{H, D},
     ::Type{S},
-) where {H<:HydroCascade,D<:HydroDispatchRunOfRiverCascade,S<:PM.AbstractActivePowerModel}
+) where {
+    H <: HydroCascade,
+    D <: HydroDispatchRunOfRiverCascade,
+    S <: PM.AbstractActivePowerModel,
+}
     devices = PSI.get_available_components(H, sys)
 
     if !PSI.validate_available_devices(H, devices)

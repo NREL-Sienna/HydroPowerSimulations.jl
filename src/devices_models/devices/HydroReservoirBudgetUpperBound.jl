@@ -6,10 +6,10 @@ function PSI.DeviceRangeConstraintSpec(
     ::Type{T},
     ::Type{<:HydroDispatchReservoirBudgetUpperBound},
     ::Type{<:PM.AbstractPowerModel},
-    feedforward::Union{Nothing,PSI.AbstractAffectFeedForward},
+    feedforward::Union{Nothing, PSI.AbstractAffectFeedForward},
     use_parameters::Bool,
     use_forecasts::Bool,
-) where {T<:PSY.HydroGen}
+) where {T <: PSY.HydroGen}
     if !use_parameters && !use_forecasts
         return PSI.DeviceRangeConstraintSpec(;
             range_constraint_spec = PSI.RangeConstraintSpec(;

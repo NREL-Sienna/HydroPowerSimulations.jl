@@ -1,12 +1,12 @@
 function PSI.construct_device!(
     optimization_container::PSI.OptimizationContainer,
     sys::PSY.System,
-    model::PSI.DeviceModel{H,D},
+    model::PSI.DeviceModel{H, D},
     ::Type{S},
 ) where {
-    H<:PSY.HydroEnergyReservoir,
-    D<:HydroDispatchReservoirBudgetUpperBound,
-    S<:PM.AbstractActivePowerModel,
+    H <: PSY.HydroEnergyReservoir,
+    D <: HydroDispatchReservoirBudgetUpperBound,
+    S <: PM.AbstractActivePowerModel,
 }
     devices = PSI.get_available_components(H, sys)
 

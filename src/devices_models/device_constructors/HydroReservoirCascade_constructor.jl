@@ -1,12 +1,12 @@
 function PSI.construct_device!(
     optimization_container::PSI.OptimizationContainer,
     sys::PSY.System,
-    model::PSI.DeviceModel{H,D},
+    model::PSI.DeviceModel{H, D},
     ::Type{S},
 ) where {
-    H<:HydroEnergyCascade,
-    D<:HydroDispatchReservoirCascade,
-    S<:PM.AbstractActivePowerModel,
+    H <: HydroEnergyCascade,
+    D <: HydroDispatchReservoirCascade,
+    S <: PM.AbstractActivePowerModel,
 }
     devices = PSI.get_available_components(H, sys)
 
@@ -41,9 +41,13 @@ end
 function PSI.construct_device!(
     optimization_container::PSI.OptimizationContainer,
     sys::PSY.System,
-    model::PSI.DeviceModel{H,D},
+    model::PSI.DeviceModel{H, D},
     ::Type{S},
-) where {H<:HydroEnergyCascade,D<:HydroDispatchReservoirCascade,S<:PM.AbstractPowerModel}
+) where {
+    H <: HydroEnergyCascade,
+    D <: HydroDispatchReservoirCascade,
+    S <: PM.AbstractPowerModel,
+}
     devices = PSI.get_available_components(H, sys)
 
     if !PSI.validate_available_devices(H, devices)

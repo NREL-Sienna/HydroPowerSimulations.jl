@@ -67,12 +67,12 @@ mutable struct HydroEnergyCascade <: HydroCascade
     rating::Float64
     "Prime mover technology according to EIA 923"
     prime_mover::PSY.PrimeMovers
-    active_power_limits::NamedTuple{(:min, :max),Tuple{Float64,Float64}}
-    reactive_power_limits::Union{Nothing,PSY.Min_Max}
+    active_power_limits::NamedTuple{(:min, :max), Tuple{Float64, Float64}}
+    reactive_power_limits::Union{Nothing, PSY.Min_Max}
     "ramp up and ramp down limits in MW (in component base per unit) per minute"
-    ramp_limits::Union{Nothing,NamedTuple{(:up, :down),Tuple{Float64,Float64}}}
+    ramp_limits::Union{Nothing, NamedTuple{(:up, :down), Tuple{Float64, Float64}}}
     "Minimum up and Minimum down time limits in hours"
-    time_limits::Union{Nothing,NamedTuple{(:up, :down),Tuple{Float64,Float64}}}
+    time_limits::Union{Nothing, NamedTuple{(:up, :down), Tuple{Float64, Float64}}}
     "Base power of the unit in MVA"
     base_power::Float64
     "Maximum storage capacity in the reservoir (units can be p.u-hr or m^3)."
@@ -89,13 +89,13 @@ mutable struct HydroEnergyCascade <: HydroCascade
     conversion_factor::Float64
     "unit: upstream units; lag: duration in number of periods between upstream release and downstream availability; multiplier: relationship between upstream energy release and downstream energy availability"
     upstream::Vector{
-        NamedTuple{(:unit, :lag, :multiplier),Tuple{PSY.HydroGen,Int64,Float64}},
+        NamedTuple{(:unit, :lag, :multiplier), Tuple{PSY.HydroGen, Int64, Float64}},
     }
     "Services that this device contributes to"
     services::Vector{PSY.Service}
     "corresponding dynamic injection device"
-    dynamic_injector::Union{Nothing,PSY.DynamicInjection}
-    ext::Dict{String,Any}
+    dynamic_injector::Union{Nothing, PSY.DynamicInjection}
+    ext::Dict{String, Any}
     "internal time_series storage"
     time_series_container::InfrastructureSystems.TimeSeriesContainer
     "power system internal reference, do not modify"
@@ -121,10 +121,10 @@ function HydroEnergyCascade(
     operation_cost = PSY.TwoPartCost(0.0, 0.0),
     storage_target = 1.0,
     conversion_factor = 1.0,
-    upstream = NamedTuple{(:unit, :lag, :multiplier),Tuple{PSY.HydroGen,Int64,Float64}}[],
+    upstream = NamedTuple{(:unit, :lag, :multiplier), Tuple{PSY.HydroGen, Int64, Float64}}[],
     services = PSY.Device[],
     dynamic_injector = nothing,
-    ext = Dict{String,Any}(),
+    ext = Dict{String, Any}(),
     time_series_container = InfrastructureSystems.TimeSeriesContainer(),
 )
     HydroEnergyCascade(
@@ -174,10 +174,10 @@ function HydroEnergyCascade(;
     operation_cost = PSY.TwoPartCost(0.0, 0.0),
     storage_target = 1.0,
     conversion_factor = 1.0,
-    upstream = NamedTuple{(:unit, :lag, :multiplier),Tuple{PSY.HydroGen,Int64,Float64}}[],
+    upstream = NamedTuple{(:unit, :lag, :multiplier), Tuple{PSY.HydroGen, Int64, Float64}}[],
     services = PSY.Device[],
     dynamic_injector = nothing,
-    ext = Dict{String,Any}(),
+    ext = Dict{String, Any}(),
     time_series_container = InfrastructureSystems.TimeSeriesContainer(),
     internal = IS.InfrastructureSystemsInternal(),
 )
@@ -232,15 +232,14 @@ function HydroEnergyCascade(::Nothing)
         conversion_factor = 0.0,
         upstream = NamedTuple{
             (:unit, :lag, :multiplier),
-            Tuple{PSY.HydroGen,Int64,Float64},
+            Tuple{PSY.HydroGen, Int64, Float64},
         }[],
         services = PSY.Device[],
         dynamic_injector = nothing,
-        ext = Dict{String,Any}(),
+        ext = Dict{String, Any}(),
         time_series_container = InfrastructureSystems.TimeSeriesContainer(),
     )
 end
-
 
 InfrastructureSystems.get_name(value::HydroEnergyCascade) = value.name
 
@@ -298,7 +297,6 @@ InfrastructureSystems.get_time_series_container(value::HydroEnergyCascade) =
 
 PowerSystems.get_internal(value::HydroEnergyCascade) = value.internal
 
-
 InfrastructureSystems.set_name!(value::HydroEnergyCascade, val) = value.name = val
 
 PowerSystems.set_available!(value::HydroEnergyCascade, val) = value.available = val
@@ -351,4 +349,3 @@ PowerSystems.set_ext!(value::HydroEnergyCascade, val) = value.ext = val
 
 InfrastructureSystems.set_time_series_container!(value::HydroEnergyCascade, val) =
     value.time_series_container = val
-
