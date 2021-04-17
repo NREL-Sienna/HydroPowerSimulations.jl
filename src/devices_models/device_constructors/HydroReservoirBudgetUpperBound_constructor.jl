@@ -1,5 +1,5 @@
 function PSI.construct_device!(
-    psi_container::PSI.PSIContainer,
+    optimization_container::PSI.OptimizationContainer,
     sys::PSY.System,
     model::PSI.DeviceModel{H, HydroDispatchReservoirBudgetUpperBound},
     ::Type{S},
@@ -11,11 +11,11 @@ function PSI.construct_device!(
     end
 
     # Variables
-    PSI.add_variables!(psi_container, PSI.ActivePowerVariable, devices)
+    PSI.add_variables!(optimization_container, PSI.ActivePowerVariable, devices)
 
     # Energy Budget Constraint
     PSI.energy_budget_constraints!(
-        psi_container,
+        optimization_container,
         devices,
         model,
         S,
@@ -24,7 +24,7 @@ function PSI.construct_device!(
 
     # Range Constraints
     PSI.add_constraints!(
-        psi_container,
+        optimization_container,
         PSI.RangeConstraint,
         PSI.ActivePowerVariable,
         devices,
@@ -33,10 +33,10 @@ function PSI.construct_device!(
         PSI.get_feedforward(model),
     )
 
-    PSI.feedforward!(psi_container, devices, model, PSI.get_feedforward(model))
+    PSI.feedforward!(optimization_container, devices, model, PSI.get_feedforward(model))
 
     # Cost Function
-    PSI.cost_function!(psi_container, devices, model, S, nothing)
+    PSI.cost_function!(optimization_container, devices, model, S, nothing)
 
     return
 end
