@@ -1,9 +1,9 @@
 function PSI.construct_device!(
     optimization_container::PSI.OptimizationContainer,
     sys::PSY.System,
-    model::PSI.DeviceModel{H, HydroDispatchReservoirCascade},
+    model::PSI.DeviceModel{H, D},
     ::Type{S},
-) where {H <: HydroEnergyCascade, S <: PM.AbstractActivePowerModel}
+) where {H <: HydroEnergyCascade, D <: HydroDispatchReservoirCascade, S <: PM.AbstractActivePowerModel}
     devices = PSI.get_available_components(H, sys)
 
     if !PSI.validate_available_devices(H, devices)
@@ -11,9 +11,9 @@ function PSI.construct_device!(
     end
 
     #Variables
-    PSI.add_variables!(optimization_container, PSI.ActivePowerVariable, devices)
-    PSI.add_variables!(optimization_container, PSI.EnergyVariable, devices)
-    PSI.add_variables!(optimization_container, PSI.SpillageVariable, devices)
+    PSI.add_variables!(optimization_container, PSI.ActivePowerVariable, devices, D())
+    PSI.add_variables!(optimization_container, PSI.EnergyVariable, devices, D())
+    PSI.add_variables!(optimization_container, PSI.SpillageVariable, devices, D())
 
     #Initial Conditions
     PSI.storage_energy_init(optimization_container, devices)
@@ -29,7 +29,7 @@ function PSI.construct_device!(
     PSI.feedforward!(optimization_container, devices, model, PSI.get_feedforward(model))
 
     #Cost Function
-    PSI.cost_function(optimization_container, devices, HydroDispatchReservoirCascade, S)
+    PSI.cost_function!(optimization_container, devices, model, S, nothing)
 
     return
 end
@@ -37,9 +37,9 @@ end
 function PSI.construct_device!(
     optimization_container::PSI.OptimizationContainer,
     sys::PSY.System,
-    model::PSI.DeviceModel{H, HydroDispatchReservoirCascade},
+    model::PSI.DeviceModel{H, D},
     ::Type{S},
-) where {H <: HydroEnergyCascade, S <: PM.AbstractPowerModel}
+) where {H <: HydroEnergyCascade, D <: HydroDispatchReservoirCascade, S <: PM.AbstractPowerModel}
     devices = PSI.get_available_components(H, sys)
 
     if !PSI.validate_available_devices(H, devices)
@@ -47,10 +47,10 @@ function PSI.construct_device!(
     end
 
     #Variables
-    PSI.add_variables!(optimization_container, PSI.ActivePowerVariable, devices)
-    PSI.add_variables!(optimization_container, PSI.EnergyVariable, devices)
-    PSI.add_variables!(optimization_container, PSI.SpillageVariable, devices)
-    PSI.add_variables!(optimization_container, PSI.ReactivePowerVariable, devices)
+    PSI.add_variables!(optimization_container, PSI.ActivePowerVariable, devices, D())
+    PSI.add_variables!(optimization_container, PSI.EnergyVariable, devices, D())
+    PSI.add_variables!(optimization_container, PSI.SpillageVariable, devices, D())
+    PSI.add_variables!(optimization_container, PSI.ReactivePowerVariable, devices, D())
 
     #Initial Conditions
     PSI.storage_energy_init(optimization_container, devices)
@@ -75,7 +75,7 @@ function PSI.construct_device!(
     PSI.feedforward!(optimization_container, devices, model, PSI.get_feedforward(model))
 
     #Cost Function
-    PSI.cost_function(optimization_container, devices, HydroDispatchReservoirCascade, S)
+    PSI.cost_function!(optimization_container, devices, model, S, nothing)
 
     return
 end

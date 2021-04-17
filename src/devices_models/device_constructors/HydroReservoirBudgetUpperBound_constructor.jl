@@ -1,9 +1,9 @@
 function PSI.construct_device!(
     optimization_container::PSI.OptimizationContainer,
     sys::PSY.System,
-    model::PSI.DeviceModel{H, HydroDispatchReservoirBudgetUpperBound},
+    model::PSI.DeviceModel{H, D},
     ::Type{S},
-) where {H <: PSY.HydroEnergyReservoir, S <: PM.AbstractActivePowerModel}
+) where {H <: PSY.HydroEnergyReservoir, D <: HydroDispatchReservoirBudgetUpperBound, S <: PM.AbstractActivePowerModel}
     devices = PSI.get_available_components(H, sys)
 
     if !PSI.validate_available_devices(H, devices)
@@ -11,7 +11,7 @@ function PSI.construct_device!(
     end
 
     # Variables
-    PSI.add_variables!(optimization_container, PSI.ActivePowerVariable, devices)
+    PSI.add_variables!(optimization_container, PSI.ActivePowerVariable, devices, D())
 
     # Energy Budget Constraint
     PSI.energy_budget_constraints!(
