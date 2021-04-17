@@ -7,10 +7,10 @@ function flow_balance_external_input_param_cascade(
     optimization_container::PSI.OptimizationContainer,
     inflow_data::Vector{PSI.DeviceTimeSeriesConstraintInfo},
     upstream::Vector{
-        Vector{NamedTuple{(:unit, :lag, :multiplier), Tuple{PSY.HydroGen, Int64, Float64}}},
+        Vector{NamedTuple{(:unit, :lag, :multiplier),Tuple{PSY.HydroGen,Int64,Float64}}},
     },
     cons_name::Symbol,
-    var_names::Tuple{Symbol, Symbol},
+    var_names::Tuple{Symbol,Symbol},
     param_reference::PSI.UpdateRef,
 )
     time_steps = PSI.model_time_steps(optimization_container)
@@ -22,8 +22,12 @@ function flow_balance_external_input_param_cascade(
     varspill = PSI.get_variable(optimization_container, var_names[1])
     varout = PSI.get_variable(optimization_container, var_names[2])
 
-    container_inflow =
-        PSI.add_param_container!(optimization_container, param_reference, name_index, time_steps)
+    container_inflow = PSI.add_param_container!(
+        optimization_container,
+        param_reference,
+        name_index,
+        time_steps,
+    )
     param_inflow = PSI.get_parameter_array(container_inflow)
     multiplier_inflow = PSI.get_multiplier_array(container_inflow)
 
@@ -35,7 +39,8 @@ function flow_balance_external_input_param_cascade(
         upstream_devices = upstream[ix]
 
         multiplier_inflow[name, 1] = d.multiplier
-        param_inflow[name, 1] = PJ.add_parameter(optimization_container.JuMPmodel, d.timeseries[1])
+        param_inflow[name, 1] =
+            PJ.add_parameter(optimization_container.JuMPmodel, d.timeseries[1])
 
         exp =
             multiplier_inflow[name, 1] * param_inflow[name, 1] - varspill[name, 1] -
@@ -46,7 +51,8 @@ function flow_balance_external_input_param_cascade(
                 JuMP.add_to_expression!(exp, varout[IS.get_name(j), 1])
             end
         =#
-        flow_constraint[name, 1] = JuMP.@constraint(optimization_container.JuMPmodel, exp == 0.0)
+        flow_constraint[name, 1] =
+            JuMP.@constraint(optimization_container.JuMPmodel, exp == 0.0)
 
         for t in time_steps[2:end]
             param_inflow[name, t] =
@@ -57,17 +63,18 @@ function flow_balance_external_input_param_cascade(
                 if t - j.lag >= 1
                     JuMP.add_to_expression!(
                         exp,
-                        varspill[IS.get_name(j.unit), t - j.lag],
+                        varspill[IS.get_name(j.unit), t-j.lag],
                         j.multiplier,
                     )
                     JuMP.add_to_expression!(
                         exp,
-                        varout[IS.get_name(j.unit), t - j.lag],
+                        varout[IS.get_name(j.unit), t-j.lag],
                         j.multiplier,
                     )
                 end
             end
-            flow_constraint[name, t] = JuMP.@constraint(optimization_container.JuMPmodel, exp == 0.0)
+            flow_constraint[name, t] =
+                JuMP.@constraint(optimization_container.JuMPmodel, exp == 0.0)
         end
     end
 
@@ -78,10 +85,10 @@ function flow_balance_external_input_cascade(
     optimization_container::PSI.OptimizationContainer,
     inflow_data::Vector{PSI.DeviceTimeSeriesConstraintInfo},
     upstream::Vector{
-        Vector{NamedTuple{(:unit, :lag, :multiplier), Tuple{PSY.HydroGen, Int64, Float64}}},
+        Vector{NamedTuple{(:unit, :lag, :multiplier),Tuple{PSY.HydroGen,Int64,Float64}}},
     },
     cons_name::Symbol,
-    var_names::Tuple{Symbol, Symbol},
+    var_names::Tuple{Symbol,Symbol},
 )
     time_steps = PSI.model_time_steps(optimization_container)
     resolution = PSI.model_resolution(optimization_container)
@@ -106,7 +113,8 @@ function flow_balance_external_input_cascade(
                 JuMP.add_to_expression!(exp, varout[IS.get_name(j), 1])
             end
         =#
-        flow_constraint[name, 1] = JuMP.@constraint(optimization_container.JuMPmodel, exp == 0.0)
+        flow_constraint[name, 1] =
+            JuMP.@constraint(optimization_container.JuMPmodel, exp == 0.0)
 
         for t in time_steps[2:end]
             exp = d.multiplier * d.timeseries[t] - varspill[name, t] - varout[name, t]
@@ -115,17 +123,18 @@ function flow_balance_external_input_cascade(
                 if t - j.lag >= 1
                     JuMP.add_to_expression!(
                         exp,
-                        varspill[IS.get_name(j.unit), t - j.lag],
+                        varspill[IS.get_name(j.unit), t-j.lag],
                         j.multiplier,
                     )
                     JuMP.add_to_expression!(
                         exp,
-                        varout[IS.get_name(j.unit), t - j.lag],
+                        varout[IS.get_name(j.unit), t-j.lag],
                         j.multiplier,
                     )
                 end
             end
-            flow_constraint[name, t] = JuMP.@constraint(optimization_container.JuMPmodel, exp == 0.0)
+            flow_constraint[name, t] =
+                JuMP.@constraint(optimization_container.JuMPmodel, exp == 0.0)
         end
     end
     return
@@ -134,10 +143,10 @@ end
 function flow_balance_cascade_constraint!(
     optimization_container::PSI.OptimizationContainer,
     devices::IS.FlattenIteratorWrapper{H},
-    model::PSI.DeviceModel{H, HydroDispatchRunOfRiverCascade},
+    model::PSI.DeviceModel{H,HydroDispatchRunOfRiverCascade},
     system_formulation::Type{<:PM.AbstractPowerModel},
-    feedforward::Union{Nothing, PSI.AbstractAffectFeedForward},
-) where {H <: HydroCascade}
+    feedforward::Union{Nothing,PSI.AbstractAffectFeedForward},
+) where {H<:HydroCascade}
     parameters = PSI.model_has_parameters(optimization_container)
     use_forecast_data = PSI.model_uses_forecasts(optimization_container)
 
@@ -145,14 +154,15 @@ function flow_balance_cascade_constraint!(
     constraint_infos_inflow =
         Vector{PSI.DeviceTimeSeriesConstraintInfo}(undef, length(devices))
     upstream_data = Vector{
-        Vector{NamedTuple{(:unit, :lag, :multiplier), Tuple{PSY.HydroGen, Int64, Float64}}},
+        Vector{NamedTuple{(:unit, :lag, :multiplier),Tuple{PSY.HydroGen,Int64,Float64}}},
     }(
         undef,
         length(devices),
     )
 
     for (ix, d) in enumerate(devices)
-        ts_vector_inflow = PSI.get_time_series(optimization_container, d, inflow_forecast_label)
+        ts_vector_inflow =
+            PSI.get_time_series(optimization_container, d, inflow_forecast_label)
         constraint_info_inflow = PSI.DeviceTimeSeriesConstraintInfo(
             d,
             x -> PSY.get_max_active_power(x),
