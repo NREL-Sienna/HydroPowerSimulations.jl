@@ -20,10 +20,6 @@ TimeZones = "f269a46b-ccf7-5d73-abea-4c690281aa53"
 
 [compat]
 InfrastructureSystems = "1"
-<<<<<<< HEAD
 PowerSimulations = "^0.14"
-=======
-PowerSimulations = "^0.12"
->>>>>>> acbe009a200a856b68d040f35e1281e69bf68062
 PowerSystems = "1"
 julia = "^1.2"
