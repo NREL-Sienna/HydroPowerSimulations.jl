@@ -1,7 +1,7 @@
 name = "HydroPowerSimulations"
 uuid = "fc1677e0-6ad7-4515-bf3a-bd6bf20a0b1b"
 authors = ["Nongchao Guo <43042596+Nongchao@users.noreply.github.com>", "sourabhdalvi <sourabh.p.dalvi@gmail.com>"]
-version = "0.1.1"
+version = "0.2.0"
 
 [deps]
 CSV = "336ed68f-0bac-5ca0-87d4-7b16caf5d00b"
@@ -9,7 +9,6 @@ DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
 Dates = "ade2ca70-3891-5945-98fb-dc099432e06a"
 InfrastructureSystems = "2cd47ed4-ca9b-11e9-27f2-ab636a7671f1"
 JuMP = "4076af6c-e467-56ae-b986-b466b2749572"
-JuliaFormatter = "98e50ef6-434e-11e9-1051-2b60c6c9e899"
 ParameterJuMP = "774612a8-9878-5177-865a-ca53ae2495f9"
 PowerModels = "c36e90e8-916a-50a6-bd94-075b64ef4655"
 PowerSimulations = "e690365d-45e2-57bb-ac84-44ba829e73c4"
@@ -21,5 +20,6 @@ TimeZones = "f269a46b-ccf7-5d73-abea-4c690281aa53"
 
 [compat]
 InfrastructureSystems = "1"
+PowerSimulations = "^0.14"
 PowerSystems = "1"
 julia = "^1.2"
