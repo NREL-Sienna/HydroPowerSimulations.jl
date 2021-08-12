@@ -4,8 +4,8 @@ function PSI.construct_device!(
     model::PSI.DeviceModel{H, D},
     ::Type{S},
 ) where {
-    H <: PSY.HydroGen,
-    D <: HydroDispatchRunOfRiverLowerBound,
+    H <: PSY.HydroEnergyReservoir,
+    D <: HydroDispatchReservoirBudgetLowerUpperBound,
     S <: PM.AbstractActivePowerModel,
 }
     devices = PSI.get_available_components(H, sys)
@@ -17,7 +17,16 @@ function PSI.construct_device!(
     # Variables
     PSI.add_variables!(optimization_container, PSI.ActivePowerVariable, devices, D())
 
-    # Constraints
+    # Energy Budget Constraint
+    PSI.energy_budget_constraints!(
+        optimization_container,
+        devices,
+        model,
+        S,
+        PSI.get_feedforward(model),
+    )
+
+    # Range Constraints
     PSI.add_constraints!(
         optimization_container,
         PSI.RangeConstraint,
