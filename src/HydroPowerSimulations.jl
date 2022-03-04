@@ -7,6 +7,8 @@ export HydroDispatchCascade
 export HydroDispatchReservoirCascade
 export HydroDispatchRunOfRiverCascade
 export HydroDispatchReservoirBudgetUpperBound
+export HydroDispatchRunOfRiverLowerBound
+export HydroDispatchReservoirBudgetLowerUpperBound
 
 #################################################################################
 # Imports
@@ -34,9 +36,12 @@ include("models/generated/includes.jl")
 include("devices_models/devices/HydroReservoirCascade.jl")
 include("devices_models/devices/HydroDispatchCascade.jl")
 include("devices_models/devices/HydroReservoirBudgetUpperBound.jl")
+include("devices_models/devices/HydroLowerBound.jl")
 include("devices_models/device_constructors/HydroReservoirCascade_constructor.jl")
 include("devices_models/device_constructors/HydroDispatchCascade_constructor.jl")
 include("devices_models/device_constructors/HydroReservoirBudgetUpperBound_constructor.jl")
+include("devices_models/device_constructors/HydroDispatchRunOfRiverLowerBound_constructor.jl")
+include("devices_models/device_constructors/HydroReservoirBudgetLowerUpperBound_constructor.jl")
 include("parsers/set_upstream.jl")
 
 end # module
