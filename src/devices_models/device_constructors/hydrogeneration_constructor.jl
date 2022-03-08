@@ -1,47 +1,47 @@
-function construct_device!(
-    optimization_container::OptimizationContainer,
+function PSI.construct_device!(
+    optimization_container::PSI.OptimizationContainer,
     sys::PSY.System,
-    model::DeviceModel{H, HydroDispatchReservoirIntervalBudget},
+    model::PSI.DeviceModel{H, HydroDispatchReservoirIntervalBudget},
     ::Type{S},
 ) where {H <: PSY.HydroEnergyReservoir, S <: PM.AbstractPowerModel}
-    devices = get_available_components(H, sys)
+    devices = PSI.get_available_components(H, sys)
 
-    if !validate_available_devices(H, devices)
+    if !PSI.validate_available_devices(H, devices)
         return
     end
 
     # Variables
-    add_variables!(
+    PSI.add_variables!(
         optimization_container,
-        ActivePowerVariable,
+        PSI.ActivePowerVariable,
         devices,
         HydroDispatchReservoirIntervalBudget(),
     )
-    add_variables!(
+    PSI.add_variables!(
         optimization_container,
-        ReactivePowerVariable,
+        PSI.ReactivePowerVariable,
         devices,
         HydroDispatchReservoirIntervalBudget(),
     )
 
     # Constraints
-    add_constraints!(
+    PSI.add_constraints!(
         optimization_container,
-        RangeConstraint,
-        ActivePowerVariable,
+        PSI.RangeConstraint,
+        PSI.ActivePowerVariable,
         devices,
         model,
         S,
-        get_feedforward(model),
+        PSI.get_feedforward(model),
     )
-    add_constraints!(
+    PSI.add_constraints!(
         optimization_container,
-        RangeConstraint,
-        ReactivePowerVariable,
+        PSI.RangeConstraint,
+        PSI.ReactivePowerVariable,
         devices,
         model,
         S,
-        get_feedforward(model),
+        PSI.get_feedforward(model),
     )
 
     # Energy Budget Constraint
@@ -50,19 +50,19 @@ function construct_device!(
         devices,
         model,
         S,
-        get_feedforward(model),
+        PSI.get_feedforward(model),
     )
     energy_interval_budget_constraints!(
         optimization_container,
         devices,
         model,
         S,
-        get_feedforward(model),
+        PSI.get_feedforward(model),
     )
-    feedforward!(optimization_container, devices, model, get_feedforward(model))
+    PSI.feedforward!(optimization_container, devices, model, PSI.get_feedforward(model))
 
     # Cost Function
-    cost_function!(optimization_container, devices, model, S, nothing)
+    PSI.cost_function!(optimization_container, devices, model, S, nothing)
 
     return
 end
@@ -71,35 +71,35 @@ end
 Construct model for HydroGen with ReservoirBudget Dispatch Formulation
 with only Active Power.
 """
-function construct_device!(
-    optimization_container::OptimizationContainer,
+function PSI.construct_device!(
+    optimization_container::PSI.OptimizationContainer,
     sys::PSY.System,
-    model::DeviceModel{H, HydroDispatchReservoirIntervalBudget},
+    model::PSI.DeviceModel{H, HydroDispatchReservoirIntervalBudget},
     ::Type{S},
 ) where {H <: PSY.HydroEnergyReservoir, S <: PM.AbstractActivePowerModel}
-    devices = get_available_components(H, sys)
+    devices = PSI.get_available_components(H, sys)
 
-    if !validate_available_devices(H, devices)
+    if !PSI.validate_available_devices(H, devices)
         return
     end
 
     # Variables
-    add_variables!(
+    PSI.add_variables!(
         optimization_container,
-        ActivePowerVariable,
+        PSI.ActivePowerVariable,
         devices,
-        HydroDispatchReservoirIntervalBudget(),
+        PSI.HydroDispatchReservoirIntervalBudget(),
     )
 
     # Constraints
-    add_constraints!(
+    PSI.add_constraints!(
         optimization_container,
-        RangeConstraint,
-        ActivePowerVariable,
+        PSI.RangeConstraint,
+        PSI.ActivePowerVariable,
         devices,
         model,
         S,
-        get_feedforward(model),
+        PSI.get_feedforward(model),
     )
 
     # Energy Budget Constraint
@@ -108,19 +108,19 @@ function construct_device!(
         devices,
         model,
         S,
-        get_feedforward(model),
+        PSI.get_feedforward(model),
     )
     energy_interval_budget_constraints!(
         optimization_container,
         devices,
         model,
         S,
-        get_feedforward(model),
+        PSI.get_feedforward(model),
     )
-    feedforward!(optimization_container, devices, model, get_feedforward(model))
+    PSI.feedforward!(optimization_container, devices, model, PSI.get_feedforward(model))
 
     # Cost Function
-    cost_function!(optimization_container, devices, model, S, nothing)
+    PSI.cost_function!(optimization_container, devices, model, S, nothing)
 
     return
 end

@@ -33,9 +33,9 @@ const PJ = ParameterJuMP
 # Includes
 include("models/HydroCascade.jl")
 include("models/generated/includes.jl")
+include("devices_models/devices/hydro_generation.jl")
 include("devices_models/devices/common/energy_balance_constraint.jl")
 include("devices_models/devices/common/range_constraint.jl")
-include("devices_models/devices/hydro_generation.jl")
 include("devices_models/device_constructors/hydrogeneration_constructor.jl")
 
 include("parsers/set_upstream.jl")

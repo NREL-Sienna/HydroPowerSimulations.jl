@@ -51,67 +51,67 @@ function PSI.DeviceRangeConstraintSpec(
 end
 
 function energy_interval_budget_constraints!(
-    optimization_container::OptimizationContainer,
+    optimization_container::PSI.OptimizationContainer,
     devices::IS.FlattenIteratorWrapper{H},
-    ::DeviceModel{H, HydroDispatchReservoirIntervalBudget},
+    ::PSI.DeviceModel{H, HydroDispatchReservoirIntervalBudget},
     ::Type{<:PM.AbstractPowerModel},
-    ::Union{Nothing, AbstractAffectFeedForward},
+    ::Union{Nothing, PSI.AbstractAffectFeedForward},
 ) where {H <: PSY.HydroGen}
     forecast_label = "hydro_budget"
-    constraint_data = Vector{DeviceTimeSeriesConstraintInfo}(undef, length(devices))
-    interval_step = get_internal(model).simulation_info.end_of_interval_step
+    constraint_data = Vector{PSI.DeviceTimeSeriesConstraintInfo}(undef, length(devices))
+    interval_step = PSI.get_internal(model).simulation_info.end_of_interval_step
     for (ix, d) in enumerate(devices)
-        ts_vector = get_time_series(optimization_container, d, forecast_label)
+        ts_vector = PSI.get_time_series(optimization_container, d, forecast_label)
         @debug "time_series" ts_vector
         constraint_d =
-            DeviceTimeSeriesConstraintInfo(d, x -> PSY.get_storage_capacity(x), ts_vector)
+            PSI.DeviceTimeSeriesConstraintInfo(d, x -> PSY.get_storage_capacity(x), ts_vector)
         constraint_data[ix] = constraint_d
     end
 
-    if model_has_parameters(optimization_container)
+    if PSI.model_has_parameters(optimization_container)
         device_interval_energy_budget_param_ub(
             optimization_container,
             constraint_data,
-            make_constraint_name(ENERGY_INTERVAL_BUDGET, H),
-            UpdateRef{H}(ENERGY_INTERVAL_BUDGET, forecast_label),
-            make_variable_name(ACTIVE_POWER, H),
+            PSI.make_constraint_name(ENERGY_INTERVAL_BUDGET, H),
+            PSI.UpdateRef{H}(ENERGY_INTERVAL_BUDGET, forecast_label),
+            PSI.make_variable_name(ACTIVE_POWER, H),
             interval_step,
         )
     else
         device_interval_energy_budget_ub(
             optimization_container,
             constraint_data,
-            make_constraint_name(ENERGY_INTERVAL_BUDGET),
-            make_variable_name(ACTIVE_POWER, H),
+            PSI.make_constraint_name(ENERGY_INTERVAL_BUDGET),
+            PSI.make_variable_name(ACTIVE_POWER, H),
             interval_step,
         )
     end
 end
 
 function device_interval_energy_budget_param_ub(
-    optimization_container::OptimizationContainer,
-    energy_budget_data::Vector{DeviceTimeSeriesConstraintInfo},
+    optimization_container::PSI.OptimizationContainer,
+    energy_budget_data::Vector{PSI.DeviceTimeSeriesConstraintInfo},
     cons_name::Symbol,
-    param_reference::UpdateRef,
+    param_reference::PSI.UpdateRef,
     var_names::Symbol,
     interval_step::Float64,
 )
-    time_steps = model_time_steps(optimization_container)
-    resolution = model_resolution(optimization_container)
+    time_steps = PSI.model_time_steps(optimization_container)
+    resolution = PSI.model_resolution(optimization_container)
     
     inv_dt = 1.0 / (Dates.value(Dates.Second(resolution)) / SECONDS_IN_HOUR)
-    variable_out = get_variable(optimization_container, var_names)
-    set_name = [get_component_name(r) for r in energy_budget_data]
-    constraint = add_cons_container!(optimization_container, cons_name, set_name)
+    variable_out = PSI.get_variable(optimization_container, var_names)
+    set_name = [PSI.get_component_name(r) for r in energy_budget_data]
+    constraint = PSI.add_cons_container!(optimization_container, cons_name, set_name)
     container =
-        add_param_container!(optimization_container, param_reference, set_name, time_steps)
-    multiplier = get_multiplier_array(container)
-    param = get_parameter_array(container)
+        PSI.add_param_container!(optimization_container, param_reference, set_name, time_steps)
+    multiplier = PSI.get_multiplier_array(container)
+    param = PSI.get_parameter_array(container)
     for constraint_info in energy_budget_data
-        name = get_component_name(constraint_info)
+        name = PSI.get_component_name(constraint_info)
         for t in time_steps
             multiplier[name, t] = constraint_info.multiplier * inv_dt
-            param[name, t] = add_parameter(
+            param[name, t] = PSI.add_parameter(
                 optimization_container.JuMPmodel,
                 constraint_info.timeseries[t],
             )
@@ -130,20 +130,20 @@ This function define the budget constraint
 for the active power budget formulation.
 """
 function device_interval_energy_budget_ub(
-    optimization_container::OptimizationContainer,
-    energy_budget_constraints::Vector{DeviceTimeSeriesConstraintInfo},
+    optimization_container::PSI.OptimizationContainer,
+    energy_budget_constraints::Vector{PSI.DeviceTimeSeriesConstraintInfo},
     cons_name::Symbol,
     var_names::Symbol,
     interval_step::Float64,
 )
-    time_steps = model_time_steps(optimization_container)
-    variable_out = get_variable(optimization_container, var_names)
-    names = [get_component_name(x) for x in energy_budget_constraints]
-    constraint = add_cons_container!(optimization_container, cons_name, names)
+    time_steps = PSI.model_time_steps(optimization_container)
+    variable_out = PSI.get_variable(optimization_container, var_names)
+    names = [PSI.get_component_name(x) for x in energy_budget_constraints]
+    constraint = PSI.add_cons_container!(optimization_container, cons_name, names)
 
     for constraint_info in energy_budget_constraints
-        name = get_component_name(constraint_info)
-        resolution = model_resolution(optimization_container)
+        name = PSI.get_component_name(constraint_info)
+        resolution = PSI.model_resolution(optimization_container)
         inv_dt = 1.0 / (Dates.value(Dates.Second(resolution)) / SECONDS_IN_HOUR)
         forecast = constraint_info.timeseries
         multiplier = constraint_info.multiplier * inv_dt
