@@ -1,4 +1,4 @@
-struct HydroDispatchReservoirIntervalBudget <: PSI.AbstractHydroDispatchFormulation end
+struct HydroDispatchReservoirIntervalBudget <: PSI.AbstractHydroReservoirFormulation end
 struct HydroDispatchRunOfRiverCascade <: PSI.AbstractHydroDispatchFormulation end
 struct HydroDispatchRunOfRiverLowerBound <: PSI.AbstractHydroDispatchFormulation end
 struct HydroDispatchReservoirBudgetLowerUpperBound <: PSI.AbstractHydroDispatchFormulation end
