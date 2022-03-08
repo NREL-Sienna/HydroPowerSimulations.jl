@@ -9,6 +9,7 @@ export HydroDispatchRunOfRiverCascade
 export HydroDispatchReservoirBudgetUpperBound
 export HydroDispatchRunOfRiverLowerBound
 export HydroDispatchReservoirBudgetLowerUpperBound
+export HydroDispatchReservoirIntervalBudget
 
 #################################################################################
 # Imports
@@ -31,6 +32,7 @@ const PJ = ParameterJuMP
 
 #################################################################################
 # Includes
+include("core/constraints.jl")
 include("models/HydroCascade.jl")
 include("models/generated/includes.jl")
 include("devices_models/devices/hydro_generation.jl")

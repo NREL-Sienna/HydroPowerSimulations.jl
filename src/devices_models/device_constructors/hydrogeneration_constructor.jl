@@ -88,7 +88,7 @@ function PSI.construct_device!(
         optimization_container,
         PSI.ActivePowerVariable,
         devices,
-        PSI.HydroDispatchReservoirIntervalBudget(),
+        HydroDispatchReservoirIntervalBudget(),
     )
 
     # Constraints
@@ -103,16 +103,18 @@ function PSI.construct_device!(
     )
 
     # Energy Budget Constraint
-    energy_budget_constraints!(
+    PSI.energy_budget_constraints!(
         optimization_container,
         devices,
         model,
         S,
         PSI.get_feedforward(model),
     )
+    interval_steps = Int(Dates.Millisecond(PSY.get_forecast_interval(sys))/PSY.get_time_series_resolution(sys))
     energy_interval_budget_constraints!(
         optimization_container,
         devices,
+        interval_steps,
         model,
         S,
         PSI.get_feedforward(model),
