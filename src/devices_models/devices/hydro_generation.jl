@@ -54,7 +54,7 @@ function energy_custom_budget_constraints!(
     optimization_container::PSI.OptimizationContainer,
     devices::IS.FlattenIteratorWrapper{H},
     budget_step::Int,
-    ::PSI.DeviceModel{H, <:AbstractHydroReservoirFormulation},
+    ::PSI.DeviceModel{H, <:PSI.AbstractHydroReservoirFormulation},
     ::Type{<:PM.AbstractPowerModel},
     ::Union{Nothing, PSI.AbstractAffectFeedForward},
 ) where {H <: PSY.HydroGen}
