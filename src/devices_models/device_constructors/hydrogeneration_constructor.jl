@@ -244,7 +244,7 @@ function PSI.construct_device!(
         S,
         PSI.get_feedforward(model),
     )
-    budget_periods = PSY.get_settings(optimization_container)["budget_periods"]
+    budget_periods = PSI.get_ext(PSI.get_settings(optimization_container))["budget_periods"]
     energy_custom_budget_constraints!(
         optimization_container,
         devices,
