@@ -10,6 +10,7 @@ export HydroDispatchReservoirBudgetUpperBound
 export HydroDispatchRunOfRiverLowerBound
 export HydroDispatchReservoirBudgetLowerUpperBound
 export HydroDispatchReservoirIntervalBudget
+export HydroDispatchReservoirCustomBudget
 
 #################################################################################
 # Imports
