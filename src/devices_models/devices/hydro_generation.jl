@@ -4,7 +4,7 @@ struct HydroDispatchRunOfRiverLowerBound <: PSI.AbstractHydroDispatchFormulation
 struct HydroDispatchReservoirBudgetLowerUpperBound <: PSI.AbstractHydroDispatchFormulation end
 struct HydroDispatchReservoirCascade <: PSI.AbstractHydroReservoirFormulation end
 struct HydroDispatchReservoirBudgetUpperBound <: PSI.AbstractHydroReservoirFormulation end
-
+struct HydroDispatchReservoirCustomBudget <: PSI.AbstractHydroReservoirFormulation end
 
 
 function PSI.DeviceRangeConstraintSpec(
@@ -50,11 +50,11 @@ function PSI.DeviceRangeConstraintSpec(
     )
 end
 
-function energy_interval_budget_constraints!(
+function energy_custom_budget_constraints!(
     optimization_container::PSI.OptimizationContainer,
     devices::IS.FlattenIteratorWrapper{H},
-    interval_step::Int,
-    ::PSI.DeviceModel{H, HydroDispatchReservoirIntervalBudget},
+    budget_step::Int,
+    ::PSI.DeviceModel{H, <:AbstractHydroReservoirFormulation},
     ::Type{<:PM.AbstractPowerModel},
     ::Union{Nothing, PSI.AbstractAffectFeedForward},
 ) where {H <: PSY.HydroGen}
@@ -75,7 +75,7 @@ function energy_interval_budget_constraints!(
             PSI.make_constraint_name(ENERGY_INTERVAL_BUDGET, H),
             PSI.UpdateRef{H}(ENERGY_INTERVAL_BUDGET, forecast_label),
             PSI.make_variable_name(PSI.ACTIVE_POWER, H),
-            interval_step,
+            budget_step,
         )
     else
         device_interval_energy_budget_ub(
@@ -83,7 +83,7 @@ function energy_interval_budget_constraints!(
             constraint_data,
             PSI.make_constraint_name(ENERGY_INTERVAL_BUDGET),
             PSI.make_variable_name(PSI.ACTIVE_POWER, H),
-            interval_step,
+            budget_step,
         )
     end
 end
@@ -94,7 +94,7 @@ function device_interval_energy_budget_param_ub(
     cons_name::Symbol,
     param_reference::PSI.UpdateRef,
     var_names::Symbol,
-    interval_step::Int,
+    budget_step::Int,
 )
     time_steps = PSI.model_time_steps(optimization_container)
     resolution = PSI.model_resolution(optimization_container)
@@ -118,7 +118,7 @@ function device_interval_energy_budget_param_ub(
         end
         constraint[name] = JuMP.@constraint(
             optimization_container.JuMPmodel,
-            sum([variable_out[name, t] for t in 1:interval_step]) <= sum([multiplier[name, t] * param[name, t] for t in 1:interval_step])
+            sum([variable_out[name, t] for t in 1:budget_step]) <= sum([multiplier[name, t] * param[name, t] for t in 1:budget_step])
         )
     end
 
@@ -134,7 +134,7 @@ function device_interval_energy_budget_ub(
     energy_budget_constraints::Vector{PSI.DeviceTimeSeriesConstraintInfo},
     cons_name::Symbol,
     var_names::Symbol,
-    interval_step::Int,
+    budget_step::Int,
 )
     time_steps = PSI.model_time_steps(optimization_container)
     variable_out = PSI.get_variable(optimization_container, var_names)
@@ -149,7 +149,7 @@ function device_interval_energy_budget_ub(
         multiplier = constraint_info.multiplier * inv_dt
         constraint[name] = JuMP.@constraint(
             optimization_container.JuMPmodel,
-            sum([variable_out[name, t] for t in 1:interval_step]) <= multiplier * sum(forecast[t] for t in 1:interval_step)
+            sum([variable_out[name, t] for t in 1:budget_step]) <= multiplier * sum(forecast[t] for t in 1:budget_step)
         )
     end
 
