@@ -261,6 +261,143 @@ function PSI.construct_device!(
     return
 end
 
+
+function PSI.construct_device!(
+    optimization_container::PSI.OptimizationContainer,
+    sys::PSY.System,
+    model::PSI.DeviceModel{H, HydroDispatchReservoirNestedCustomBudget},
+    ::Type{S},
+) where {H <: PSY.HydroEnergyReservoir, S <: PM.AbstractPowerModel}
+    devices = PSI.get_available_components(H, sys)
+
+    if !PSI.validate_available_devices(H, devices)
+        return
+    end
+
+    # Variables
+    PSI.add_variables!(
+        optimization_container,
+        PSI.ActivePowerVariable,
+        devices,
+        HydroDispatchReservoirNestedCustomBudget(),
+    )
+    PSI.add_variables!(
+        optimization_container,
+        PSI.ReactivePowerVariable,
+        devices,
+        HydroDispatchReservoirNestedCustomBudget(),
+    )
+
+    # Constraints
+    PSI.add_constraints!(
+        optimization_container,
+        PSI.RangeConstraint,
+        PSI.ActivePowerVariable,
+        devices,
+        model,
+        S,
+        PSI.get_feedforward(model),
+    )
+    PSI.add_constraints!(
+        optimization_container,
+        PSI.RangeConstraint,
+        PSI.ReactivePowerVariable,
+        devices,
+        model,
+        S,
+        PSI.get_feedforward(model),
+    )
+
+    # Energy Budget Constraint
+    energy_budget_constraints!(
+        optimization_container,
+        devices,
+        model,
+        S,
+        PSI.get_feedforward(model),
+    )
+    budget_periods = PSI.get_ext(PSI.get_settings(optimization_container))["budget_periods"]
+    interval_steps = Int(Dates.Millisecond(PSY.get_forecast_interval(sys))/PSY.get_time_series_resolution(sys))
+    energy_custom_budget_constraints!(
+        optimization_container,
+        devices,
+        budget_periods,
+        interval_steps,
+        model,
+        S,
+        PSI.get_feedforward(model),
+    )
+    PSI.feedforward!(optimization_container, devices, model, PSI.get_feedforward(model))
+
+    # Cost Function
+    PSI.cost_function!(optimization_container, devices, model, S, nothing)
+
+    return
+end
+
+"""
+Construct model for HydroGen with ReservoirBudget Dispatch Formulation
+with only Active Power.
+"""
+function PSI.construct_device!(
+    optimization_container::PSI.OptimizationContainer,
+    sys::PSY.System,
+    model::PSI.DeviceModel{H, HydroDispatchReservoirNestedCustomBudget},
+    ::Type{S},
+) where {H <: PSY.HydroEnergyReservoir, S <: PM.AbstractActivePowerModel}
+    devices = PSI.get_available_components(H, sys)
+
+    if !PSI.validate_available_devices(H, devices)
+        return
+    end
+
+    # Variables
+    PSI.add_variables!(
+        optimization_container,
+        PSI.ActivePowerVariable,
+        devices,
+        HydroDispatchReservoirNestedCustomBudget(),
+    )
+
+    # Constraints
+    PSI.add_constraints!(
+        optimization_container,
+        PSI.RangeConstraint,
+        PSI.ActivePowerVariable,
+        devices,
+        model,
+        S,
+        PSI.get_feedforward(model),
+    )
+
+    # Energy Budget Constraint
+    PSI.energy_budget_constraints!(
+        optimization_container,
+        devices,
+        model,
+        S,
+        PSI.get_feedforward(model),
+    )
+    budget_periods = PSI.get_ext(PSI.get_settings(optimization_container))["budget_periods"]
+    interval_steps = Int(Dates.Millisecond(PSY.get_forecast_interval(sys))/PSY.get_time_series_resolution(sys))
+    energy_custom_budget_constraints!(
+        optimization_container,
+        devices,
+        budget_periods,
+        interval_steps,
+        model,
+        S,
+        PSI.get_feedforward(model),
+    )
+    PSI.feedforward!(optimization_container, devices, model, PSI.get_feedforward(model))
+
+    # Cost Function
+    PSI.cost_function!(optimization_container, devices, model, S, nothing)
+
+    return
+end
+
+
 function PSI.construct_device!(
     optimization_container::PSI.OptimizationContainer,
     sys::PSY.System,
