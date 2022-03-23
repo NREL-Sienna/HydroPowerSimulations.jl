@@ -165,7 +165,7 @@ function get_nested_budget_length(
 )
     time_steps = PSI.model_time_steps(optimization_container)
     horizon = time_steps[end]
-    range_time_periods = budget_step:interval:horizon
+    range_time_periods = collect(budget_step:interval:horizon)
     return range_time_periods
 end
 
@@ -192,7 +192,7 @@ function energy_custom_budget_constraints!(
     end
 
     if PSI.model_has_parameters(optimization_container)
-        device_interval_energy_budget_param_ub(
+        device_interval_nested_energy_budget_param_ub(
             optimization_container,
             constraint_data,
             PSI.make_constraint_name(ENERGY_INTERVAL_BUDGET, H),
@@ -201,7 +201,7 @@ function energy_custom_budget_constraints!(
             get_nested_budget_length(optimization_container, budget_step, interval),
         )
     else
-        device_interval_energy_budget_ub(
+        device_interval_nested_energy_budget_ub(
             optimization_container,
             constraint_data,
             PSI.make_constraint_name(ENERGY_INTERVAL_BUDGET),
