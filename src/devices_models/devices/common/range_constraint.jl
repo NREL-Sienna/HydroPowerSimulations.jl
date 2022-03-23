@@ -11,8 +11,11 @@ function time_series_lower_bound!(
     for (ix, d) in enumerate(devices)
         ts_vector = PSI.get_time_series(optimization_container, d, forecast_label)
         @debug "time_series" ts_vector
-        constraint_d =
-            PSI.DeviceTimeSeriesConstraintInfo(d, x -> PSY.get_max_active_power(x), ts_vector)
+        constraint_d = PSI.DeviceTimeSeriesConstraintInfo(
+            d,
+            x -> PSY.get_max_active_power(x),
+            ts_vector,
+        )
         constraint_data[ix] = constraint_d
     end
 
@@ -34,7 +37,6 @@ function time_series_lower_bound!(
     end
 end
 
-
 function device_time_series_param_lb(
     optimization_container::PSI.OptimizationContainer,
     time_series_lower_bound_data::Vector{PSI.DeviceTimeSeriesConstraintInfo},
@@ -47,9 +49,14 @@ function device_time_series_param_lb(
     inv_dt = 1.0 / (Dates.value(Dates.Second(resolution)) / PSI.SECONDS_IN_HOUR)
     variable_out = PSI.get_variable(optimization_container, var_names)
     set_name = [PSI.get_component_name(r) for r in time_series_lower_bound_data]
-    constraint = PSI.add_cons_container!(optimization_container, cons_name, set_name, time_steps)
-    container =
-        PSI.add_param_container!(optimization_container, param_reference, set_name, time_steps)
+    constraint =
+        PSI.add_cons_container!(optimization_container, cons_name, set_name, time_steps)
+    container = PSI.add_param_container!(
+        optimization_container,
+        param_reference,
+        set_name,
+        time_steps,
+    )
     multiplier = PSI.get_multiplier_array(container)
     param = PSI.get_parameter_array(container)
     for constraint_info in time_series_lower_bound_data
@@ -62,7 +69,7 @@ function device_time_series_param_lb(
             )
         end
         for t in time_steps
-            constraint[name,t] = JuMP.@constraint(
+            constraint[name, t] = JuMP.@constraint(
                 optimization_container.JuMPmodel,
                 variable_out[name, t] >= multiplier[name, t] * param[name, t]
             )
@@ -71,7 +78,6 @@ function device_time_series_param_lb(
 
     return
 end
-
 
 function device_time_series_lb(
     optimization_container::PSI.OptimizationContainer,
@@ -82,7 +88,8 @@ function device_time_series_lb(
     time_steps = PSI.model_time_steps(optimization_container)
     variable_out = PSI.get_variable(optimization_container, var_names)
     names = [PSI.get_component_name(x) for x in time_series_lower_bound_data]
-    constraint = PSI.add_cons_container!(optimization_container, cons_name, names, time_steps)
+    constraint =
+        PSI.add_cons_container!(optimization_container, cons_name, names, time_steps)
 
     for constraint_info in time_series_lower_bound_data
         name = PSI.get_component_name(constraint_info)
@@ -91,7 +98,7 @@ function device_time_series_lb(
         forecast = constraint_info.timeseries
         multiplier = constraint_info.multiplier * inv_dt
         for t in time_steps
-            constraint[name,t] = JuMP.@constraint(
+            constraint[name, t] = JuMP.@constraint(
                 optimization_container.JuMPmodel,
                 variable_out[name, t] >= multiplier .* forecast[t]
             )

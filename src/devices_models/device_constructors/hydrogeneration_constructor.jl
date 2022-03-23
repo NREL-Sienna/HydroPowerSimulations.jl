@@ -52,7 +52,10 @@ function PSI.construct_device!(
         S,
         PSI.get_feedforward(model),
     )
-    interval_steps = Int(Dates.Millisecond(PSY.get_forecast_interval(sys))/PSY.get_time_series_resolution(sys))
+    interval_steps = Int(
+        Dates.Millisecond(PSY.get_forecast_interval(sys)) /
+        PSY.get_time_series_resolution(sys),
+    )
     energy_custom_budget_constraints!(
         optimization_container,
         devices,
@@ -112,7 +115,10 @@ function PSI.construct_device!(
         S,
         PSI.get_feedforward(model),
     )
-    interval_steps = Int(Dates.Millisecond(PSY.get_forecast_interval(sys))/PSY.get_time_series_resolution(sys))
+    interval_steps = Int(
+        Dates.Millisecond(PSY.get_forecast_interval(sys)) /
+        PSY.get_time_series_resolution(sys),
+    )
     energy_custom_budget_constraints!(
         optimization_container,
         devices,
@@ -128,7 +134,6 @@ function PSI.construct_device!(
 
     return
 end
-
 
 function PSI.construct_device!(
     optimization_container::PSI.OptimizationContainer,
@@ -261,7 +266,6 @@ function PSI.construct_device!(
     return
 end
 
-
 function PSI.construct_device!(
     optimization_container::PSI.OptimizationContainer,
     sys::PSY.System,
@@ -317,7 +321,10 @@ function PSI.construct_device!(
         PSI.get_feedforward(model),
     )
     budget_periods = PSI.get_ext(PSI.get_settings(optimization_container))["budget_periods"]
-    interval_steps = Int(Dates.Millisecond(PSY.get_forecast_interval(sys))/PSY.get_time_series_resolution(sys))
+    interval_steps = Int(
+        Dates.Millisecond(PSY.get_forecast_interval(sys)) /
+        PSY.get_time_series_resolution(sys),
+    )
     energy_custom_budget_constraints!(
         optimization_container,
         devices,
@@ -379,7 +386,10 @@ function PSI.construct_device!(
         PSI.get_feedforward(model),
     )
     budget_periods = PSI.get_ext(PSI.get_settings(optimization_container))["budget_periods"]
-    interval_steps = Int(Dates.Millisecond(PSY.get_forecast_interval(sys))/PSY.get_time_series_resolution(sys))
+    interval_steps = Int(
+        Dates.Millisecond(PSY.get_forecast_interval(sys)) /
+        PSY.get_time_series_resolution(sys),
+    )
     energy_custom_budget_constraints!(
         optimization_container,
         devices,
@@ -396,7 +406,6 @@ function PSI.construct_device!(
 
     return
 end
-
 
 function PSI.construct_device!(
     optimization_container::PSI.OptimizationContainer,
@@ -487,7 +496,6 @@ function PSI.construct_device!(
 
     return
 end
-
 
 function PSI.construct_device!(
     optimization_container::PSI.OptimizationContainer,

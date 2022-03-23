@@ -63,8 +63,11 @@ function energy_custom_budget_constraints!(
     for (ix, d) in enumerate(devices)
         ts_vector = PSI.get_time_series(optimization_container, d, forecast_label)
         @debug "time_series" ts_vector
-        constraint_d =
-            PSI.DeviceTimeSeriesConstraintInfo(d, x -> PSY.get_storage_capacity(x), ts_vector)
+        constraint_d = PSI.DeviceTimeSeriesConstraintInfo(
+            d,
+            x -> PSY.get_storage_capacity(x),
+            ts_vector,
+        )
         constraint_data[ix] = constraint_d
     end
 
@@ -98,13 +101,12 @@ function device_interval_energy_budget_param_ub(
 )
     time_steps = PSI.model_time_steps(optimization_container)
     resolution = PSI.model_resolution(optimization_container)
-    
+
     inv_dt = 1.0 / (Dates.value(Dates.Second(resolution)) / PSI.SECONDS_IN_HOUR)
     variable_out = PSI.get_variable(optimization_container, var_names)
     set_name = [PSI.get_component_name(r) for r in energy_budget_data]
     constraint = PSI.add_cons_container!(optimization_container, cons_name, set_name)
-    container =
-        PSI.add_param_container!(optimization_container, param_reference, set_name)
+    container = PSI.add_param_container!(optimization_container, param_reference, set_name)
     multiplier = PSI.get_multiplier_array(container)
     param = PSI.get_parameter_array(container)
     for constraint_info in energy_budget_data
@@ -156,8 +158,6 @@ function device_interval_energy_budget_ub(
     return
 end
 
-
-
 function get_nested_budget_length(
     optimization_container::PSI.OptimizationContainer,
     budget_step::Int,
@@ -183,8 +183,11 @@ function energy_custom_budget_constraints!(
     for (ix, d) in enumerate(devices)
         ts_vector = PSI.get_time_series(optimization_container, d, forecast_label)
         @debug "time_series" ts_vector
-        constraint_d =
-            PSI.DeviceTimeSeriesConstraintInfo(d, x -> PSY.get_storage_capacity(x), ts_vector)
+        constraint_d = PSI.DeviceTimeSeriesConstraintInfo(
+            d,
+            x -> PSY.get_storage_capacity(x),
+            ts_vector,
+        )
         constraint_data[ix] = constraint_d
     end
 
@@ -195,11 +198,7 @@ function energy_custom_budget_constraints!(
             PSI.make_constraint_name(ENERGY_INTERVAL_BUDGET, H),
             PSI.UpdateRef{H}(ENERGY_INTERVAL_BUDGET, forecast_label),
             PSI.make_variable_name(PSI.ACTIVE_POWER, H),
-            get_nested_budget_length(
-                optimization_container,
-                budget_step,
-                interval,
-            )
+            get_nested_budget_length(optimization_container, budget_step, interval),
         )
     else
         device_interval_energy_budget_ub(
@@ -207,15 +206,10 @@ function energy_custom_budget_constraints!(
             constraint_data,
             PSI.make_constraint_name(ENERGY_INTERVAL_BUDGET),
             PSI.make_variable_name(PSI.ACTIVE_POWER, H),
-            get_nested_budget_length(
-                optimization_container,
-                budget_step,
-                interval,
-            )
+            get_nested_budget_length(optimization_container, budget_step, interval),
         )
     end
 end
-
 
 function device_interval_nested_energy_budget_param_ub(
     optimization_container::PSI.OptimizationContainer,
@@ -227,13 +221,17 @@ function device_interval_nested_energy_budget_param_ub(
 )
     time_steps = PSI.model_time_steps(optimization_container)
     resolution = PSI.model_resolution(optimization_container)
-    
+
     inv_dt = 1.0 / (Dates.value(Dates.Second(resolution)) / PSI.SECONDS_IN_HOUR)
     variable_out = PSI.get_variable(optimization_container, var_names)
     set_name = [PSI.get_component_name(r) for r in energy_budget_data]
     constraint = PSI.add_cons_container!(optimization_container, cons_name, set_name)
-    container =
-        PSI.add_param_container!(optimization_container, param_reference, set_name, length(budget_steps))
+    container = PSI.add_param_container!(
+        optimization_container,
+        param_reference,
+        set_name,
+        length(budget_steps),
+    )
     multiplier = PSI.get_multiplier_array(container)
     param = PSI.get_parameter_array(container)
     for constraint_info in energy_budget_data
@@ -248,7 +246,7 @@ function device_interval_nested_energy_budget_param_ub(
         for (ix, T) in enumerate(budget_step)
             constraint[name, ix] = JuMP.@constraint(
                 optimization_container.JuMPmodel,
-                sum([variable_out[name, t] for t in 1:T]) <= sum([multiplier[name, t] * param[name, t] for t in 1:T]
+                sum([variable_out[name, t] for t in 1:T]) <= sum([multiplier[name, t] * param[name, t] for t in 1:T])
             )
         end
     end
@@ -270,7 +268,12 @@ function device_interval_nested_energy_budget_ub(
     time_steps = PSI.model_time_steps(optimization_container)
     variable_out = PSI.get_variable(optimization_container, var_names)
     names = [PSI.get_component_name(x) for x in energy_budget_constraints]
-    constraint = PSI.add_cons_container!(optimization_container, cons_name, names, length(budget_steps))
+    constraint = PSI.add_cons_container!(
+        optimization_container,
+        cons_name,
+        names,
+        length(budget_steps),
+    )
 
     for constraint_info in energy_budget_constraints
         name = PSI.get_component_name(constraint_info)
