@@ -106,7 +106,7 @@ function device_interval_energy_budget_param_ub(
     variable_out = PSI.get_variable(optimization_container, var_names)
     set_name = [PSI.get_component_name(r) for r in energy_budget_data]
     constraint = PSI.add_cons_container!(optimization_container, cons_name, set_name)
-    container = PSI.add_param_container!(optimization_container, param_reference, set_name)
+    container = PSI.add_param_container!(optimization_container, param_reference, set_name, time_steps)
     multiplier = PSI.get_multiplier_array(container)
     param = PSI.get_parameter_array(container)
     for constraint_info in energy_budget_data
@@ -225,12 +225,12 @@ function device_interval_nested_energy_budget_param_ub(
     inv_dt = 1.0 / (Dates.value(Dates.Second(resolution)) / PSI.SECONDS_IN_HOUR)
     variable_out = PSI.get_variable(optimization_container, var_names)
     set_name = [PSI.get_component_name(r) for r in energy_budget_data]
-    constraint = PSI.add_cons_container!(optimization_container, cons_name, set_name)
+    constraint = PSI.add_cons_container!(optimization_container, cons_name, set_name, 1:length(budget_steps))
     container = PSI.add_param_container!(
         optimization_container,
         param_reference,
         set_name,
-        length(budget_steps),
+        time_steps,
     )
     multiplier = PSI.get_multiplier_array(container)
     param = PSI.get_parameter_array(container)
@@ -243,7 +243,7 @@ function device_interval_nested_energy_budget_param_ub(
                 constraint_info.timeseries[t],
             )
         end
-        for (ix, T) in enumerate(budget_step)
+        for (ix, T) in enumerate(budget_steps)
             constraint[name, ix] = JuMP.@constraint(
                 optimization_container.JuMPmodel,
                 sum([variable_out[name, t] for t in 1:T]) <= sum([multiplier[name, t] * param[name, t] for t in 1:T])
@@ -272,7 +272,7 @@ function device_interval_nested_energy_budget_ub(
         optimization_container,
         cons_name,
         names,
-        length(budget_steps),
+        1:length(budget_steps),
     )
 
     for constraint_info in energy_budget_constraints
@@ -281,7 +281,7 @@ function device_interval_nested_energy_budget_ub(
         inv_dt = 1.0 / (Dates.value(Dates.Second(resolution)) / PSI.SECONDS_IN_HOUR)
         forecast = constraint_info.timeseries
         multiplier = constraint_info.multiplier * inv_dt
-        for (ix, T) in enumerate(budget_step)
+        for (ix, T) in enumerate(budget_steps)
             constraint[name, ix] = JuMP.@constraint(
                 optimization_container.JuMPmodel,
                 sum([variable_out[name, t] for t in 1:T]) <= multiplier * sum(forecast[t] for t in 1:T)
