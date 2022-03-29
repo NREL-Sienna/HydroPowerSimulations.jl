@@ -166,7 +166,7 @@ function get_nested_budget_length(
 )
     time_steps = PSI.model_time_steps(optimization_container)
     horizon = time_steps[end]
-    if budget_step == 1
+    if budget_step == 24
         range_time_periods = collect(interval:interval:horizon)
         range_time_periods = vcat(budget_step, range_time_periods)
     else
