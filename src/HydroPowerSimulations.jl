@@ -11,6 +11,7 @@ export HydroDispatchRunOfRiverLowerBound
 export HydroDispatchReservoirBudgetLowerUpperBound
 export HydroDispatchReservoirIntervalBudget
 export HydroDispatchReservoirCustomBudget
+export HydroDispatchReservoirNestedBudget
 export HydroDispatchReservoirNestedCustomBudget
 
 #################################################################################

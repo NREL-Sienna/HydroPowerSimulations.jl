@@ -5,6 +5,7 @@ struct HydroDispatchReservoirBudgetLowerUpperBound <: PSI.AbstractHydroDispatchF
 struct HydroDispatchReservoirCascade <: PSI.AbstractHydroReservoirFormulation end
 struct HydroDispatchReservoirBudgetUpperBound <: PSI.AbstractHydroReservoirFormulation end
 struct HydroDispatchReservoirCustomBudget <: PSI.AbstractHydroReservoirFormulation end
+struct HydroDispatchReservoirNestedBudget <: PSI.AbstractHydroReservoirFormulation end
 struct HydroDispatchReservoirNestedCustomBudget <: PSI.AbstractHydroReservoirFormulation end
 
 function PSI.DeviceRangeConstraintSpec(
@@ -165,7 +166,12 @@ function get_nested_budget_length(
 )
     time_steps = PSI.model_time_steps(optimization_container)
     horizon = time_steps[end]
-    range_time_periods = collect(budget_step:interval:horizon)
+    if budget_step == 1
+        range_time_periods = collect(interval:interval:horizon)
+        range_time_periods = vcat(budget_step, range_time_periods)
+    else
+        range_time_periods = collect(budget_step:interval:horizon)
+    end
     return range_time_periods
 end
 
