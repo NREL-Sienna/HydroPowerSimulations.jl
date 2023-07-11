@@ -1,7 +1,7 @@
 ############################ Hydro Generation Formulations #################################
 # Defined in PSI copied here for reference
-# abstract type PSI.AbstractHydroFormulation <: AbstractDeviceFormulation end
-# abstract type AbstractHydroDispatchFormulation <: PSI.AbstractHydroFormulation end
+# abstract type PSI.AbstractHydroFormulation <: PSI.AbstractDeviceFormulation end
+# abstract type PSI.AbstractHydroDispatchFormulation <: PSI.AbstractHydroFormulation end
 # abstract type PSI.AbstractHydroUnitCommitment <: PSI.AbstractHydroFormulation end
 
 abstract type AbstractHydroReservoirFormulation <: PSI.AbstractHydroDispatchFormulation end

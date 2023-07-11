@@ -88,14 +88,14 @@ function test_2_stage_decision_models_with_feedforwards(in_memory)
     template_ed = get_template_nomin_ed_simulation()
     set_device_model!(template_ed, InterruptiblePowerLoad, StaticPowerLoad)
     set_device_model!(template_ed, HydroEnergyReservoir, HydroDispatchReservoirBudget)
-    set_network_model!(template_uc, NetworkModel(
+    set_network_model!(template_uc, PSI.NetworkModel(
         CopperPlatePowerModel,
         # MILP "duals" not supported with free solvers
         # duals = [CopperPlateBalanceConstraint],
     ))
     set_network_model!(
         template_ed,
-        NetworkModel(
+        PSI.NetworkModel(
             CopperPlatePowerModel;
             duals=[CopperPlateBalanceConstraint],
             use_slacks=true,
@@ -116,7 +116,7 @@ function test_2_stage_decision_models_with_feedforwards(in_memory)
             "ED" => [
                 SemiContinuousFeedforward(;
                     component_type=ThermalStandard,
-                    source=OnVariable,
+                    source=PSI.OnVariable,
                     affected_values=[PSI.ActivePowerVariable],
                 ),
                 EnergyLimitFeedforward(;

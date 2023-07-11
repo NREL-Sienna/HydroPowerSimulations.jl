@@ -1,8 +1,8 @@
 struct HydroDispatchReservoirCascade <: PSI.AbstractHydroReservoirFormulation end
 
 function energy_balance_external_input_param_cascade(
-    optimization_container::PSI.OptimizationContainer,
-    initial_conditions::Vector{PSI.InitialCondition},
+    optimization_container::PSI.PSI.OptimizationContainer,
+    initial_conditions::Vector{PSI.PSI.InitialCondition},
     time_series_data::Tuple{
         Vector{PSI.DeviceTimeSeriesConstraintInfo},
         Vector{PSI.DeviceTimeSeriesConstraintInfo},
@@ -136,8 +136,8 @@ function energy_balance_external_input_param_cascade(
 end
 
 function energy_balance_external_input_cascade(
-    optimization_container::PSI.OptimizationContainer,
-    initial_conditions::Vector{PSI.InitialCondition},
+    optimization_container::PSI.PSI.OptimizationContainer,
+    initial_conditions::Vector{PSI.PSI.InitialCondition},
     time_series_data::Tuple{
         Vector{PSI.DeviceTimeSeriesConstraintInfo},
         Vector{PSI.DeviceTimeSeriesConstraintInfo},
@@ -237,7 +237,7 @@ function energy_balance_external_input_cascade(
 end
 
 function energy_balance_cascade_constraint!(
-    optimization_container::PSI.OptimizationContainer,
+    optimization_container::PSI.PSI.OptimizationContainer,
     devices::IS.FlattenIteratorWrapper{H},
     model::PSI.DeviceModel{H, HydroDispatchReservoirCascade},
     system_formulation::Type{<:PM.AbstractPowerModel},

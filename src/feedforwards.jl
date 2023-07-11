@@ -1,6 +1,6 @@
 @doc raw"""
         add_feedforward_constraints(
-            container::OptimizationContainer,
+            container::PSI.OptimizationContainer,
             ::PSI.DeviceModel,
             devices::IS.FlattenIteratorWrapper{T},
             ff::EnergyTargetFeedforward,
@@ -16,13 +16,13 @@ Constructs a equality constraint to a fix a variable in one model using the vari
 `` x + slack >= param``
 
 # Arguments
-* container::OptimizationContainer : the optimization_container model built in PowerSimulations
+* container::PSI.OptimizationContainer : the optimization_container model built in PowerSimulations
 * model::PSI.DeviceModel : the device model
 * devices::IS.FlattenIteratorWrapper{T} : list of devices
 * ff::EnergyTargetFeedforward : a instance of the FixValue Feedforward
 """
 function add_feedforward_constraints!(
-    container::OptimizationContainer,
+    container::PSI.OptimizationContainer,
     ::PSI.DeviceModel,
     devices::IS.FlattenIteratorWrapper{T},
     ff::EnergyTargetFeedforward,
@@ -46,7 +46,7 @@ function add_feedforward_constraints!(
             FeedforwardEnergyTargetConstraint(),
             T,
             set_name;
-            meta = "$(var_type)target",
+            meta="$(var_type)target",
         )
 
         for d in devices
@@ -66,7 +66,7 @@ function add_feedforward_constraints!(
 end
 
 function _add_feedforward_arguments!(
-    container::OptimizationContainer,
+    container::PSI.OptimizationContainer,
     model::PSI.DeviceModel,
     devices::IS.FlattenIteratorWrapper{T},
     ff::EnergyTargetFeedforward,

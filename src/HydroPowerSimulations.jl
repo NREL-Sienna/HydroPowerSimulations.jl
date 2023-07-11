@@ -39,10 +39,15 @@ export HydroDispatchRunOfRiver
 
 #################################################################################
 # Includes
+# Core includes
 include("core/formulations.jl")
 include("core/variables.jl")
 include("core/constraints.jl")
 include("core/expressions.jl")
+include("core/parameters.jl")
+include("core/initial_conditions.jl")
+
+# Models
 include("hydro_generation.jl")
 
 end # module
