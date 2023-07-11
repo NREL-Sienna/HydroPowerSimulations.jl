@@ -49,5 +49,6 @@ include("core/initial_conditions.jl")
 
 # Models
 include("hydro_generation.jl")
+include("hydrogeneration_constructor.jl")
 
 end # module
