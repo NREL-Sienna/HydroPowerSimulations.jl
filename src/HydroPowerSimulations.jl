@@ -33,6 +33,10 @@ const IS = InfrastructureSystems
 const PM = PowerModels
 const PSI = PowerSimulations
 
+import PowerSimulations: HydroDispatchRunOfRiver, HydroCommitmentRunOfRiver
+export HydroCommitmentRunOfRiver
+export HydroDispatchRunOfRiver
+
 #################################################################################
 # Includes
 include("core/formulations.jl")

@@ -1,7 +1,7 @@
 @doc raw"""
         add_feedforward_constraints(
             container::OptimizationContainer,
-            ::DeviceModel,
+            ::PSI.DeviceModel,
             devices::IS.FlattenIteratorWrapper{T},
             ff::EnergyTargetFeedforward,
         ) where {T <: PSY.Component}
@@ -17,13 +17,13 @@ Constructs a equality constraint to a fix a variable in one model using the vari
 
 # Arguments
 * container::OptimizationContainer : the optimization_container model built in PowerSimulations
-* model::DeviceModel : the device model
+* model::PSI.DeviceModel : the device model
 * devices::IS.FlattenIteratorWrapper{T} : list of devices
 * ff::EnergyTargetFeedforward : a instance of the FixValue Feedforward
 """
 function add_feedforward_constraints!(
     container::OptimizationContainer,
-    ::DeviceModel,
+    ::PSI.DeviceModel,
     devices::IS.FlattenIteratorWrapper{T},
     ff::EnergyTargetFeedforward,
 ) where {T <: PSY.Component}
@@ -67,7 +67,7 @@ end
 
 function _add_feedforward_arguments!(
     container::OptimizationContainer,
-    model::DeviceModel,
+    model::PSI.DeviceModel,
     devices::IS.FlattenIteratorWrapper{T},
     ff::EnergyTargetFeedforward,
 ) where {T <: PSY.Component}
