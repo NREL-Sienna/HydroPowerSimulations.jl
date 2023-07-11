@@ -29,33 +29,32 @@ This file is auto-generated. Do not edit.
         internal::IS.InfrastructureSystemsInternal
     end
 
-
-
 # Arguments
-- `name::String`
-- `available::Bool`
-- `bus::PSY.Bus`
-- `active_power::Float64`
-- `reactive_power::Float64`, validation range: `reactive_power_limits`, action if invalid: `warn`
-- `rating::Float64`: Thermal limited MVA Power Output of the unit. <= Capacity, validation range: `(0, nothing)`, action if invalid: `error`
-- `prime_mover::PSY.PrimeMovers`: Prime mover technology according to EIA 923
-- `active_power_limits::NamedTuple{(:min, :max), Tuple{Float64, Float64}}`
-- `reactive_power_limits::Union{Nothing, PSY.Min_Max}`, action if invalid: `warn`
-- `ramp_limits::Union{Nothing, NamedTuple{(:up, :down), Tuple{Float64, Float64}}}`: ramp up and ramp down limits in MW (in component base per unit) per minute, validation range: `(0, nothing)`, action if invalid: `error`
-- `time_limits::Union{Nothing, NamedTuple{(:up, :down), Tuple{Float64, Float64}}}`: Minimum up and Minimum down time limits in hours, validation range: `(0, nothing)`, action if invalid: `error`
-- `base_power::Float64`: Base power of the unit in MVA, validation range: `(0, nothing)`, action if invalid: `warn`
-- `storage_capacity::Float64`: Maximum storage capacity in the reservoir (units can be p.u-hr or m^3)., validation range: `(0, nothing)`, action if invalid: `error`
-- `inflow::Float64`: Baseline inflow into the reservoir (units can be p.u. or m^3/hr), validation range: `(0, nothing)`, action if invalid: `error`
-- `initial_storage::Float64`: Initial storage capacity in the reservoir (units can be p.u-hr or m^3)., validation range: `(0, nothing)`, action if invalid: `error`
-- `operation_cost::PSY.OperationalCost`: Operation Cost of Generation [`OperationalCost`](@ref)
-- `storage_target::Float64`: Storage target at the end of simulation as ratio of storage capacity.
-- `conversion_factor::Float64`: Conversion factor from flow/volume to energy: m^3 -> p.u-hr.
-- `upstream::Vector{NamedTuple{(:unit, :lag, :multiplier), Tuple{PSY.HydroGen, Int64, Float64}}}`: unit: upstream units; lag: duration in number of periods between upstream release and downstream availability; multiplier: relationship between upstream energy release and downstream energy availability
-- `services::Vector{PSY.Service}`: Services that this device contributes to
-- `dynamic_injector::Union{Nothing, PSY.DynamicInjection}`: corresponding dynamic injection device
-- `ext::Dict{String, Any}`
-- `time_series_container::InfrastructureSystems.TimeSeriesContainer`: internal time_series storage
-- `internal::IS.InfrastructureSystemsInternal`: power system internal reference, do not modify
+
+  - `name::String`
+  - `available::Bool`
+  - `bus::PSY.Bus`
+  - `active_power::Float64`
+  - `reactive_power::Float64`, validation range: `reactive_power_limits`, action if invalid: `warn`
+  - `rating::Float64`: Thermal limited MVA Power Output of the unit. <= Capacity, validation range: `(0, nothing)`, action if invalid: `error`
+  - `prime_mover::PSY.PrimeMovers`: Prime mover technology according to EIA 923
+  - `active_power_limits::NamedTuple{(:min, :max), Tuple{Float64, Float64}}`
+  - `reactive_power_limits::Union{Nothing, PSY.Min_Max}`, action if invalid: `warn`
+  - `ramp_limits::Union{Nothing, NamedTuple{(:up, :down), Tuple{Float64, Float64}}}`: ramp up and ramp down limits in MW (in component base per unit) per minute, validation range: `(0, nothing)`, action if invalid: `error`
+  - `time_limits::Union{Nothing, NamedTuple{(:up, :down), Tuple{Float64, Float64}}}`: Minimum up and Minimum down time limits in hours, validation range: `(0, nothing)`, action if invalid: `error`
+  - `base_power::Float64`: Base power of the unit in MVA, validation range: `(0, nothing)`, action if invalid: `warn`
+  - `storage_capacity::Float64`: Maximum storage capacity in the reservoir (units can be p.u-hr or m^3)., validation range: `(0, nothing)`, action if invalid: `error`
+  - `inflow::Float64`: Baseline inflow into the reservoir (units can be p.u. or m^3/hr), validation range: `(0, nothing)`, action if invalid: `error`
+  - `initial_storage::Float64`: Initial storage capacity in the reservoir (units can be p.u-hr or m^3)., validation range: `(0, nothing)`, action if invalid: `error`
+  - `operation_cost::PSY.OperationalCost`: Operation Cost of Generation [`OperationalCost`](@ref)
+  - `storage_target::Float64`: Storage target at the end of simulation as ratio of storage capacity.
+  - `conversion_factor::Float64`: Conversion factor from flow/volume to energy: m^3 -> p.u-hr.
+  - `upstream::Vector{NamedTuple{(:unit, :lag, :multiplier), Tuple{PSY.HydroGen, Int64, Float64}}}`: unit: upstream units; lag: duration in number of periods between upstream release and downstream availability; multiplier: relationship between upstream energy release and downstream energy availability
+  - `services::Vector{PSY.Service}`: Services that this device contributes to
+  - `dynamic_injector::Union{Nothing, PSY.DynamicInjection}`: corresponding dynamic injection device
+  - `ext::Dict{String, Any}`
+  - `time_series_container::InfrastructureSystems.TimeSeriesContainer`: internal time_series storage
+  - `internal::IS.InfrastructureSystemsInternal`: power system internal reference, do not modify
 """
 mutable struct HydroEnergyCascade <: HydroCascade
     name::String
@@ -118,14 +117,14 @@ function HydroEnergyCascade(
     storage_capacity,
     inflow,
     initial_storage,
-    operation_cost = PSY.TwoPartCost(0.0, 0.0),
-    storage_target = 1.0,
-    conversion_factor = 1.0,
-    upstream = NamedTuple{(:unit, :lag, :multiplier), Tuple{PSY.HydroGen, Int64, Float64}}[],
-    services = PSY.Device[],
-    dynamic_injector = nothing,
-    ext = Dict{String, Any}(),
-    time_series_container = InfrastructureSystems.TimeSeriesContainer(),
+    operation_cost=PSY.TwoPartCost(0.0, 0.0),
+    storage_target=1.0,
+    conversion_factor=1.0,
+    upstream=NamedTuple{(:unit, :lag, :multiplier), Tuple{PSY.HydroGen, Int64, Float64}}[],
+    services=PSY.Device[],
+    dynamic_injector=nothing,
+    ext=Dict{String, Any}(),
+    time_series_container=InfrastructureSystems.TimeSeriesContainer(),
 )
     HydroEnergyCascade(
         name,
@@ -171,15 +170,15 @@ function HydroEnergyCascade(;
     storage_capacity,
     inflow,
     initial_storage,
-    operation_cost = PSY.TwoPartCost(0.0, 0.0),
-    storage_target = 1.0,
-    conversion_factor = 1.0,
-    upstream = NamedTuple{(:unit, :lag, :multiplier), Tuple{PSY.HydroGen, Int64, Float64}}[],
-    services = PSY.Device[],
-    dynamic_injector = nothing,
-    ext = Dict{String, Any}(),
-    time_series_container = InfrastructureSystems.TimeSeriesContainer(),
-    internal = IS.InfrastructureSystemsInternal(),
+    operation_cost=PSY.TwoPartCost(0.0, 0.0),
+    storage_target=1.0,
+    conversion_factor=1.0,
+    upstream=NamedTuple{(:unit, :lag, :multiplier), Tuple{PSY.HydroGen, Int64, Float64}}[],
+    services=PSY.Device[],
+    dynamic_injector=nothing,
+    ext=Dict{String, Any}(),
+    time_series_container=InfrastructureSystems.TimeSeriesContainer(),
+    internal=IS.InfrastructureSystemsInternal(),
 )
     HydroEnergyCascade(
         name,
@@ -212,32 +211,32 @@ end
 # Constructor for demo purposes; non-functional.
 function HydroEnergyCascade(::Nothing)
     HydroEnergyCascade(;
-        name = "init",
-        available = false,
-        bus = PSY.Bus(nothing),
-        active_power = 0.0,
-        reactive_power = 0.0,
-        rating = 0.0,
-        prime_mover = PSY.PrimeMovers.HY,
-        active_power_limits = (min = 0.0, max = 0.0),
-        reactive_power_limits = nothing,
-        ramp_limits = nothing,
-        time_limits = nothing,
-        base_power = 0.0,
-        storage_capacity = 0.0,
-        inflow = 0.0,
-        initial_storage = 0.0,
-        operation_cost = PSY.TwoPartCost(nothing),
-        storage_target = 0.0,
-        conversion_factor = 0.0,
-        upstream = NamedTuple{
+        name="init",
+        available=false,
+        bus=PSY.Bus(nothing),
+        active_power=0.0,
+        reactive_power=0.0,
+        rating=0.0,
+        prime_mover=PSY.PrimeMovers.HY,
+        active_power_limits=(min=0.0, max=0.0),
+        reactive_power_limits=nothing,
+        ramp_limits=nothing,
+        time_limits=nothing,
+        base_power=0.0,
+        storage_capacity=0.0,
+        inflow=0.0,
+        initial_storage=0.0,
+        operation_cost=PSY.TwoPartCost(nothing),
+        storage_target=0.0,
+        conversion_factor=0.0,
+        upstream=NamedTuple{
             (:unit, :lag, :multiplier),
             Tuple{PSY.HydroGen, Int64, Float64},
         }[],
-        services = PSY.Device[],
-        dynamic_injector = nothing,
-        ext = Dict{String, Any}(),
-        time_series_container = InfrastructureSystems.TimeSeriesContainer(),
+        services=PSY.Device[],
+        dynamic_injector=nothing,
+        ext=Dict{String, Any}(),
+        time_series_container=InfrastructureSystems.TimeSeriesContainer(),
     )
 end
 
@@ -283,7 +282,9 @@ PowerSystems.get_operation_cost(value::HydroEnergyCascade) = value.operation_cos
 PowerSystems.get_storage_target(value::HydroEnergyCascade) = value.storage_target
 
 PowerSystems.get_conversion_factor(value::HydroEnergyCascade) = value.conversion_factor
-"""Get [`HydroEnergyCascade`](@ref) `upstream`."""
+"""
+Get [`HydroEnergyCascade`](@ref) `upstream`.
+"""
 get_upstream(value::HydroEnergyCascade) = value.upstream
 
 PowerSystems.get_services(value::HydroEnergyCascade) = value.services
@@ -340,7 +341,9 @@ PowerSystems.set_storage_target!(value::HydroEnergyCascade, val) =
 
 PowerSystems.set_conversion_factor!(value::HydroEnergyCascade, val) =
     value.conversion_factor = val
-"""Set [`HydroEnergyCascade`](@ref) `upstream`."""
+"""
+Set [`HydroEnergyCascade`](@ref) `upstream`.
+"""
 set_upstream!(value::HydroEnergyCascade, val) = value.upstream = val
 
 PowerSystems.set_services!(value::HydroEnergyCascade, val) = value.services = val

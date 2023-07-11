@@ -12,33 +12,33 @@ function PSI.DeviceRangeConstraintSpec(
 ) where {T <: PSY.HydroGen}
     if !use_parameters && !use_forecasts
         return PSI.DeviceRangeConstraintSpec(;
-            range_constraint_spec = PSI.RangeConstraintSpec(;
-                constraint_name = PSI.make_constraint_name(
+            range_constraint_spec=PSI.RangeConstraintSpec(;
+                constraint_name=PSI.make_constraint_name(
                     PSI.RangeConstraint,
                     PSI.ActivePowerVariable,
                     T,
                 ),
-                variable_name = PSI.make_variable_name(PSI.ActivePowerVariable, T),
-                limits_func = x -> (min = 0.0, max = PSY.get_active_power(x)),
-                constraint_func = PSI.device_range!,
-                constraint_struct = PSI.DeviceRangeConstraintInfo,
+                variable_name=PSI.make_variable_name(PSI.ActivePowerVariable, T),
+                limits_func=x -> (min=0.0, max=PSY.get_active_power(x)),
+                constraint_func=PSI.device_range!,
+                constraint_struct=PSI.DeviceRangeConstraintInfo,
             ),
         )
     end
 
     return PSI.DeviceRangeConstraintSpec(;
-        timeseries_range_constraint_spec = PSI.TimeSeriesConstraintSpec(
-            constraint_name = PSI.make_constraint_name(
+        timeseries_range_constraint_spec=PSI.TimeSeriesConstraintSpec(
+            constraint_name=PSI.make_constraint_name(
                 PSI.RangeConstraint,
                 PSI.ActivePowerVariable,
                 T,
             ),
-            variable_name = PSI.make_variable_name(PSI.ActivePowerVariable, T),
-            parameter_name = use_parameters ? PSI.ACTIVE_POWER : nothing,
-            forecast_label = "max_hourly_hydro_budget",
-            multiplier_func = x -> PSY.get_max_active_power(x),
-            constraint_func = use_parameters ? PSI.device_timeseries_param_ub! :
-                              PSI.device_timeseries_ub!,
+            variable_name=PSI.make_variable_name(PSI.ActivePowerVariable, T),
+            parameter_name=use_parameters ? PSI.ACTIVE_POWER : nothing,
+            forecast_label="max_hourly_hydro_budget",
+            multiplier_func=x -> PSY.get_max_active_power(x),
+            constraint_func=use_parameters ? PSI.device_timeseries_param_ub! :
+                            PSI.device_timeseries_ub!,
         ),
     )
 end

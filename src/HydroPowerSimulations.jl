@@ -43,6 +43,4 @@ include("core/variables.jl")
 include("core/constraints.jl")
 include("core/expressions.jl")
 
-
-
 end # module

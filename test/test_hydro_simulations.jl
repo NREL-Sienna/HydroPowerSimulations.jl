@@ -25,62 +25,62 @@
         DecisionModel(
             template,
             sys_md;
-            name = "MD",
-            initialize_model = false,
-            system_to_file = false,
-            optimizer = HiGHS_optimizer,
+            name="MD",
+            initialize_model=false,
+            system_to_file=false,
+            optimizer=HiGHS_optimizer,
         ),
         DecisionModel(
             template_uc,
             sys_uc;
-            name = "UC",
-            initialize_model = false,
-            system_to_file = false,
-            optimizer = HiGHS_optimizer,
+            name="UC",
+            initialize_model=false,
+            system_to_file=false,
+            optimizer=HiGHS_optimizer,
         ),
         DecisionModel(
             template_ed,
             sys_ed;
-            name = "ED",
-            initialize_model = false,
-            system_to_file = false,
-            optimizer = HiGHS_optimizer,
+            name="ED",
+            initialize_model=false,
+            system_to_file=false,
+            optimizer=HiGHS_optimizer,
         ),
     ])
 
     feedforwards = Dict(
         "UC" => [
             EnergyLimitFeedforward(;
-                source = ActivePowerVariable,
-                affected_values = [ActivePowerVariable],
-                component_type = HydroEnergyReservoir,
-                number_of_periods = 24,
+                source=ActivePowerVariable,
+                affected_values=[ActivePowerVariable],
+                component_type=HydroEnergyReservoir,
+                number_of_periods=24,
             ),
         ],
         "ED" => [
             EnergyLimitFeedforward(;
-                source = ActivePowerVariable,
-                affected_values = [ActivePowerVariable],
-                component_type = HydroEnergyReservoir,
-                number_of_periods = 12,
+                source=ActivePowerVariable,
+                affected_values=[ActivePowerVariable],
+                component_type=HydroEnergyReservoir,
+                number_of_periods=12,
             ),
         ],
     )
 
     test_sequence = SimulationSequence(;
-        models = models,
-        ini_cond_chronology = InterProblemChronology(),
-        feedforwards = feedforwards,
+        models=models,
+        ini_cond_chronology=InterProblemChronology(),
+        feedforwards=feedforwards,
     )
 
     sim = Simulation(;
-        name = "test_md",
-        steps = 2,
-        models = models,
-        sequence = test_sequence,
-        simulation_folder = mktempdir(; cleanup = true),
+        name="test_md",
+        steps=2,
+        models=models,
+        sequence=test_sequence,
+        simulation_folder=mktempdir(; cleanup=true),
     )
-    @test build!(sim; serialize = false) == PSI.BuildStatus.BUILT
+    @test build!(sim; serialize=false) == PSI.BuildStatus.BUILT
 end
 
 function test_2_stage_decision_models_with_feedforwards(in_memory)
@@ -97,59 +97,49 @@ function test_2_stage_decision_models_with_feedforwards(in_memory)
         template_ed,
         NetworkModel(
             CopperPlatePowerModel;
-            duals = [CopperPlateBalanceConstraint],
-            use_slacks = true,
+            duals=[CopperPlateBalanceConstraint],
+            use_slacks=true,
         ),
     )
     c_sys5_hy_uc = PSB.build_system(PSITestSystems, "c_sys5_hy_uc")
     c_sys5_hy_ed = PSB.build_system(PSITestSystems, "c_sys5_hy_ed")
     models = SimulationModels(;
-        decision_models = [
-            DecisionModel(
-                template_uc,
-                c_sys5_hy_uc;
-                name = "UC",
-                optimizer = GLPK_optimizer,
-            ),
-            DecisionModel(
-                template_ed,
-                c_sys5_hy_ed;
-                name = "ED",
-                optimizer = ipopt_optimizer,
-            ),
+        decision_models=[
+            DecisionModel(template_uc, c_sys5_hy_uc; name="UC", optimizer=GLPK_optimizer),
+            DecisionModel(template_ed, c_sys5_hy_ed; name="ED", optimizer=ipopt_optimizer),
         ],
     )
 
     sequence = SimulationSequence(;
-        models = models,
-        feedforwards = Dict(
+        models=models,
+        feedforwards=Dict(
             "ED" => [
                 SemiContinuousFeedforward(;
-                    component_type = ThermalStandard,
-                    source = OnVariable,
-                    affected_values = [ActivePowerVariable],
+                    component_type=ThermalStandard,
+                    source=OnVariable,
+                    affected_values=[ActivePowerVariable],
                 ),
                 EnergyLimitFeedforward(;
-                    component_type = HydroEnergyReservoir,
-                    source = ActivePowerVariable,
-                    affected_values = [ActivePowerVariable],
-                    number_of_periods = 12,
+                    component_type=HydroEnergyReservoir,
+                    source=ActivePowerVariable,
+                    affected_values=[ActivePowerVariable],
+                    number_of_periods=12,
                 ),
             ],
         ),
-        ini_cond_chronology = InterProblemChronology(),
+        ini_cond_chronology=InterProblemChronology(),
     )
     sim = Simulation(;
-        name = "no_cache",
-        steps = 2,
-        models = models,
-        sequence = sequence,
-        simulation_folder = mktempdir(; cleanup = true),
+        name="no_cache",
+        steps=2,
+        models=models,
+        sequence=sequence,
+        simulation_folder=mktempdir(; cleanup=true),
     )
 
-    build_out = build!(sim; console_level = Logging.Error)
+    build_out = build!(sim; console_level=Logging.Error)
     @test build_out == PSI.BuildStatus.BUILT
-    execute_out = execute!(sim; in_memory = in_memory)
+    execute_out = execute!(sim; in_memory=in_memory)
     @test execute_out == PSI.RunStatus.SUCCESSFUL
 end
 
