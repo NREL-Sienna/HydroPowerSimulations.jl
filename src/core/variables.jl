@@ -3,6 +3,6 @@ Struct to dispatch the creation of energy (water) spillage variable representing
 
 Docs abbreviation: ``S``
 """
-struct WaterSpillageVariable <: VariableType end
+struct WaterSpillageVariable <: PSI.VariableType end
 
 # convert_result_to_natural_units(::Type{WaterSpillageVariable }) = true # TODO: is this pu?
