@@ -1,0 +1,9 @@
+[deps]
+DataStructures = "864edb3b-99cc-5e75-8d2d-829cb0a9cfe8"
+Documenter = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
+DocumenterTools = "35a29f4d-8980-5a13-9543-d66fff28ecb8"
+HydroPowerSimulations = "bed98974-b02a-5e2f-9ee0-a103f5c450dd"
+
+[compat]
+Documenter = "0.27"
+julia = "^1.6"
