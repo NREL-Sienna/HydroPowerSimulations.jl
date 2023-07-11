@@ -11,9 +11,9 @@ using Test
 using Logging
 
 import Aqua
-Aqua.test_unbound_args(HybridSystemsSimulations)
-Aqua.test_undefined_exports(HybridSystemsSimulations)
-Aqua.test_ambiguities(HybridSystemsSimulations)
+Aqua.test_unbound_args(HydroPowerSimulations)
+Aqua.test_undefined_exports(HydroPowerSimulations)
+Aqua.test_ambiguities(HydroPowerSimulations)
 
 LOG_FILE = "power-systems.log"
 LOG_LEVELS = Dict(
@@ -126,7 +126,7 @@ function run_tests()
         end
 
         # Testing Topological components of the schema
-        @time @testset "Begin HybridSystemsSimulations tests" begin
+        @time @testset "Begin HydroPowerSimulations tests" begin
             @includetests ARGS
         end
 

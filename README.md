@@ -1,5 +1,14 @@
 # HydroPowerSimulations.jl
 
-This package contains extensions on [PowerSystems.jl](https://github.com/nrel-siip/powersystems.jl) and [PowerSimulations.jl](https://github.com/nrel-siip/powersimulations.jl) to enable enhanced hydropower representations. Extensions on the basic hydropower representations include:
+[![Main - CI](https://github.com/NREL-Sienna/HydroPowerSimulations.jl/actions/workflows/main-tests.yml/badge.svg)](https://github.com/NREL-Sienna/HydroPowerSimulations.jl/actions/workflows/main-tests.yml)
+[![codecov](https://codecov.io/gh/NREL-Sienna/HydroPowerSimulations.jl/branch/main/graph/badge.svg?token=4TAeajF0h6)](https://codecov.io/gh/NREL-Sienna/HydroPowerSimulations.jl)
+[![Documentation Build](https://github.com/NREL-Sienna/HydroPowerSimulations.jl/actions/workflows/docs.yml/badge.svg)](https://nrel-sienna.github.io/HydroPowerSimulations.jl/dev/)
+[<img src="https://img.shields.io/badge/slack-@Sienna/HydroPowerSimulations-sienna.svg?logo=slack">](https://join.slack.com/t/nrel-sienna/shared_invite/zt-glam9vdu-o8A9TwZTZqqNTKHa7q3BpQ)
 
- - Cascading hydropower network representation with `HydroEnergyCascade` device and `HydroDispatchReservoirCascade` formulation.
+## Development
+
+Contributions to the development and enahancement of HydroPowerSimulations is welcome. Please see [CONTRIBUTING.md](https://github.com/NREL-Sienna/HydroPowerSimulations.jl/blob/master/CONTRIBUTING.md) for code contribution guidelines.
+
+## License
+
+HydroPowerSimulations is released under a BSD [license](https://github.com/NREL-Sienna/HydroPowerSimulations/blob/master/LICENSE). HydroPowerSimulations has been developed as part of the R2D2 Project at the U.S. Department of Energy's National Renewable Energy Laboratory ([NREL](https://www.nrel.gov/))
