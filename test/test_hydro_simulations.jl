@@ -51,16 +51,16 @@
     feedforwards = Dict(
         "UC" => [
             EnergyLimitFeedforward(;
-                source=ActivePowerVariable,
-                affected_values=[ActivePowerVariable],
+                source=PSI.ActivePowerVariable,
+                affected_values=[PSI.ActivePowerVariable],
                 component_type=HydroEnergyReservoir,
                 number_of_periods=24,
             ),
         ],
         "ED" => [
             EnergyLimitFeedforward(;
-                source=ActivePowerVariable,
-                affected_values=[ActivePowerVariable],
+                source=PSI.ActivePowerVariable,
+                affected_values=[PSI.ActivePowerVariable],
                 component_type=HydroEnergyReservoir,
                 number_of_periods=12,
             ),
@@ -117,12 +117,12 @@ function test_2_stage_decision_models_with_feedforwards(in_memory)
                 SemiContinuousFeedforward(;
                     component_type=ThermalStandard,
                     source=OnVariable,
-                    affected_values=[ActivePowerVariable],
+                    affected_values=[PSI.ActivePowerVariable],
                 ),
                 EnergyLimitFeedforward(;
                     component_type=HydroEnergyReservoir,
-                    source=ActivePowerVariable,
-                    affected_values=[ActivePowerVariable],
+                    source=PSI.ActivePowerVariable,
+                    affected_values=[PSI.ActivePowerVariable],
                     number_of_periods=12,
                 ),
             ],

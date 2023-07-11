@@ -2,8 +2,8 @@
 """
 Construct model for HydroGen with RunOfRiver Dispatch Formulation
 """
-function PSI.PSI.construct_device!(
-    optimization_container::PSI.PSI.OptimizationContainer,
+function PSI.construct_device!(
+    optimization_container::PSI.OptimizationContainer,
     sys::PSY.System,
     model::PSI.DeviceModel{H, D},
     ::Type{S},
@@ -59,8 +59,8 @@ end
 Construct model for HydroGen with RunOfRiver Dispatch Formulation
 with only Active Power.
 """
-function PSI.PSI.construct_device!(
-    optimization_container::PSI.PSI.OptimizationContainer,
+function PSI.construct_device!(
+    optimization_container::PSI.OptimizationContainer,
     sys::PSY.System,
     model::PSI.DeviceModel{H, D},
     ::Type{S},

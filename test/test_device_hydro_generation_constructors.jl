@@ -457,7 +457,7 @@ end
     ff_sc = SemiContinuousFeedforward(;
         component_type=HydroDispatch,
         source=OnVariable,
-        affected_values=[ActivePowerVariable],
+        affected_values=[PSI.ActivePowerVariable],
     )
 
     PSI.attach_feedforward!(device_model, ff_sc)
@@ -471,8 +471,8 @@ end
     device_model = DeviceModel(HydroDispatch, HydroCommitmentRunOfRiver)
     ff_ub = UpperBoundFeedforward(;
         component_type=HydroDispatch,
-        source=ActivePowerVariable,
-        affected_values=[ActivePowerVariable],
+        source=PSI.ActivePowerVariable,
+        affected_values=[PSI.ActivePowerVariable],
     )
     PSI.attach_feedforward!(device_model, ff_ub)
     c_sys5_hy = PSB.build_system(PSITestSystems, "c_sys5_hy")
@@ -485,8 +485,8 @@ end
     device_model = DeviceModel(HydroDispatch, HydroCommitmentRunOfRiver)
     ff_ub = LowerBoundFeedforward(;
         component_type=HydroDispatch,
-        source=ActivePowerVariable,
-        affected_values=[ActivePowerVariable],
+        source=PSI.ActivePowerVariable,
+        affected_values=[PSI.ActivePowerVariable],
     )
     PSI.attach_feedforward!(device_model, ff_ub)
     c_sys5_hy = PSB.build_system(PSITestSystems, "c_sys5_hy")
@@ -500,8 +500,8 @@ end
 
     ff_ub = UpperBoundFeedforward(;
         component_type=HydroDispatch,
-        source=ActivePowerVariable,
-        affected_values=[ActivePowerVariable],
+        source=PSI.ActivePowerVariable,
+        affected_values=[PSI.ActivePowerVariable],
     )
 
     PSI.attach_feedforward!(device_model, ff_ub)
@@ -516,8 +516,8 @@ end
 
     ff_ub = LowerBoundFeedforward(;
         component_type=HydroDispatch,
-        source=ActivePowerVariable,
-        affected_values=[ActivePowerVariable],
+        source=PSI.ActivePowerVariable,
+        affected_values=[PSI.ActivePowerVariable],
     )
 
     PSI.attach_feedforward!(device_model, ff_ub)
@@ -531,8 +531,8 @@ end
     device_model = DeviceModel(HydroEnergyReservoir, HydroDispatchReservoirBudget)
     ff_il = EnergyLimitFeedforward(;
         component_type=HydroEnergyReservoir,
-        source=ActivePowerVariable,
-        affected_values=[ActivePowerVariable],
+        source=PSI.ActivePowerVariable,
+        affected_values=[PSI.ActivePowerVariable],
         number_of_periods=12,
     )
 
@@ -547,8 +547,8 @@ end
     device_model = DeviceModel(HydroEnergyReservoir, HydroDispatchReservoirStorage)
     ff_il = EnergyLimitFeedforward(;
         component_type=HydroEnergyReservoir,
-        source=ActivePowerVariable,
-        affected_values=[ActivePowerVariable],
+        source=PSI.ActivePowerVariable,
+        affected_values=[PSI.ActivePowerVariable],
         number_of_periods=12,
     )
 
@@ -563,8 +563,8 @@ end
     device_model = DeviceModel(HydroEnergyReservoir, HydroDispatchReservoirStorage)
     ff_il = LowerBoundFeedforward(;
         component_type=HydroEnergyReservoir,
-        source=ActivePowerVariable,
-        affected_values=[ActivePowerVariable],
+        source=PSI.ActivePowerVariable,
+        affected_values=[PSI.ActivePowerVariable],
     )
 
     PSI.attach_feedforward!(device_model, ff_il)
@@ -578,8 +578,8 @@ end
     device_model = DeviceModel(HydroEnergyReservoir, HydroCommitmentReservoirStorage)
     ff_il = EnergyLimitFeedforward(;
         component_type=HydroEnergyReservoir,
-        source=ActivePowerVariable,
-        affected_values=[ActivePowerVariable],
+        source=PSI.ActivePowerVariable,
+        affected_values=[PSI.ActivePowerVariable],
         number_of_periods=12,
     )
     PSI.attach_feedforward!(device_model, ff_il)
@@ -594,7 +594,7 @@ end
     ff_sc = SemiContinuousFeedforward(;
         component_type=HydroEnergyReservoir,
         source=OnVariable,
-        affected_values=[ActivePowerVariable],
+        affected_values=[PSI.ActivePowerVariable],
     )
     PSI.attach_feedforward!(device_model, ff_sc)
     c_sys5_hy = PSB.build_system(PSITestSystems, "c_sys5_hyd_ems")

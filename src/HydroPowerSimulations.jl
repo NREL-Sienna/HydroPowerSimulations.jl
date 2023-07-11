@@ -39,5 +39,6 @@ include("core/formulations.jl")
 include("core/variables.jl")
 include("core/constraints.jl")
 include("core/expressions.jl")
+include("hydro_generation.jl")
 
 end # module

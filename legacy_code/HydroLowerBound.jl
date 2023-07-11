@@ -3,7 +3,7 @@ struct HydroDispatchReservoirBudgetLowerUpperBound <: PSI.AbstractHydroDispatchF
 const MIN_HOURLY_HYDRO_BOUND = "min_hourly_hydro_bound"
 
 function time_series_lower_bound!(
-    optimization_container::PSI.PSI.OptimizationContainer,
+    optimization_container::PSI.OptimizationContainer,
     devices::IS.FlattenIteratorWrapper{H},
     ::PSI.DeviceModel{H, <:PSI.AbstractHydroDispatchFormulation},
     ::Type{<:PM.AbstractPowerModel},
@@ -41,7 +41,7 @@ function time_series_lower_bound!(
 end
 
 function device_time_series_param_lb(
-    optimization_container::PSI.PSI.OptimizationContainer,
+    optimization_container::PSI.OptimizationContainer,
     time_series_lower_bound_data::Vector{PSI.DeviceTimeSeriesConstraintInfo},
     cons_name::Symbol,
     param_reference::PSI.UpdateRef,
@@ -83,7 +83,7 @@ function device_time_series_param_lb(
 end
 
 function device_time_series_lb(
-    optimization_container::PSI.PSI.OptimizationContainer,
+    optimization_container::PSI.OptimizationContainer,
     time_series_lower_bound_data::Vector{PSI.DeviceTimeSeriesConstraintInfo},
     cons_name::Symbol,
     var_names::Symbol,
