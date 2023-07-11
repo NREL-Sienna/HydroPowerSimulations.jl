@@ -10,6 +10,14 @@ export HydroDispatchReservoirBudgetUpperBound
 export HydroDispatchRunOfRiverLowerBound
 export HydroDispatchReservoirBudgetLowerUpperBound
 
+######## Hydro Formulations ########
+export HydroDispatchReservoirBudget
+export HydroDispatchReservoirStorage
+export HydroCommitmentRunOfRiver
+export HydroCommitmentReservoirBudget
+export HydroCommitmentReservoirStorage
+export HydroDispatchPumpedStorage
+
 #################################################################################
 # Imports
 using PowerSystems
@@ -27,21 +35,12 @@ const PSY = PowerSystems
 const IS = InfrastructureSystems
 const PM = PowerModels
 const PSI = PowerSimulations
-const PJ = ParameterJuMP
 
 #################################################################################
 # Includes
-include("models/HydroCascade.jl")
-include("models/generated/includes.jl")
-include("devices_models/devices/HydroReservoirCascade.jl")
-include("devices_models/devices/HydroDispatchCascade.jl")
-include("devices_models/devices/HydroReservoirBudgetUpperBound.jl")
-include("devices_models/devices/HydroLowerBound.jl")
-include("devices_models/device_constructors/HydroReservoirCascade_constructor.jl")
-include("devices_models/device_constructors/HydroDispatchCascade_constructor.jl")
-include("devices_models/device_constructors/HydroReservoirBudgetUpperBound_constructor.jl")
-include("devices_models/device_constructors/HydroDispatchRunOfRiverLowerBound_constructor.jl")
-include("devices_models/device_constructors/HydroReservoirBudgetLowerUpperBound_constructor.jl")
-include("parsers/set_upstream.jl")
+include("core/formulations.jl")
+include("core/variables.jl")
+include("core/constraints.jl")
+include("core/expressions.jl")
 
 end # module
