@@ -1,4 +1,4 @@
-function PSI.PSI.construct_device!(
+function PSI.construct_device!(
     optimization_container::PSI.PSI.OptimizationContainer,
     sys::PSY.System,
     model::PSI.DeviceModel{H, D},
@@ -16,7 +16,7 @@ function PSI.PSI.construct_device!(
 
     #Variables
     PSI.add_variables!(optimization_container, PSI.ActivePowerVariable, devices, D())
-    PSI.add_variables!(optimization_container, PSI.EnergyVariable, devices, D())
+    PSI.add_variables!(optimization_container, PSI .. EnergyVariable, devices, D())
     PSI.add_variables!(optimization_container, PSI.SpillageVariable, devices, D())
 
     #Initial Conditions
@@ -38,7 +38,7 @@ function PSI.PSI.construct_device!(
     return
 end
 
-function PSI.PSI.construct_device!(
+function PSI.construct_device!(
     optimization_container::PSI.PSI.OptimizationContainer,
     sys::PSY.System,
     model::PSI.DeviceModel{H, D},
@@ -56,7 +56,7 @@ function PSI.PSI.construct_device!(
 
     #Variables
     PSI.add_variables!(optimization_container, PSI.ActivePowerVariable, devices, D())
-    PSI.add_variables!(optimization_container, PSI.EnergyVariable, devices, D())
+    PSI.add_variables!(optimization_container, PSI .. EnergyVariable, devices, D())
     PSI.add_variables!(optimization_container, PSI.SpillageVariable, devices, D())
     PSI.add_variables!(optimization_container, PSI.ReactivePowerVariable, devices, D())
 

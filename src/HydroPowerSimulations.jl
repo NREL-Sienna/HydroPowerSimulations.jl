@@ -33,11 +33,22 @@ const IS = InfrastructureSystems
 const PM = PowerModels
 const PSI = PowerSimulations
 
+import PowerSimulations: HydroDispatchRunOfRiver, HydroCommitmentRunOfRiver
+export HydroCommitmentRunOfRiver
+export HydroDispatchRunOfRiver
+
 #################################################################################
 # Includes
+# Core includes
 include("core/formulations.jl")
 include("core/variables.jl")
 include("core/constraints.jl")
 include("core/expressions.jl")
+include("core/parameters.jl")
+include("core/initial_conditions.jl")
+
+# Models
+include("hydro_generation.jl")
+include("hydrogeneration_constructor.jl")
 
 end # module

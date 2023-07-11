@@ -1,4 +1,4 @@
-function PSI.PSI.construct_device!(
+function PSI.construct_device!(
     optimization_container::PSI.PSI.OptimizationContainer,
     sys::PSY.System,
     model::PSI.DeviceModel{H, D},

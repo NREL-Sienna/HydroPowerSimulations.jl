@@ -2,7 +2,7 @@ struct HydroDispatchReservoirCascade <: PSI.AbstractHydroReservoirFormulation en
 
 function energy_balance_external_input_param_cascade(
     optimization_container::PSI.PSI.OptimizationContainer,
-    initial_conditions::Vector{PSI.InitialCondition},
+    initial_conditions::Vector{PSI.PSI.InitialCondition},
     time_series_data::Tuple{
         Vector{PSI.DeviceTimeSeriesConstraintInfo},
         Vector{PSI.DeviceTimeSeriesConstraintInfo},
@@ -137,7 +137,7 @@ end
 
 function energy_balance_external_input_cascade(
     optimization_container::PSI.PSI.OptimizationContainer,
-    initial_conditions::Vector{PSI.InitialCondition},
+    initial_conditions::Vector{PSI.PSI.InitialCondition},
     time_series_data::Tuple{
         Vector{PSI.DeviceTimeSeriesConstraintInfo},
         Vector{PSI.DeviceTimeSeriesConstraintInfo},
