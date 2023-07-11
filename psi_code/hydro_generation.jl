@@ -205,7 +205,7 @@ end
 Time series constraints
 """
 function add_constraints!(
-    container::OptimizationContainer,
+    container::PSI.OptimizationContainer,
     T::Type{ActivePowerVariableLimitsConstraint},
     U::Type{<:Union{VariableType, ExpressionType}},
     devices::IS.FlattenIteratorWrapper{V},
@@ -228,7 +228,7 @@ function add_constraints!(
 end
 
 function add_constraints!(
-    container::OptimizationContainer,
+    container::PSI.OptimizationContainer,
     T::Type{ActivePowerVariableLimitsConstraint},
     U::Type{<:RangeConstraintLBExpressions},
     devices::IS.FlattenIteratorWrapper{V},
@@ -245,7 +245,7 @@ end
 Add semicontinuous range constraints for Hydro Unit Commitment formulation
 """
 function add_constraints!(
-    container::OptimizationContainer,
+    container::PSI.OptimizationContainer,
     T::Type{ActivePowerVariableLimitsConstraint},
     U::Type{<:Union{VariableType, <:RangeConstraintLBExpressions}},
     devices::IS.FlattenIteratorWrapper{V},
@@ -257,7 +257,7 @@ function add_constraints!(
 end
 
 function add_constraints!(
-    container::OptimizationContainer,
+    container::PSI.OptimizationContainer,
     T::Type{ActivePowerVariableLimitsConstraint},
     U::Type{<:Union{VariableType, ExpressionType}},
     devices::IS.FlattenIteratorWrapper{V},
@@ -311,7 +311,7 @@ end
 Add power variable limits constraints for hydro unit commitment formulation
 """
 function add_constraints!(
-    container::OptimizationContainer,
+    container::PSI.OptimizationContainer,
     T::Type{<:PowerVariableLimitsConstraint},
     U::Type{<:Union{VariableType, ExpressionType}},
     devices::IS.FlattenIteratorWrapper{V},
@@ -326,7 +326,7 @@ end
 Add power variable limits constraints for hydro dispatch formulation
 """
 function add_constraints!(
-    container::OptimizationContainer,
+    container::PSI.OptimizationContainer,
     T::Type{<:PowerVariableLimitsConstraint},
     U::Type{<:Union{VariableType, ExpressionType}},
     devices::IS.FlattenIteratorWrapper{V},
@@ -347,7 +347,7 @@ end
 Add input power variable limits constraints for hydro dispatch formulation
 """
 function add_constraints!(
-    container::OptimizationContainer,
+    container::PSI.OptimizationContainer,
     T::Type{InputActivePowerVariableLimitsConstraint},
     U::Type{<:Union{VariableType, ExpressionType}},
     devices::IS.FlattenIteratorWrapper{V},
@@ -372,7 +372,7 @@ end
 Add output power variable limits constraints for hydro dispatch formulation
 """
 function add_constraints!(
-    container::OptimizationContainer,
+    container::PSI.OptimizationContainer,
     T::Type{<:PowerVariableLimitsConstraint},
     U::Type{<:Union{VariableType, ExpressionType}},
     devices::IS.FlattenIteratorWrapper{V},
@@ -422,7 +422,7 @@ This function defines the constraints for the water level (or state of charge)
 for the Hydro Reservoir.
 """
 function add_constraints!(
-    container::OptimizationContainer,
+    container::PSI.OptimizationContainer,
     ::Type{EnergyBalanceConstraint},
     devices::IS.FlattenIteratorWrapper{V},
     model::DeviceModel{V, W},
@@ -480,7 +480,7 @@ This function defines the constraints for the water level (or state of charge)
 for the HydroPumpedStorage.
 """
 function add_constraints!(
-    container::OptimizationContainer,
+    container::PSI.OptimizationContainer,
     ::Type{EnergyCapacityUpConstraint},
     devices::IS.FlattenIteratorWrapper{V},
     model::DeviceModel{V, W},
@@ -546,7 +546,7 @@ end
 Add energy capacity down constraints for hydro pumped storage
 """
 function add_constraints!(
-    container::OptimizationContainer,
+    container::PSI.OptimizationContainer,
     ::Type{EnergyCapacityDownConstraint},
     devices::IS.FlattenIteratorWrapper{V},
     model::DeviceModel{V, W},
@@ -612,7 +612,7 @@ end
 Add energy target constraints for hydro gen
 """
 function add_constraints!(
-    container::OptimizationContainer,
+    container::PSI.OptimizationContainer,
     ::Type{EnergyTargetConstraint},
     devices::IS.FlattenIteratorWrapper{V},
     model::DeviceModel{V, W},
@@ -673,7 +673,7 @@ active power budget formulation.
 """
 
 function add_constraints!(
-    container::OptimizationContainer,
+    container::PSI.OptimizationContainer,
     ::Type{EnergyBudgetConstraint},
     devices::IS.FlattenIteratorWrapper{V},
     model::DeviceModel{V, W},
@@ -703,7 +703,7 @@ end
 ##################################### Auxillary Variables ############################
 
 function calculate_aux_variable_value!(
-    container::OptimizationContainer,
+    container::PSI.OptimizationContainer,
     ::AuxVarKey{EnergyOutput, T},
     system::PSY.System,
 ) where {T <: PSY.HydroGen}
@@ -723,7 +723,7 @@ function calculate_aux_variable_value!(
 end
 
 function calculate_aux_variable_value!(
-    container::OptimizationContainer,
+    container::PSI.OptimizationContainer,
     ::AuxVarKey{EnergyOutput, T},
     system::PSY.System,
 ) where {T <: PSY.HydroPumpedStorage}
@@ -744,7 +744,7 @@ end
 
 ##################################### Hydro generation cost ############################
 function objective_function!(
-    container::OptimizationContainer,
+    container::PSI.OptimizationContainer,
     devices::IS.FlattenIteratorWrapper{T},
     ::DeviceModel{T, U},
     ::Type{<:PM.AbstractPowerModel},
@@ -755,7 +755,7 @@ function objective_function!(
 end
 
 function objective_function!(
-    container::OptimizationContainer,
+    container::PSI.OptimizationContainer,
     devices::IS.FlattenIteratorWrapper{PSY.HydroPumpedStorage},
     ::DeviceModel{PSY.HydroPumpedStorage, T},
     ::Type{<:PM.AbstractPowerModel},
@@ -765,7 +765,7 @@ function objective_function!(
 end
 
 function objective_function!(
-    container::OptimizationContainer,
+    container::PSI.OptimizationContainer,
     devices::IS.FlattenIteratorWrapper{T},
     ::DeviceModel{T, U},
     ::Type{<:PM.AbstractPowerModel},
@@ -775,7 +775,7 @@ function objective_function!(
 end
 
 function objective_function!(
-    container::OptimizationContainer,
+    container::PSI.OptimizationContainer,
     devices::IS.FlattenIteratorWrapper{T},
     ::DeviceModel{T, U},
     ::Type{<:PM.AbstractPowerModel},
@@ -790,7 +790,7 @@ function objective_function!(
 end
 
 function objective_function!(
-    container::OptimizationContainer,
+    container::PSI.OptimizationContainer,
     devices::IS.FlattenIteratorWrapper{T},
     ::DeviceModel{T, U},
     ::Type{<:PM.AbstractPowerModel},
@@ -802,7 +802,7 @@ function objective_function!(
 end
 
 function objective_function!(
-    container::OptimizationContainer,
+    container::PSI.OptimizationContainer,
     devices::IS.FlattenIteratorWrapper{T},
     ::DeviceModel{T, U},
     ::Type{<:PM.AbstractPowerModel},

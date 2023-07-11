@@ -1,10 +1,10 @@
 """
 Construct model for HydroGen with FixedOutput Formulation
 """
-function construct_device!(
-    container::OptimizationContainer,
+function PSI.construct_device!(
+    container::PSI.OptimizationContainer,
     sys::PSY.System,
-    ::ArgumentConstructStage,
+    ::PSI.ArgumentConstructStage,
     model::DeviceModel{H, FixedOutput},
     network_model::NetworkModel{S},
 ) where {H <: PSY.HydroGen, S <: PM.AbstractPowerModel}
@@ -33,10 +33,10 @@ function construct_device!(
     return
 end
 
-function construct_device!(
-    ::OptimizationContainer,
+function PSI.construct_device!(
+    ::PSI.OptimizationContainer,
     ::PSY.System,
-    ::ModelConstructStage,
+    ::PSI.ModelConstructStage,
     ::DeviceModel{H, FixedOutput},
     network_model::NetworkModel{S},
 ) where {H <: PSY.HydroGen, S <: PM.AbstractPowerModel}
@@ -45,10 +45,10 @@ function construct_device!(
     return
 end
 
-function construct_device!(
-    container::OptimizationContainer,
+function PSI.construct_device!(
+    container::PSI.OptimizationContainer,
     sys::PSY.System,
-    ::ArgumentConstructStage,
+    ::PSI.ArgumentConstructStage,
     model::DeviceModel{H, FixedOutput},
     network_model::NetworkModel{S},
 ) where {H <: PSY.HydroGen, S <: PM.AbstractActivePowerModel}
@@ -71,10 +71,10 @@ end
 """
 Construct model for HydroGen with RunOfRiver Dispatch Formulation
 """
-function construct_device!(
-    container::OptimizationContainer,
+function PSI.construct_device!(
+    container::PSI.OptimizationContainer,
     sys::PSY.System,
-    ::ArgumentConstructStage,
+    ::PSI.ArgumentConstructStage,
     model::DeviceModel{H, D},
     network_model::NetworkModel{S},
 ) where {
@@ -129,10 +129,10 @@ function construct_device!(
     return
 end
 
-function construct_device!(
-    container::OptimizationContainer,
+function PSI.construct_device!(
+    container::PSI.OptimizationContainer,
     sys::PSY.System,
-    ::ModelConstructStage,
+    ::PSI.ModelConstructStage,
     model::DeviceModel{H, D},
     network_model::NetworkModel{S},
 ) where {
@@ -179,10 +179,10 @@ end
 Construct model for HydroGen with RunOfRiver Dispatch Formulation
 with only Active Power.
 """
-function construct_device!(
-    container::OptimizationContainer,
+function PSI.construct_device!(
+    container::PSI.OptimizationContainer,
     sys::PSY.System,
-    ::ArgumentConstructStage,
+    ::PSI.ArgumentConstructStage,
     model::DeviceModel{H, D},
     network_model::NetworkModel{S},
 ) where {
@@ -227,10 +227,10 @@ function construct_device!(
     return
 end
 
-function construct_device!(
-    container::OptimizationContainer,
+function PSI.construct_device!(
+    container::PSI.OptimizationContainer,
     sys::PSY.System,
-    ::ModelConstructStage,
+    ::PSI.ModelConstructStage,
     model::DeviceModel{H, D},
     network_model::NetworkModel{S},
 ) where {
@@ -268,10 +268,10 @@ end
 """
 Construct model for HydroGen with ReservoirBudget Dispatch Formulation
 """
-function construct_device!(
-    container::OptimizationContainer,
+function PSI.construct_device!(
+    container::PSI.OptimizationContainer,
     sys::PSY.System,
-    ::ArgumentConstructStage,
+    ::PSI.ArgumentConstructStage,
     model::DeviceModel{H, HydroDispatchReservoirBudget},
     network_model::NetworkModel{S},
 ) where {H <: PSY.HydroEnergyReservoir, S <: PM.AbstractPowerModel}
@@ -325,10 +325,10 @@ function construct_device!(
     return
 end
 
-function construct_device!(
-    container::OptimizationContainer,
+function PSI.construct_device!(
+    container::PSI.OptimizationContainer,
     sys::PSY.System,
-    ::ModelConstructStage,
+    ::PSI.ModelConstructStage,
     model::DeviceModel{H, HydroDispatchReservoirBudget},
     network_model::NetworkModel{S},
 ) where {H <: PSY.HydroEnergyReservoir, S <: PM.AbstractPowerModel}
@@ -375,10 +375,10 @@ end
 Construct model for HydroGen with ReservoirBudget Dispatch Formulation
 with only Active Power.
 """
-function construct_device!(
-    container::OptimizationContainer,
+function PSI.construct_device!(
+    container::PSI.OptimizationContainer,
     sys::PSY.System,
-    ::ArgumentConstructStage,
+    ::PSI.ArgumentConstructStage,
     model::DeviceModel{H, HydroDispatchReservoirBudget},
     network_model::NetworkModel{S},
 ) where {H <: PSY.HydroEnergyReservoir, S <: PM.AbstractActivePowerModel}
@@ -419,10 +419,10 @@ function construct_device!(
     return
 end
 
-function construct_device!(
-    container::OptimizationContainer,
+function PSI.construct_device!(
+    container::PSI.OptimizationContainer,
     sys::PSY.System,
-    ::ModelConstructStage,
+    ::PSI.ModelConstructStage,
     model::DeviceModel{H, HydroDispatchReservoirBudget},
     network_model::NetworkModel{S},
 ) where {H <: PSY.HydroEnergyReservoir, S <: PM.AbstractActivePowerModel}
@@ -459,10 +459,10 @@ end
 """
 Construct model for HydroGen with ReservoirStorage Dispatch Formulation
 """
-function construct_device!(
-    container::OptimizationContainer,
+function PSI.construct_device!(
+    container::PSI.OptimizationContainer,
     sys::PSY.System,
-    ::ArgumentConstructStage,
+    ::PSI.ArgumentConstructStage,
     model::DeviceModel{H, HydroDispatchReservoirStorage},
     network_model::NetworkModel{S},
 ) where {H <: PSY.HydroEnergyReservoir, S <: PM.AbstractPowerModel}
@@ -536,10 +536,10 @@ function construct_device!(
     return
 end
 
-function construct_device!(
-    container::OptimizationContainer,
+function PSI.construct_device!(
+    container::PSI.OptimizationContainer,
     sys::PSY.System,
-    ::ModelConstructStage,
+    ::PSI.ModelConstructStage,
     model::DeviceModel{H, HydroDispatchReservoirStorage},
     network_model::NetworkModel{S},
 ) where {H <: PSY.HydroEnergyReservoir, S <: PM.AbstractPowerModel}
@@ -592,10 +592,10 @@ end
 Construct model for HydroGen with ReservoirStorage Dispatch Formulation
 with only Active Power
 """
-function construct_device!(
-    container::OptimizationContainer,
+function PSI.construct_device!(
+    container::PSI.OptimizationContainer,
     sys::PSY.System,
-    ::ArgumentConstructStage,
+    ::PSI.ArgumentConstructStage,
     model::DeviceModel{H, HydroDispatchReservoirStorage},
     network_model::NetworkModel{S},
 ) where {H <: PSY.HydroEnergyReservoir, S <: PM.AbstractActivePowerModel}
@@ -658,10 +658,10 @@ function construct_device!(
     return
 end
 
-function construct_device!(
-    container::OptimizationContainer,
+function PSI.construct_device!(
+    container::PSI.OptimizationContainer,
     sys::PSY.System,
-    ::ModelConstructStage,
+    ::PSI.ModelConstructStage,
     model::DeviceModel{H, HydroDispatchReservoirStorage},
     network_model::NetworkModel{S},
 ) where {H <: PSY.HydroEnergyReservoir, S <: PM.AbstractActivePowerModel}
@@ -704,10 +704,10 @@ end
 """
 Construct model for HydroGen with RunOfRiver Commitment Formulation
 """
-function construct_device!(
-    container::OptimizationContainer,
+function PSI.construct_device!(
+    container::PSI.OptimizationContainer,
     sys::PSY.System,
-    ::ArgumentConstructStage,
+    ::PSI.ArgumentConstructStage,
     model::DeviceModel{H, D},
     network_model::NetworkModel{S},
 ) where {H <: PSY.HydroGen, D <: HydroCommitmentRunOfRiver, S <: PM.AbstractPowerModel}
@@ -759,10 +759,10 @@ function construct_device!(
     return
 end
 
-function construct_device!(
-    container::OptimizationContainer,
+function PSI.construct_device!(
+    container::PSI.OptimizationContainer,
     sys::PSY.System,
-    ::ModelConstructStage,
+    ::PSI.ModelConstructStage,
     model::DeviceModel{H, D},
     network_model::NetworkModel{S},
 ) where {H <: PSY.HydroGen, D <: HydroCommitmentRunOfRiver, S <: PM.AbstractPowerModel}
@@ -806,10 +806,10 @@ end
 Construct model for HydroGen with RunOfRiver Commitment Formulation
 with only Active Power.
 """
-function construct_device!(
-    container::OptimizationContainer,
+function PSI.construct_device!(
+    container::PSI.OptimizationContainer,
     sys::PSY.System,
-    ::ArgumentConstructStage,
+    ::PSI.ArgumentConstructStage,
     model::DeviceModel{H, D},
     network_model::NetworkModel{S},
 ) where {
@@ -855,10 +855,10 @@ function construct_device!(
     return
 end
 
-function construct_device!(
-    container::OptimizationContainer,
+function PSI.construct_device!(
+    container::PSI.OptimizationContainer,
     sys::PSY.System,
-    ::ModelConstructStage,
+    ::PSI.ModelConstructStage,
     model::DeviceModel{H, D},
     network_model::NetworkModel{S},
 ) where {
@@ -896,10 +896,10 @@ end
 """
 Construct model for HydroGen with ReservoirBudget Commitment Formulation
 """
-function construct_device!(
-    container::OptimizationContainer,
+function PSI.construct_device!(
+    container::PSI.OptimizationContainer,
     sys::PSY.System,
-    ::ArgumentConstructStage,
+    ::PSI.ArgumentConstructStage,
     model::DeviceModel{H, D},
     network_model::NetworkModel{S},
 ) where {H <: PSY.HydroGen, D <: HydroCommitmentReservoirBudget, S <: PM.AbstractPowerModel}
@@ -950,10 +950,10 @@ function construct_device!(
     return
 end
 
-function construct_device!(
-    container::OptimizationContainer,
+function PSI.construct_device!(
+    container::PSI.OptimizationContainer,
     sys::PSY.System,
-    ::ModelConstructStage,
+    ::PSI.ModelConstructStage,
     model::DeviceModel{H, D},
     network_model::NetworkModel{S},
 ) where {H <: PSY.HydroGen, D <: HydroCommitmentReservoirBudget, S <: PM.AbstractPowerModel}
@@ -999,10 +999,10 @@ end
 Construct model for HydroGen with ReservoirBudget Commitment Formulation
 with only Active Power.
 """
-function construct_device!(
-    container::OptimizationContainer,
+function PSI.construct_device!(
+    container::PSI.OptimizationContainer,
     sys::PSY.System,
-    ::ArgumentConstructStage,
+    ::PSI.ArgumentConstructStage,
     model::DeviceModel{H, D},
     network_model::NetworkModel{S},
 ) where {
@@ -1048,10 +1048,10 @@ function construct_device!(
     return
 end
 
-function construct_device!(
-    container::OptimizationContainer,
+function PSI.construct_device!(
+    container::PSI.OptimizationContainer,
     sys::PSY.System,
-    ::ModelConstructStage,
+    ::PSI.ModelConstructStage,
     model::DeviceModel{H, D},
     network_model::NetworkModel{S},
 ) where {
@@ -1092,10 +1092,10 @@ end
 """
 Construct model for HydroGen with ReservoirStorage Commitment Formulation
 """
-function construct_device!(
-    container::OptimizationContainer,
+function PSI.construct_device!(
+    container::PSI.OptimizationContainer,
     sys::PSY.System,
-    ::ArgumentConstructStage,
+    ::PSI.ArgumentConstructStage,
     model::DeviceModel{H, HydroCommitmentReservoirStorage},
     network_model::NetworkModel{S},
 ) where {H <: PSY.HydroEnergyReservoir, S <: PM.AbstractPowerModel}
@@ -1176,10 +1176,10 @@ function construct_device!(
     return
 end
 
-function construct_device!(
-    container::OptimizationContainer,
+function PSI.construct_device!(
+    container::PSI.OptimizationContainer,
     sys::PSY.System,
-    ::ModelConstructStage,
+    ::PSI.ModelConstructStage,
     model::DeviceModel{H, HydroCommitmentReservoirStorage},
     network_model::NetworkModel{S},
 ) where {H <: PSY.HydroEnergyReservoir, S <: PM.AbstractPowerModel}
@@ -1232,10 +1232,10 @@ end
 Construct model for HydroGen with ReservoirStorage Dispatch Formulation
 with only Active Power
 """
-function construct_device!(
-    container::OptimizationContainer,
+function PSI.construct_device!(
+    container::PSI.OptimizationContainer,
     sys::PSY.System,
-    ::ArgumentConstructStage,
+    ::PSI.ArgumentConstructStage,
     model::DeviceModel{H, HydroCommitmentReservoirStorage},
     network_model::NetworkModel{S},
 ) where {H <: PSY.HydroEnergyReservoir, S <: PM.AbstractActivePowerModel}
@@ -1302,10 +1302,10 @@ function construct_device!(
     return
 end
 
-function construct_device!(
-    container::OptimizationContainer,
+function PSI.construct_device!(
+    container::PSI.OptimizationContainer,
     sys::PSY.System,
-    ::ModelConstructStage,
+    ::PSI.ModelConstructStage,
     model::DeviceModel{H, HydroCommitmentReservoirStorage},
     network_model::NetworkModel{S},
 ) where {H <: PSY.HydroEnergyReservoir, S <: PM.AbstractActivePowerModel}
@@ -1350,10 +1350,10 @@ end
 Construct model for HydroPumpedStorage with PumpedStorage Dispatch Formulation
 with only Active Power
 """
-function construct_device!(
-    container::OptimizationContainer,
+function PSI.construct_device!(
+    container::PSI.OptimizationContainer,
     sys::PSY.System,
-    ::ArgumentConstructStage,
+    ::PSI.ArgumentConstructStage,
     model::DeviceModel{H, HydroDispatchPumpedStorage},
     network_model::NetworkModel{S},
 ) where {H <: PSY.HydroPumpedStorage, S <: PM.AbstractActivePowerModel}
@@ -1403,10 +1403,10 @@ function construct_device!(
     return
 end
 
-function construct_device!(
-    container::OptimizationContainer,
+function PSI.construct_device!(
+    container::PSI.OptimizationContainer,
     sys::PSY.System,
-    ::ModelConstructStage,
+    ::PSI.ModelConstructStage,
     model::DeviceModel{H, HydroDispatchPumpedStorage},
     network_model::NetworkModel{S},
 ) where {H <: PSY.HydroPumpedStorage, S <: PM.AbstractActivePowerModel}

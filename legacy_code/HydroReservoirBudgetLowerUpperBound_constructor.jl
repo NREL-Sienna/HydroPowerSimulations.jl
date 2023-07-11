@@ -1,11 +1,11 @@
-function PSI.construct_device!(
-    optimization_container::PSI.OptimizationContainer,
+function PSI.PSI.construct_device!(
+    optimization_container::PSI.PSI.OptimizationContainer,
     sys::PSY.System,
     model::PSI.DeviceModel{H, D},
     ::Type{S},
 ) where {
     H <: PSY.HydroEnergyReservoir,
-    D <: HydroDispatchReservoirBudgetUpperBound,
+    D <: HydroDispatchReservoirBudgetLowerUpperBound,
     S <: PM.AbstractActivePowerModel,
 }
     devices = PSI.get_available_components(H, sys)
@@ -31,6 +31,14 @@ function PSI.construct_device!(
         optimization_container,
         PSI.RangeConstraint,
         PSI.ActivePowerVariable,
+        devices,
+        model,
+        S,
+        PSI.get_feedforward(model),
+    )
+
+    time_series_lower_bound!(
+        optimization_container,
         devices,
         model,
         S,

@@ -4,7 +4,7 @@ struct HydroDispatchRunOfRiverCascade <: PSI.AbstractHydroDispatchFormulation en
 const CASCADING_FLOW = "cascading_flow"
 
 function flow_balance_external_input_param_cascade(
-    optimization_container::PSI.OptimizationContainer,
+    optimization_container::PSI.PSI.OptimizationContainer,
     inflow_data::Vector{PSI.DeviceTimeSeriesConstraintInfo},
     upstream::Vector{
         Vector{NamedTuple{(:unit, :lag, :multiplier), Tuple{PSY.HydroGen, Int64, Float64}}},
@@ -82,7 +82,7 @@ function flow_balance_external_input_param_cascade(
 end
 
 function flow_balance_external_input_cascade(
-    optimization_container::PSI.OptimizationContainer,
+    optimization_container::PSI.PSI.OptimizationContainer,
     inflow_data::Vector{PSI.DeviceTimeSeriesConstraintInfo},
     upstream::Vector{
         Vector{NamedTuple{(:unit, :lag, :multiplier), Tuple{PSY.HydroGen, Int64, Float64}}},
@@ -141,7 +141,7 @@ function flow_balance_external_input_cascade(
 end
 
 function flow_balance_cascade_constraint!(
-    optimization_container::PSI.OptimizationContainer,
+    optimization_container::PSI.PSI.OptimizationContainer,
     devices::IS.FlattenIteratorWrapper{H},
     model::PSI.DeviceModel{H, HydroDispatchRunOfRiverCascade},
     system_formulation::Type{<:PM.AbstractPowerModel},

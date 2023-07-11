@@ -2,12 +2,7 @@
 abstract type AbstractHydroFormulation <: AbstractDeviceFormulation end
 abstract type AbstractHydroDispatchFormulation <: AbstractHydroFormulation end
 abstract type AbstractHydroUnitCommitment <: AbstractHydroFormulation end
-abstract type AbstractHydroReservoirFormulation <: AbstractHydroDispatchFormulation end
-
-"""
-Formulation type to add injection variables constrained by a maximum injection time series for `HydroGen`
-"""
-struct HydroDispatchRunOfRiver <: AbstractHydroDispatchFormulation end
+abstract type AbstractHydroReservoirFormulation <: PSI.AbstractHydroDispatchFormulation end
 
 """
 Formulation type to add injection variables constrained by total energy production budget defined with a time series for `HydroGen`
@@ -25,16 +20,11 @@ Formulation type to constrain energy production from pumped storage with a repre
 struct HydroDispatchPumpedStorage <: AbstractHydroReservoirFormulation end
 
 """
-Formulation type to add commitment and injection variables constrained by a maximum injection time series for `HydroGen`
-"""
-struct HydroCommitmentRunOfRiver <: AbstractHydroUnitCommitment end
-
-"""
 Formulation type to add commitment and injection variables constrained by total energy production budget defined with a time series for `HydroGen`
 """
-struct HydroCommitmentReservoirBudget <: AbstractHydroUnitCommitment end
+struct HydroCommitmentReservoirBudget <: AbstractHydroReservoirFormulation end
 
 """
 Formulation type to constrain hydropower production with unit commitment variables and a representation of the energy storage capacity and water inflow time series of a reservoir for `HydroGen`
 """
-struct HydroCommitmentReservoirStorage <: AbstractHydroUnitCommitment end
+struct HydroCommitmentReservoirStorage <: AbstractHydroReservoirFormulation end
