@@ -1,131 +1,9 @@
-###################################
-###### FIXED OUTPUT TESTS #########
-###################################
-
-@testset "Hydro DCPLossLess FixedOutput" begin
-    device_model = DeviceModel(HydroDispatch, FixedOutput)
-    c_sys5_hy = PSB.build_system(PSITestSystems, "c_sys5_hy")
-
-    # No Parameters Testing
-    model = DecisionModel(MockOperationProblem, DCPPowerModel, c_sys5_hy)
-    mock_PSI.construct_device!(model, device_model)
-    moi_tests(model, 0, 0, 0, 0, 0, false)
-    psi_checkobjfun_test(model, GAEVF)
-end
-
-@testset "Hydro DCPLossLess HydroEnergyReservoir with FixedOutput formulations" begin
-    device_model = DeviceModel(HydroEnergyReservoir, FixedOutput)
-    c_sys5_hyd = PSB.build_system(PSITestSystems, "c_sys5_hyd")
-
-    # No Parameters Testing
-    model = DecisionModel(MockOperationProblem, DCPPowerModel, c_sys5_hyd)
-    mock_PSI.construct_device!(model, device_model)
-    moi_tests(model, 0, 0, 0, 0, 0, false)
-    psi_checkobjfun_test(model, GAEVF)
-end
-
-###################################
-### RUN OF RIVER DISPATCH TESTS ###
-###################################
-
-@testset "Hydro DCPLossLess HydroDispatch with HydroDispatchRunOfRiver formulations" begin
-    device_model = DeviceModel(HydroDispatch, HydroDispatchRunOfRiver)
-    c_sys5_hy = PSB.build_system(PSITestSystems, "c_sys5_hy")
-
-    # No Parameters Testing
-    model = DecisionModel(MockOperationProblem, DCPPowerModel, c_sys5_hy)
-    mock_PSI.construct_device!(model, device_model)
-    moi_tests(model, 24, 0, 48, 24, 0, false)
-    psi_checkobjfun_test(model, GAEVF)
-end
-
-@testset "Hydro ACPPowerModel HydroDispatch with HydroDispatchRunOfRiver formulations" begin
-    device_model = DeviceModel(HydroDispatch, HydroDispatchRunOfRiver)
-    c_sys5_hy = PSB.build_system(PSITestSystems, "c_sys5_hy")
-
-    # No Parameters Testing
-    model = DecisionModel(MockOperationProblem, ACPPowerModel, c_sys5_hy)
-    mock_PSI.construct_device!(model, device_model)
-    moi_tests(model, 48, 0, 72, 48, 0, false)
-    psi_checkobjfun_test(model, GAEVF)
-end
-
-@testset "Hydro DCPLossLess HydroEnergyReservoir with HydroDispatchRunOfRiver formulations" begin
-    device_model = DeviceModel(HydroEnergyReservoir, HydroDispatchRunOfRiver)
-    c_sys5_hyd = PSB.build_system(PSITestSystems, "c_sys5_hyd")
-
-    # No Parameters Testing
-    model = DecisionModel(MockOperationProblem, DCPPowerModel, c_sys5_hyd)
-    mock_PSI.construct_device!(model, device_model)
-    moi_tests(model, 24, 0, 48, 24, 0, false)
-    psi_checkobjfun_test(model, GAEVF)
-end
-
-@testset "Hydro ACPPowerModel HydroEnergyReservoir with HydroDispatchRunOfRiver formulations" begin
-    device_model = DeviceModel(HydroEnergyReservoir, HydroDispatchRunOfRiver)
-    c_sys5_hyd = PSB.build_system(PSITestSystems, "c_sys5_hyd")
-
-    # No Parameters Testing
-    model = DecisionModel(MockOperationProblem, ACPPowerModel, c_sys5_hyd)
-    mock_PSI.construct_device!(model, device_model)
-    moi_tests(model, 48, 0, 72, 48, 0, false)
-    psi_checkobjfun_test(model, GAEVF)
-end
-
-###################################
-#### RUN OF RIVER COMMIT TESTS ####
-###################################
-
-@testset "Hydro DCPLossLess HydroDispatch with HydroCommitmentRunOfRiver formulations" begin
-    device_model = DeviceModel(HydroDispatch, HydroCommitmentRunOfRiver)
-    c_sys5_hy = PSB.build_system(PSITestSystems, "c_sys5_hy")
-
-    # No Parameters Testing
-    model = DecisionModel(MockOperationProblem, DCPPowerModel, c_sys5_hy)
-    mock_PSI.construct_device!(model, device_model)
-    moi_tests(model, 48, 0, 48, 24, 0, true)
-    psi_checkobjfun_test(model, GAEVF)
-end
-
-@testset "Hydro ACPPowerModel HydroDispatch with HydroCommitmentRunOfRiver formulations" begin
-    device_model = DeviceModel(HydroDispatch, HydroCommitmentRunOfRiver)
-    c_sys5_hy = PSB.build_system(PSITestSystems, "c_sys5_hy")
-
-    # No Parameters Testing
-    model = DecisionModel(MockOperationProblem, ACPPowerModel, c_sys5_hy)
-    mock_PSI.construct_device!(model, device_model)
-    moi_tests(model, 72, 0, 72, 48, 0, true)
-    psi_checkobjfun_test(model, GAEVF)
-end
-
-@testset "Hydro DCPLossLess HydroEnergyReservoir with HydroCommitmentRunOfRiver formulations" begin
-    device_model = DeviceModel(HydroEnergyReservoir, HydroCommitmentRunOfRiver)
-    c_sys5_hyd = PSB.build_system(PSITestSystems, "c_sys5_hyd")
-
-    # No Parameters Testing
-    model = DecisionModel(MockOperationProblem, DCPPowerModel, c_sys5_hyd)
-    mock_PSI.construct_device!(model, device_model)
-    moi_tests(model, 48, 0, 48, 24, 0, true)
-    psi_checkobjfun_test(model, GAEVF)
-end
-
-@testset "Hydro ACPPowerModel HydroEnergyReservoir with HydroCommitmentRunOfRiver formulations" begin
-    device_model = DeviceModel(HydroEnergyReservoir, HydroCommitmentRunOfRiver)
-    c_sys5_hyd = PSB.build_system(PSITestSystems, "c_sys5_hyd")
-
-    # No Parameters Testing
-    model = DecisionModel(MockOperationProblem, ACPPowerModel, c_sys5_hyd)
-    mock_PSI.construct_device!(model, device_model)
-    moi_tests(model, 72, 0, 72, 48, 0, true)
-    psi_checkobjfun_test(model, GAEVF)
-end
-
 #########################################
 #### RESERVOIR BUDGET DISPATCH TESTS ####
 #########################################
 
 @testset "Hydro DCPLossLess HydroEnergyReservoir with HydroDispatchReservoirBudget Formulations" begin
-    device_model = DeviceModel(HydroEnergyReservoir, HydroDispatchReservoirBudget)
+    device_model = PSI.DeviceModel(HydroEnergyReservoir, HydroDispatchReservoirBudget)
     c_sys5_hyd = PSB.build_system(PSITestSystems, "c_sys5_hyd")
 
     # No Parameters Testing
@@ -136,7 +14,7 @@ end
 end
 
 @testset "Hydro ACPPowerModel HydroEnergyReservoir with HydroDispatchReservoirBudget Formulations" begin
-    device_model = DeviceModel(HydroEnergyReservoir, HydroDispatchReservoirBudget)
+    device_model = PSI.DeviceModel(HydroEnergyReservoir, HydroDispatchReservoirBudget)
     c_sys5_hyd = PSB.build_system(PSITestSystems, "c_sys5_hyd")
 
     # No Parameters Testing
@@ -151,7 +29,7 @@ end
 #########################################
 
 @testset "Hydro DCPLossLess HydroPumpedStorage with HydroDispatchPumpedStorage Formulations" begin
-    device_model = DeviceModel(
+    device_model = PSI.DeviceModel(
         HydroPumpedStorage,
         HydroDispatchPumpedStorage;
         attributes=Dict{String, Any}("reservation" => false),
@@ -166,7 +44,7 @@ end
 end
 
 @testset "Hydro DCPLossLess HydroPumpedStorage with HydroDispatchPumpedStorage with Reservation Formulations" begin
-    device_model = DeviceModel(HydroPumpedStorage, HydroDispatchPumpedStorage)
+    device_model = PSI.DeviceModel(HydroPumpedStorage, HydroDispatchPumpedStorage)
     c_sys5_phes_ed = PSB.build_system(PSITestSystems, "c_sys5_phes_ed")
 
     # No Parameters Testing
@@ -181,7 +59,7 @@ end
 #########################################
 
 @testset "Hydro DCPLossLess HydroEnergyReservoir with HydroCommitmentReservoirBudget Formulations" begin
-    device_model = DeviceModel(HydroEnergyReservoir, HydroCommitmentReservoirBudget)
+    device_model = PSI.DeviceModel(HydroEnergyReservoir, HydroCommitmentReservoirBudget)
     c_sys5_hyd = PSB.build_system(PSITestSystems, "c_sys5_hyd")
 
     # No Parameters Testing
@@ -192,7 +70,7 @@ end
 end
 
 @testset "Hydro ACPPowerModel HydroEnergyReservoir with HydroCommitmentReservoirBudget Formulations" begin
-    device_model = DeviceModel(HydroEnergyReservoir, HydroCommitmentReservoirBudget)
+    device_model = PSI.DeviceModel(HydroEnergyReservoir, HydroCommitmentReservoirBudget)
     c_sys5_hyd = PSB.build_system(PSITestSystems, "c_sys5_hyd")
 
     # No Parameters Testing
@@ -207,7 +85,7 @@ end
 #########################################
 
 @testset "Hydro DCPLossLess HydroEnergyReservoir with HydroDispatchReservoirStorage Formulations" begin
-    device_model = DeviceModel(HydroEnergyReservoir, HydroDispatchReservoirStorage)
+    device_model = PSI.DeviceModel(HydroEnergyReservoir, HydroDispatchReservoirStorage)
     c_sys5_hyd = PSB.build_system(PSITestSystems, "c_sys5_hyd_ems")
 
     # No Parameters Testing
@@ -218,7 +96,7 @@ end
 end
 
 @testset "Hydro ACPLossLess HydroEnergyReservoir with HydroDispatchReservoirStorage Formulations" begin
-    device_model = DeviceModel(HydroEnergyReservoir, HydroDispatchReservoirStorage)
+    device_model = PSI.DeviceModel(HydroEnergyReservoir, HydroDispatchReservoirStorage)
     c_sys5_hyd = PSB.build_system(PSITestSystems, "c_sys5_hyd_ems")
 
     # No Parameters Testing
@@ -233,7 +111,7 @@ end
 #########################################
 
 @testset "Hydro DCPLossLess HydroEnergyReservoir with HydroCommitmentReservoirStorage Formulations" begin
-    device_model = DeviceModel(HydroEnergyReservoir, HydroCommitmentReservoirStorage)
+    device_model = PSI.DeviceModel(HydroEnergyReservoir, HydroCommitmentReservoirStorage)
     c_sys5_hyd = PSB.build_system(PSITestSystems, "c_sys5_hyd_ems")
 
     # No Parameters Testing
@@ -244,7 +122,7 @@ end
 end
 
 @testset "Hydro ACPLossLess HydroEnergyReservoir with HydroCommitmentReservoirStorage Formulations" begin
-    device_model = DeviceModel(HydroEnergyReservoir, HydroCommitmentReservoirStorage)
+    device_model = PSI.DeviceModel(HydroEnergyReservoir, HydroCommitmentReservoirStorage)
     c_sys5_hyd = PSB.build_system(PSITestSystems, "c_sys5_hyd_ems")
 
     # No Parameters Testing
@@ -453,11 +331,11 @@ end
 ### Feedforward Test ###
 
 @testset "Test SemiContinuousFeedforward to HydroDispatch with HydroCommitmentRunOfRiver model" begin
-    device_model = DeviceModel(HydroDispatch, HydroCommitmentRunOfRiver)
+    device_model = PSI.DeviceModel(HydroDispatch, HydroCommitmentRunOfRiver)
     ff_sc = SemiContinuousFeedforward(;
         component_type=HydroDispatch,
-        source=OnVariable,
-        affected_values=[ActivePowerVariable],
+        source=PSI.OnVariable,
+        affected_values=[PSI.ActivePowerVariable],
     )
 
     PSI.attach_feedforward!(device_model, ff_sc)
@@ -468,11 +346,11 @@ end
 end
 
 @testset "Test UpperBoundFeedforward to HydroDispatch with HydroCommitmentRunOfRiver model" begin
-    device_model = DeviceModel(HydroDispatch, HydroCommitmentRunOfRiver)
+    device_model = PSI.DeviceModel(HydroDispatch, HydroCommitmentRunOfRiver)
     ff_ub = UpperBoundFeedforward(;
         component_type=HydroDispatch,
-        source=ActivePowerVariable,
-        affected_values=[ActivePowerVariable],
+        source=PSI.ActivePowerVariable,
+        affected_values=[PSI.ActivePowerVariable],
     )
     PSI.attach_feedforward!(device_model, ff_ub)
     c_sys5_hy = PSB.build_system(PSITestSystems, "c_sys5_hy")
@@ -482,11 +360,11 @@ end
 end
 
 @testset "Test LowerBoundFeedforward to HydroDispatch with HydroCommitmentRunOfRiver model" begin
-    device_model = DeviceModel(HydroDispatch, HydroCommitmentRunOfRiver)
+    device_model = PSI.DeviceModel(HydroDispatch, HydroCommitmentRunOfRiver)
     ff_ub = LowerBoundFeedforward(;
         component_type=HydroDispatch,
-        source=ActivePowerVariable,
-        affected_values=[ActivePowerVariable],
+        source=PSI.ActivePowerVariable,
+        affected_values=[PSI.ActivePowerVariable],
     )
     PSI.attach_feedforward!(device_model, ff_ub)
     c_sys5_hy = PSB.build_system(PSITestSystems, "c_sys5_hy")
@@ -496,12 +374,12 @@ end
 end
 
 @testset "Test UpperBoundFeedforward to HydroDispatch with HydroDispatchRunOfRiver model" begin
-    device_model = DeviceModel(HydroDispatch, HydroDispatchRunOfRiver)
+    device_model = PSI.DeviceModel(HydroDispatch, HydroDispatchRunOfRiver)
 
     ff_ub = UpperBoundFeedforward(;
         component_type=HydroDispatch,
-        source=ActivePowerVariable,
-        affected_values=[ActivePowerVariable],
+        source=PSI.ActivePowerVariable,
+        affected_values=[PSI.ActivePowerVariable],
     )
 
     PSI.attach_feedforward!(device_model, ff_ub)
@@ -512,12 +390,12 @@ end
 end
 
 @testset "Test LowerBoundFeedforward to HydroDispatch with HydroDispatchRunOfRiver model" begin
-    device_model = DeviceModel(HydroDispatch, HydroDispatchRunOfRiver)
+    device_model = PSI.DeviceModel(HydroDispatch, HydroDispatchRunOfRiver)
 
     ff_ub = LowerBoundFeedforward(;
         component_type=HydroDispatch,
-        source=ActivePowerVariable,
-        affected_values=[ActivePowerVariable],
+        source=PSI.ActivePowerVariable,
+        affected_values=[PSI.ActivePowerVariable],
     )
 
     PSI.attach_feedforward!(device_model, ff_ub)
@@ -528,11 +406,11 @@ end
 end
 
 @testset "Test EnergyLimitFeedforward to HydroEnergyReservoir with HydroDispatchReservoirBudget model" begin
-    device_model = DeviceModel(HydroEnergyReservoir, HydroDispatchReservoirBudget)
+    device_model = PSI.DeviceModel(HydroEnergyReservoir, HydroDispatchReservoirBudget)
     ff_il = EnergyLimitFeedforward(;
         component_type=HydroEnergyReservoir,
-        source=ActivePowerVariable,
-        affected_values=[ActivePowerVariable],
+        source=PSI.ActivePowerVariable,
+        affected_values=[PSI.ActivePowerVariable],
         number_of_periods=12,
     )
 
@@ -544,11 +422,11 @@ end
 end
 
 @testset "Test EnergyLimitFeedforward to HydroEnergyReservoir with HydroDispatchReservoirStorage model" begin
-    device_model = DeviceModel(HydroEnergyReservoir, HydroDispatchReservoirStorage)
+    device_model = PSI.DeviceModel(HydroEnergyReservoir, HydroDispatchReservoirStorage)
     ff_il = EnergyLimitFeedforward(;
         component_type=HydroEnergyReservoir,
-        source=ActivePowerVariable,
-        affected_values=[ActivePowerVariable],
+        source=PSI.ActivePowerVariable,
+        affected_values=[PSI.ActivePowerVariable],
         number_of_periods=12,
     )
 
@@ -560,11 +438,11 @@ end
 end
 
 @testset "Test LowerBoundFeedforward to HydroEnergyReservoir with HydroDispatchReservoirStorage model" begin
-    device_model = DeviceModel(HydroEnergyReservoir, HydroDispatchReservoirStorage)
+    device_model = PSI.DeviceModel(HydroEnergyReservoir, HydroDispatchReservoirStorage)
     ff_il = LowerBoundFeedforward(;
         component_type=HydroEnergyReservoir,
-        source=ActivePowerVariable,
-        affected_values=[ActivePowerVariable],
+        source=PSI.ActivePowerVariable,
+        affected_values=[PSI.ActivePowerVariable],
     )
 
     PSI.attach_feedforward!(device_model, ff_il)
@@ -575,11 +453,11 @@ end
 end
 
 @testset "Test EnergyLimitFeedforward to HydroEnergyReservoir with HydroCommitmentReservoirStorage model" begin
-    device_model = DeviceModel(HydroEnergyReservoir, HydroCommitmentReservoirStorage)
+    device_model = PSI.DeviceModel(HydroEnergyReservoir, HydroCommitmentReservoirStorage)
     ff_il = EnergyLimitFeedforward(;
         component_type=HydroEnergyReservoir,
-        source=ActivePowerVariable,
-        affected_values=[ActivePowerVariable],
+        source=PSI.ActivePowerVariable,
+        affected_values=[PSI.ActivePowerVariable],
         number_of_periods=12,
     )
     PSI.attach_feedforward!(device_model, ff_il)
@@ -590,11 +468,11 @@ end
 end
 
 @testset "Test SemiContinuousFeedforward to HydroEnergyReservoir with HydroCommitmentReservoirStorage model" begin
-    device_model = DeviceModel(HydroEnergyReservoir, HydroCommitmentReservoirStorage)
+    device_model = PSI.DeviceModel(HydroEnergyReservoir, HydroCommitmentReservoirStorage)
     ff_sc = SemiContinuousFeedforward(;
         component_type=HydroEnergyReservoir,
-        source=OnVariable,
-        affected_values=[ActivePowerVariable],
+        source=PSI.OnVariable,
+        affected_values=[PSI.ActivePowerVariable],
     )
     PSI.attach_feedforward!(device_model, ff_sc)
     c_sys5_hy = PSB.build_system(PSITestSystems, "c_sys5_hyd_ems")
@@ -604,12 +482,12 @@ end
 end
 
 @testset "Test EnergyLimitFeedforward to HydroEnergyReservoir models" begin
-    device_model = DeviceModel(HydroPumpedStorage, HydroDispatchPumpedStorage)
+    device_model = PSI.DeviceModel(HydroPumpedStorage, HydroDispatchPumpedStorage)
 
     ff_il = EnergyLimitFeedforward(;
         component_type=HydroPumpedStorage,
-        source=ActivePowerOutVariable,
-        affected_values=[ActivePowerOutVariable],
+        source=PSI.ActivePowerOutVariable,
+        affected_values=[PSI.ActivePowerOutVariable],
         number_of_periods=12,
     )
 
@@ -621,7 +499,7 @@ end
 end
 
 @testset "Test EnergyTargetFeedforward to HydroEnergyReservoir models" begin
-    device_model = DeviceModel(HydroPumpedStorage, HydroDispatchPumpedStorage)
+    device_model = PSI.DeviceModel(HydroPumpedStorage, HydroDispatchPumpedStorage)
 
     ff_up = EnergyTargetFeedforward(;
         component_type=HydroPumpedStorage,
