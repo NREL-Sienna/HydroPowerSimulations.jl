@@ -25,25 +25,25 @@ function add_feedforward_constraints!(
     container::PSI.OptimizationContainer,
     ::PSI.DeviceModel,
     devices::IS.FlattenIteratorWrapper{T},
-    ff::EnergyTargetFeedforward,
+    ff::PSI.EnergyTargetFeedforward,
 ) where {T <: PSY.Component}
-    time_steps = get_time_steps(container)
-    parameter_type = get_default_parameter_type(ff, T)
-    param = get_parameter_array(container, parameter_type(), T)
-    multiplier = get_parameter_multiplier_array(container, parameter_type(), T)
+    time_steps = PSI.get_time_steps(container)
+    parameter_type = PSI.get_default_parameter_type(ff, T)
+    param = PSI.get_parameter_array(container, parameter_type(), T)
+    multiplier = PSI.get_parameter_multiplier_array(container, parameter_type(), T)
     target_period = ff.target_period
     penalty_cost = ff.penalty_cost
-    for var in get_affected_values(ff)
-        variable = get_variable(container, var)
-        slack_var = get_variable(container, EnergyShortageVariable(), T)
+    for var in PSI.get_affected_values(ff)
+        variable = PSI.get_variable(container, var)
+        slack_var = PSI.get_variable(container, EnergyShortageVariable(), T)
         set_name, set_time = JuMP.axes(variable)
         IS.@assert_op set_name == [PSY.get_name(d) for d in devices]
         IS.@assert_op set_time == time_steps
 
-        var_type = get_entry_type(var)
-        con_ub = add_constraints_container!(
+        var_type = PSI.get_entry_type(var)
+        con_ub = PSI.add_constraints_container!(
             container,
-            FeedforwardEnergyTargetConstraint(),
+            PSI.FeedforwardEnergyTargetConstraint(),
             T,
             set_name;
             meta="$(var_type)target",
@@ -56,7 +56,7 @@ function add_feedforward_constraints!(
                 variable[name, target_period] + slack_var[name, target_period] >=
                 param[name, target_period] * multiplier[name, target_period]
             )
-            add_to_objective_invariant_expression!(
+            PSI.add_to_objective_invariant_expression!(
                 container,
                 slack_var[name, target_period] * penalty_cost,
             )
@@ -69,11 +69,11 @@ function _add_feedforward_arguments!(
     container::PSI.OptimizationContainer,
     model::PSI.DeviceModel,
     devices::IS.FlattenIteratorWrapper{T},
-    ff::EnergyTargetFeedforward,
+    ff::PSI.EnergyTargetFeedforward,
 ) where {T <: PSY.Component}
-    parameter_type = get_default_parameter_type(ff, T)
-    add_parameters!(container, parameter_type, ff, model, devices)
+    parameter_type = PSI.get_default_parameter_type(ff, T)
+    PSI.add_parameters!(container, parameter_type, ff, model, devices)
     # Enabling this FF requires the addition of an extra variable
-    add_variables!(container, EnergyShortageVariable, devices, get_formulation(model)())
+    PSI.add_variables!(container, PSI.EnergyShortageVariable, devices, PSI.get_formulation(model)())
     return
 end
