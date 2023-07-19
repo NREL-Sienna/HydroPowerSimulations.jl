@@ -442,7 +442,8 @@ function PSI.add_constraints!(
         time_steps,
     )
     param_container = PSI.get_parameter(container, InflowTimeSeriesParameter(), V)
-    multiplier = PSI.get_parameter_multiplier_array(container, InflowTimeSeriesParameter(), V)
+    multiplier =
+        PSI.get_parameter_multiplier_array(container, InflowTimeSeriesParameter(), V)
 
     for ic in initial_conditions
         device = PSI.get_component(ic)
@@ -524,7 +525,8 @@ function PSI.add_constraints!(
                 container.JuMPmodel,
                 energy_var[name, t] ==
                 energy_var[name, t - 1] +
-                PSI.get_parameter_column_refs(param_container, name)[t] * multiplier[name, t] +
+                PSI.get_parameter_column_refs(param_container, name)[t] *
+                multiplier[name, t] +
                 (
                     powerin_var[name, 1] -
                     (powerout_var[name, t] + spillage_var[name, t]) / efficiency
@@ -822,7 +824,13 @@ function PSI.add_proportional_cost!(
         cost_term = PSI.proportional_cost(op_cost_data, U(), d, V())
         iszero(cost_term) && continue
         for t in PSI.get_time_steps(container)
-            PSI._add_proportional_term!(container, U(), d, cost_term * multiplier * base_p, t)
+            PSI._add_proportional_term!(
+                container,
+                U(),
+                d,
+                cost_term * multiplier * base_p,
+                t,
+            )
         end
     end
     return
@@ -836,11 +844,8 @@ function PSI.update_initial_conditions!(
     T <: PSI.PSI.InitialCondition{InitialEnergyLevelUp, S},
 } where {S <: Union{Float64, JuMP.VariableRef}}
     for ic in ics
-        var_val = PSI.get_variable_value(
-            store,
-            EnergyVariableUp(),
-            PSI.get_component_type(ic),
-        )
+        var_val =
+            PSI.get_variable_value(store, EnergyVariableUp(), PSI.get_component_type(ic))
         PSI.set_ic_quantity!(
             ic,
             PSI.get_last_recorded_value(var_val)[PSI.get_component_name(ic)],

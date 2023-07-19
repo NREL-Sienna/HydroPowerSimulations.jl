@@ -420,7 +420,12 @@ function PSI.construct_device!(
         devices,
         HydroDispatchReservoirStorage(),
     )
-    PSI.add_variables!(container, PSI.EnergyVariable, devices, HydroDispatchReservoirStorage())
+    PSI.add_variables!(
+        container,
+        PSI.EnergyVariable,
+        devices,
+        HydroDispatchReservoirStorage(),
+    )
     PSI.add_variables!(
         container,
         WaterSpillageVariable,
@@ -439,7 +444,12 @@ function PSI.construct_device!(
         devices,
         HydroDispatchReservoirStorage(),
     )
-    PSI.add_variables!(container, PSI.EnergyOutput, devices, HydroDispatchReservoirStorage())
+    PSI.add_variables!(
+        container,
+        PSI.EnergyOutput,
+        devices,
+        HydroDispatchReservoirStorage(),
+    )
     PSI.add_parameters!(container, EnergyTargetTimeSeriesParameter, devices, model)
     PSI.add_parameters!(container, InflowTimeSeriesParameter, devices, model)
 
@@ -523,7 +533,13 @@ function PSI.construct_device!(
         PSI.InitialEnergyLevel(),
     )
     # Energy Balance Constraint
-    PSI.add_constraints!(container, PSI.EnergyBalanceConstraint, devices, model, network_model)
+    PSI.add_constraints!(
+        container,
+        PSI.EnergyBalanceConstraint,
+        devices,
+        model,
+        network_model,
+    )
     PSI.add_constraints!(container, EnergyTargetConstraint, devices, model, network_model)
     PSI.add_feedforward_constraints!(container, model, devices)
 
@@ -552,7 +568,12 @@ function PSI.construct_device!(
         devices,
         HydroDispatchReservoirStorage(),
     )
-    PSI.add_variables!(container, PSI.EnergyVariable, devices, HydroDispatchReservoirStorage())
+    PSI.add_variables!(
+        container,
+        PSI.EnergyVariable,
+        devices,
+        HydroDispatchReservoirStorage(),
+    )
     PSI.add_variables!(
         container,
         WaterSpillageVariable,
@@ -571,7 +592,12 @@ function PSI.construct_device!(
         devices,
         HydroDispatchReservoirStorage(),
     )
-    PSI.add_variables!(container, PSI.EnergyOutput, devices, HydroDispatchReservoirStorage())
+    PSI.add_variables!(
+        container,
+        PSI.EnergyOutput,
+        devices,
+        HydroDispatchReservoirStorage(),
+    )
     PSI.add_to_expression!(
         container,
         PSI.ActivePowerBalance,
@@ -641,7 +667,13 @@ function PSI.construct_device!(
         PSI.InitialEnergyLevel(),
     )
     # Energy Balance Constraint
-    PSI.add_constraints!(container, PSI.EnergyBalanceConstraint, devices, model, network_model)
+    PSI.add_constraints!(
+        container,
+        PSI.EnergyBalanceConstraint,
+        devices,
+        model,
+        network_model,
+    )
     PSI.add_constraints!(container, EnergyTargetConstraint, devices, model, network_model)
     PSI.add_feedforward_constraints!(container, model, devices)
 
@@ -871,7 +903,12 @@ function PSI.construct_device!(
         devices,
         HydroCommitmentReservoirStorage(),
     )
-    PSI.add_variables!(container, PSI.OnVariable, devices, HydroCommitmentReservoirStorage())
+    PSI.add_variables!(
+        container,
+        PSI.OnVariable,
+        devices,
+        HydroCommitmentReservoirStorage(),
+    )
     PSI.add_variables!(
         container,
         PSI.EnergyVariable,
@@ -896,7 +933,12 @@ function PSI.construct_device!(
         devices,
         HydroCommitmentReservoirStorage(),
     )
-    PSI.add_variables!(container, PSI.EnergyOutput, devices, HydroCommitmentReservoirStorage())
+    PSI.add_variables!(
+        container,
+        PSI.EnergyOutput,
+        devices,
+        HydroCommitmentReservoirStorage(),
+    )
     PSI.add_to_expression!(
         container,
         PSI.ActivePowerBalance,
@@ -981,7 +1023,13 @@ function PSI.construct_device!(
         PSI.InitialEnergyLevel(),
     )
     # Energy Balance Constraint
-    PSI.add_constraints!(container, PSI.EnergyBalanceConstraint, devices, model, network_model)
+    PSI.add_constraints!(
+        container,
+        PSI.EnergyBalanceConstraint,
+        devices,
+        model,
+        network_model,
+    )
     PSI.add_constraints!(container, EnergyTargetConstraint, devices, model, network_model)
     PSI.add_feedforward_constraints!(container, model, devices)
 
@@ -1010,7 +1058,12 @@ function PSI.construct_device!(
         devices,
         HydroCommitmentReservoirStorage(),
     )
-    PSI.add_variables!(container, PSI.OnVariable, devices, HydroCommitmentReservoirStorage())
+    PSI.add_variables!(
+        container,
+        PSI.OnVariable,
+        devices,
+        HydroCommitmentReservoirStorage(),
+    )
     PSI.add_variables!(
         container,
         PSI.EnergyVariable,
@@ -1044,7 +1097,12 @@ function PSI.construct_device!(
         model,
         network_model,
     )
-    PSI.add_variables!(container, PSI.EnergyOutput, devices, HydroCommitmentReservoirStorage())
+    PSI.add_variables!(
+        container,
+        PSI.EnergyOutput,
+        devices,
+        HydroCommitmentReservoirStorage(),
+    )
     PSI.add_parameters!(container, EnergyTargetTimeSeriesParameter, devices, model)
     PSI.add_parameters!(container, InflowTimeSeriesParameter, devices, model)
 
@@ -1104,7 +1162,13 @@ function PSI.construct_device!(
     )
 
     # Energy Balance Constraint
-    PSI.add_constraints!(container, PSI.EnergyBalanceConstraint, devices, model, network_model)
+    PSI.add_constraints!(
+        container,
+        PSI.EnergyBalanceConstraint,
+        devices,
+        model,
+        network_model,
+    )
     PSI.add_constraints!(container, EnergyTargetConstraint, devices, model, network_model)
     PSI.add_feedforward_constraints!(container, model, devices)
 
@@ -1141,7 +1205,12 @@ function PSI.construct_device!(
     )
     PSI.add_variables!(container, EnergyVariableUp, devices, HydroDispatchPumpedStorage())
     PSI.add_variables!(container, EnergyVariableDown, devices, HydroDispatchPumpedStorage())
-    PSI.add_variables!(container, WaterSpillageVariable, devices, HydroDispatchPumpedStorage())
+    PSI.add_variables!(
+        container,
+        WaterSpillageVariable,
+        devices,
+        HydroDispatchPumpedStorage(),
+    )
     PSI.add_variables!(container, PSI.EnergyOutput, devices, HydroDispatchPumpedStorage())
     if PSI.get_attribute(model, "reservation")
         PSI.add_variables!(
@@ -1221,8 +1290,20 @@ function PSI.construct_device!(
     )
 
     # Energy Balance limits
-    PSI.add_constraints!(container, EnergyCapacityUpConstraint, devices, model, network_model)
-    PSI.add_constraints!(container, EnergyCapacityDownConstraint, devices, model, network_model)
+    PSI.add_constraints!(
+        container,
+        EnergyCapacityUpConstraint,
+        devices,
+        model,
+        network_model,
+    )
+    PSI.add_constraints!(
+        container,
+        EnergyCapacityDownConstraint,
+        devices,
+        model,
+        network_model,
+    )
     PSI.add_feedforward_constraints!(container, model, devices)
 
     PSI.objective_function!(container, devices, model, S)

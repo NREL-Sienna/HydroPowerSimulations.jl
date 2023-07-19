@@ -74,6 +74,11 @@ function _add_feedforward_arguments!(
     parameter_type = PSI.get_default_parameter_type(ff, T)
     PSI.add_parameters!(container, parameter_type, ff, model, devices)
     # Enabling this FF requires the addition of an extra variable
-    PSI.add_variables!(container, PSI.EnergyShortageVariable, devices, PSI.get_formulation(model)())
+    PSI.add_variables!(
+        container,
+        PSI.EnergyShortageVariable,
+        devices,
+        PSI.get_formulation(model)(),
+    )
     return
 end

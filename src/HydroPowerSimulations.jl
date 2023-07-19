@@ -21,7 +21,6 @@ export HydroDispatchPumpedStorage
 export EnergyVariableUp
 export WaterSpillageVariable
 
-
 ######## Hydro parameters #######
 export EnergyTargetParameter
 
