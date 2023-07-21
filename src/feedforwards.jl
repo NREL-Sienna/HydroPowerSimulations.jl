@@ -21,7 +21,7 @@ Constructs a equality constraint to a fix a variable in one model using the vari
 * devices::IS.FlattenIteratorWrapper{T} : list of devices
 * ff::EnergyTargetFeedforward : a instance of the FixValue Feedforward
 """
-function add_feedforward_constraints!(
+function PSI.add_feedforward_constraints!(
     container::PSI.OptimizationContainer,
     ::PSI.DeviceModel,
     devices::IS.FlattenIteratorWrapper{T},
@@ -35,7 +35,7 @@ function add_feedforward_constraints!(
     penalty_cost = ff.penalty_cost
     for var in PSI.get_affected_values(ff)
         variable = PSI.get_variable(container, var)
-        slack_var = PSI.get_variable(container, EnergyShortageVariable(), T)
+        slack_var = PSI.get_variable(container, HydroEnergyShortageVariable(), T)
         set_name, set_time = JuMP.axes(variable)
         IS.@assert_op set_name == [PSY.get_name(d) for d in devices]
         IS.@assert_op set_time == time_steps
@@ -65,7 +65,7 @@ function add_feedforward_constraints!(
     return
 end
 
-function _add_feedforward_arguments!(
+function PSI._add_feedforward_arguments!(
     container::PSI.OptimizationContainer,
     model::PSI.DeviceModel,
     devices::IS.FlattenIteratorWrapper{T},
@@ -76,9 +76,11 @@ function _add_feedforward_arguments!(
     # Enabling this FF requires the addition of an extra variable
     PSI.add_variables!(
         container,
-        PSI.EnergyShortageVariable,
+        HydroEnergyShortageVariable,
         devices,
         PSI.get_formulation(model)(),
     )
     return
 end
+
+get_default_parameter_type(::PSI.EnergyTargetFeedforward, _) = EnergyTargetParameter

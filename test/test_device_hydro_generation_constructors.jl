@@ -501,7 +501,7 @@ end
 @testset "Test EnergyTargetFeedforward to HydroEnergyReservoir models" begin
     device_model = PSI.DeviceModel(HydroPumpedStorage, HydroDispatchPumpedStorage)
 
-    ff_up = EnergyTargetFeedforward(;
+    ff_up = PSI.EnergyTargetFeedforward(;
         component_type=HydroPumpedStorage,
         source=EnergyVariableUp,
         affected_values=[EnergyVariableUp],

@@ -67,10 +67,10 @@ PSI.get_variable_binary(::PSI.ReservationVariable, ::Type{<:PSY.HydroGen}, ::PSI
 PSI.get_variable_binary(::PSI.ReservationVariable, ::Type{<:PSY.HydroPumpedStorage}, ::PSI.AbstractHydroFormulation) = true
 
 ############## EnergyShortageVariable, HydroGen ####################
-PSI.get_variable_binary(::EnergyShortageVariable, ::Type{<:PSY.HydroGen}, ::PSI.AbstractHydroFormulation) = false
-PSI.get_variable_lower_bound(::EnergyShortageVariable, d::PSY.HydroGen, ::PSI.AbstractHydroFormulation) = 0.0
-PSI.get_variable_upper_bound(::EnergyShortageVariable, d::PSY.HydroGen, ::PSI.AbstractHydroFormulation) = PSY.get_storage_capacity(d)
-PSI.get_variable_upper_bound(::EnergyShortageVariable, d::PSY.HydroPumpedStorage, ::PSI.AbstractHydroFormulation) = PSY.get_storage_capacity(d).up
+PSI.get_variable_binary(::HydroEnergyShortageVariable, ::Type{<:PSY.HydroGen}, ::PSI.AbstractHydroFormulation) = false
+PSI.get_variable_lower_bound(::HydroEnergyShortageVariable, d::PSY.HydroGen, ::PSI.AbstractHydroFormulation) = 0.0
+PSI.get_variable_upper_bound(::HydroEnergyShortageVariable, d::PSY.HydroGen, ::PSI.AbstractHydroFormulation) = PSY.get_storage_capacity(d)
+PSI.get_variable_upper_bound(::HydroEnergyShortageVariable, d::PSY.HydroPumpedStorage, ::PSI.AbstractHydroFormulation) = PSY.get_storage_capacity(d).up
 ############## EnergySurplusVariable, HydroGen ####################
 PSI.get_variable_binary(::EnergySurplusVariable, ::Type{<:PSY.HydroGen}, ::PSI.AbstractHydroFormulation) = false
 PSI.get_variable_upper_bound(::EnergySurplusVariable, d::PSY.HydroGen, ::PSI.AbstractHydroFormulation) = 0.0
@@ -109,13 +109,13 @@ PSI.initial_condition_variable(::PSI.InitialTimeDurationOff, d::PSY.HydroGen, ::
 PSI.proportional_cost(cost::Nothing, ::PSY.HydroGen, ::PSI.ActivePowerVariable, ::PSI.AbstractHydroFormulation)=0.0
 PSI.proportional_cost(cost::PSY.OperationalCost, ::PSI.OnVariable, ::PSY.HydroGen, ::PSI.AbstractHydroFormulation)=PSY.get_fixed(cost)
 PSI.proportional_cost(cost::PSY.StorageManagementCost, ::EnergySurplusVariable, ::PSY.HydroGen, ::PSI.AbstractHydroFormulation)=PSY.get_energy_surplus_cost(cost)
-PSI.proportional_cost(cost::PSY.StorageManagementCost, ::EnergyShortageVariable, ::PSY.HydroGen, ::PSI.AbstractHydroFormulation)=PSY.get_energy_shortage_cost(cost)
+PSI.proportional_cost(cost::PSY.StorageManagementCost, ::HydroEnergyShortageVariable, ::PSY.HydroGen, ::PSI.AbstractHydroFormulation)=PSY.get_energy_shortage_cost(cost)
 
 PSI.objective_function_multiplier(::PSI.ActivePowerVariable, ::PSI.AbstractHydroFormulation)=PSI.OBJECTIVE_FUNCTION_POSITIVE
 PSI.objective_function_multiplier(::PSI.ActivePowerOutVariable, ::PSI.AbstractHydroFormulation)=PSI.OBJECTIVE_FUNCTION_POSITIVE
 PSI.objective_function_multiplier(::PSI.OnVariable, ::PSI.AbstractHydroFormulation)=PSI.OBJECTIVE_FUNCTION_POSITIVE
 PSI.objective_function_multiplier(::EnergySurplusVariable, ::PSI.AbstractHydroFormulation)=PSI.OBJECTIVE_FUNCTION_NEGATIVE
-PSI.objective_function_multiplier(::EnergyShortageVariable, ::PSI.AbstractHydroFormulation)=PSI.OBJECTIVE_FUNCTION_POSITIVE
+PSI.objective_function_multiplier(::HydroEnergyShortageVariable, ::PSI.AbstractHydroFormulation)=PSI.OBJECTIVE_FUNCTION_POSITIVE
 
 PSI.sos_status(::PSY.HydroGen, ::PSI.AbstractHydroFormulation)=PSI.SOSStatusVariable.NO_VARIABLE
 PSI.sos_status(::PSY.HydroGen, ::PSI.AbstractHydroUnitCommitment)=PSI.SOSStatusVariable.VARIABLE
@@ -624,7 +624,7 @@ function PSI.add_constraints!(
     )
 
     e_var = PSI.get_variable(container, PSI.EnergyVariable(), V)
-    shortage_var = PSI.get_variable(container, EnergyShortageVariable(), V)
+    shortage_var = PSI.get_variable(container, HydroEnergyShortageVariable(), V)
     surplus_var = PSI.get_variable(container, EnergySurplusVariable(), V)
     param_container = PSI.get_parameter(container, EnergyTargetTimeSeriesParameter(), V)
     multiplier =
@@ -779,7 +779,7 @@ function PSI.objective_function!(
 }
     PSI.add_variable_cost!(container, PSI.ActivePowerOutVariable(), devices, U())
     PSI.add_proportional_cost!(container, EnergySurplusVariable(), devices, U())
-    PSI.add_proportional_cost!(container, EnergyShortageVariable(), devices, U())
+    PSI.add_proportional_cost!(container, HydroEnergyShortageVariable(), devices, U())
     return
 end
 
@@ -791,7 +791,7 @@ function PSI.objective_function!(
 ) where {T <: PSY.HydroEnergyReservoir, U <: HydroDispatchReservoirStorage}
     PSI.add_variable_cost!(container, PSI.ActivePowerVariable(), devices, U())
     PSI.add_proportional_cost!(container, EnergySurplusVariable(), devices, U())
-    PSI.add_proportional_cost!(container, EnergyShortageVariable(), devices, U())
+    PSI.add_proportional_cost!(container, HydroEnergyShortageVariable(), devices, U())
     return
 end
 
@@ -803,7 +803,7 @@ function PSI.objective_function!(
 ) where {T <: PSY.HydroEnergyReservoir, U <: HydroCommitmentReservoirStorage}
     PSI.add_variable_cost!(container, PSI.ActivePowerVariable(), devices, U())
     PSI.add_proportional_cost!(container, EnergySurplusVariable(), devices, U())
-    PSI.add_proportional_cost!(container, EnergyShortageVariable(), devices, U())
+    PSI.add_proportional_cost!(container, HydroEnergyShortageVariable(), devices, U())
     return
 end
 
@@ -814,7 +814,7 @@ function PSI.add_proportional_cost!(
     ::V,
 ) where {
     T <: PSY.Component,
-    U <: Union{EnergySurplusVariable, EnergyShortageVariable},
+    U <: Union{EnergySurplusVariable, HydroEnergyShortageVariable},
     V <: PSI.AbstractDeviceFormulation,
 }
     base_p = PSI.get_base_power(container)

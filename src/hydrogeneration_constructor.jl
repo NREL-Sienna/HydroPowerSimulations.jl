@@ -97,7 +97,7 @@ function PSI.construct_device!(
         model,
         network_model,
     )
-    PSI.add_feedforward_constraints!(container, model, devices)
+    PSI._add_feedforward_constraints!(container, model, devices)
 
     PSI.objective_function!(container, devices, model, S)
     PSI.add_constraint_dual!(container, sys, model)
@@ -434,7 +434,7 @@ function PSI.construct_device!(
     )
     PSI.add_variables!(
         container,
-        EnergyShortageVariable,
+        HydroEnergyShortageVariable,
         devices,
         HydroDispatchReservoirStorage(),
     )
@@ -582,7 +582,7 @@ function PSI.construct_device!(
     )
     PSI.add_variables!(
         container,
-        EnergyShortageVariable,
+        HydroEnergyShortageVariable,
         devices,
         HydroDispatchReservoirStorage(),
     )
@@ -923,7 +923,7 @@ function PSI.construct_device!(
     )
     PSI.add_variables!(
         container,
-        EnergyShortageVariable,
+        HydroEnergyShortageVariable,
         devices,
         HydroCommitmentReservoirStorage(),
     )
@@ -1078,7 +1078,7 @@ function PSI.construct_device!(
     )
     PSI.add_variables!(
         container,
-        EnergyShortageVariable,
+        HydroEnergyShortageVariable,
         devices,
         HydroCommitmentReservoirStorage(),
     )
