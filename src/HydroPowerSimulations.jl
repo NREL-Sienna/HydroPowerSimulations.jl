@@ -2,13 +2,13 @@ module HydroPowerSimulations
 
 #################################################################################
 # Exports
-export HydroEnergyCascade
-export HydroDispatchCascade
-export HydroDispatchReservoirCascade
-export HydroDispatchRunOfRiverCascade
-export HydroDispatchReservoirBudgetUpperBound
-export HydroDispatchRunOfRiverLowerBound
-export HydroDispatchReservoirBudgetLowerUpperBound
+# export HydroEnergyCascade
+# export HydroDispatchCascade
+# export HydroDispatchReservoirCascade
+# export HydroDispatchRunOfRiverCascade
+# export HydroDispatchReservoirBudgetUpperBound
+# export HydroDispatchRunOfRiverLowerBound
+# export HydroDispatchReservoirBudgetLowerUpperBound
 
 ######## Hydro Formulations ########
 export HydroDispatchReservoirBudget
@@ -16,6 +16,13 @@ export HydroDispatchReservoirStorage
 export HydroCommitmentReservoirBudget
 export HydroCommitmentReservoirStorage
 export HydroDispatchPumpedStorage
+
+######## Hydro Variables ########
+export EnergyVariableUp
+export WaterSpillageVariable
+
+######## Hydro parameters #######
+export EnergyTargetParameter
 
 #################################################################################
 # Imports
@@ -50,5 +57,6 @@ include("core/initial_conditions.jl")
 # Models
 include("hydro_generation.jl")
 include("hydrogeneration_constructor.jl")
+include("feedforwards.jl")
 
 end # module

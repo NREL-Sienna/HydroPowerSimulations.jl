@@ -24,7 +24,7 @@ Struct to dispatch the creation of a slack variable for energy storage levels < 
 
 Docs abbreviation: ``E^{shortage}``
 """
-struct EnergyShortageVariable <: PSI.VariableType end
+struct HydroEnergyShortageVariable <: PSI.VariableType end
 
 """
 Struct to dispatch the creation of a slack variable for energy storage levels > target storage levels
