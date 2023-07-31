@@ -234,7 +234,7 @@ end
 Add semicontinuous range constraints for Hydro Unit Commitment formulation
 """
 function PSI.add_constraints!(
-    container::PSI.PSI.OptimizationContainer,
+    container::PSI.OptimizationContainer,
     T::Type{PSI.ActivePowerVariableLimitsConstraint},
     U::Type{<:Union{PSI.VariableType, <:PSI.RangeConstraintLBExpressions}},
     devices::IS.FlattenIteratorWrapper{V},
@@ -263,6 +263,22 @@ function PSI.add_constraints!(
         model,
         X,
     )
+    return
+end
+
+function PSI.add_constraints!(
+    container::PSI.OptimizationContainer,
+    T::Type{PSI.ActivePowerVariableLimitsConstraint},
+    U::Type{<:Union{PSI.VariableType, <:PSI.RangeConstraintLBExpressions}},
+    devices::IS.FlattenIteratorWrapper{V},
+    model::PSI.DeviceModel{V, W},
+    ::PSI.NetworkModel{X},
+) where {
+    V <: PSY.HydroGen,
+    W <: HydroCommitmentReservoirStorage,
+    X <: PM.AbstractPowerModel,
+}
+    PSI.add_semicontinuous_range_constraints!(container, T, U, devices, model, X)
     return
 end
 
@@ -300,7 +316,7 @@ end
 Add power variable limits constraints for hydro unit commitment formulation
 """
 function add_constraints!(
-    container::PSI.PSI.OptimizationContainer,
+    container::PSI.OptimizationContainer,
     T::Type{<:PSI.PowerVariableLimitsConstraint},
     U::Type{<:Union{PSI.VariableType, PSI.ExpressionType}},
     devices::IS.FlattenIteratorWrapper{V},
@@ -759,7 +775,7 @@ function PSI.objective_function!(
 end
 
 function PSI.objective_function!(
-    container::PSI.PSI.OptimizationContainer,
+    container::PSI.OptimizationContainer,
     devices::IS.FlattenIteratorWrapper{T},
     ::PSI.DeviceModel{T, U},
     ::Type{<:PM.AbstractPowerModel},
@@ -841,7 +857,7 @@ function PSI.update_initial_conditions!(
     store::PSI.EmulationModelStore,
     ::Dates.Millisecond,
 ) where {
-    T <: PSI.PSI.InitialCondition{InitialEnergyLevelUp, S},
+    T <: PSI.InitialCondition{InitialEnergyLevelUp, S},
 } where {S <: Union{Float64, JuMP.VariableRef}}
     for ic in ics
         var_val =
@@ -859,7 +875,7 @@ function PSI.update_initial_conditions!(
     store::PSI.EmulationModelStore,
     ::Dates.Millisecond,
 ) where {
-    T <: PSI.PSI.InitialCondition{InitialEnergyLevelDown, S},
+    T <: PSI.InitialCondition{InitialEnergyLevelDown, S},
 } where {S <: Union{Float64, JuMP.VariableRef}}
     for ic in ics
         var_val = PSI.get_variable_value(
@@ -898,7 +914,7 @@ function PSI.update_initial_conditions!(
     state::PSI.SimulationState,
     ::Dates.Millisecond,
 ) where {
-    T <: PSI.PSI.InitialCondition{InitialEnergyLevelDown, S},
+    T <: PSI.InitialCondition{InitialEnergyLevelDown, S},
 } where {S <: Union{Float64, JuMP.VariableRef}}
     for ic in ics
         var_val = PSI.get_system_state_value(

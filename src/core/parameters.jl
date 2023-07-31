@@ -26,5 +26,5 @@ struct EnergyTargetParameter <: PSI.VariableValueParameter end
 PSI.convert_result_to_natural_units(::Type{EnergyTargetTimeSeriesParameter}) = true
 PSI.convert_result_to_natural_units(::Type{EnergyBudgetTimeSeriesParameter}) = true
 PSI.convert_result_to_natural_units(::Type{EnergyTargetParameter}) = true
-#PSI.convert_result_to_natural_units(::Type{InflowTimeSeriesParameter}) = true # TODO: is this pu?
-#PSI.convert_result_to_natural_units(::Type{OutflowTimeSeriesParameter}) = true # TODO: is this pu?
+PSI.convert_result_to_natural_units(::Type{InflowTimeSeriesParameter}) = true # TODO: is this pu?
+PSI.convert_result_to_natural_units(::Type{OutflowTimeSeriesParameter}) = true # TODO: is this pu?
