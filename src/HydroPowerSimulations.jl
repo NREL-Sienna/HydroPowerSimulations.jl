@@ -20,6 +20,7 @@ export HydroDispatchPumpedStorage
 ######## Hydro Variables ########
 export EnergyVariableUp
 export WaterSpillageVariable
+export HydroEnergyShortageVariable
 
 ######## Hydro parameters #######
 export EnergyTargetParameter

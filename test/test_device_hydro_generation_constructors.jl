@@ -330,8 +330,8 @@ end
 
 ### Feedforward Test ###
 
-@testset "Test SemiContinuousFeedforward to HydroDispatch with HydroCommitmentRunOfRiver model" begin
-    device_model = PSI.DeviceModel(HydroDispatch, HydroCommitmentRunOfRiver)
+@testset "Test SemiContinuousFeedforward to HydroDispatch with HydroDispatchRunOfRiver model" begin
+    device_model = PSI.DeviceModel(HydroDispatch, HydroDispatchRunOfRiver)
     ff_sc = SemiContinuousFeedforward(;
         component_type=HydroDispatch,
         source=PSI.OnVariable,
@@ -342,7 +342,7 @@ end
     c_sys5_hy = PSB.build_system(PSITestSystems, "c_sys5_hy")
     model = DecisionModel(MockOperationProblem, DCPPowerModel, c_sys5_hy)
     mock_construct_device!(model, device_model; built_for_recurrent_solves=true)
-    moi_tests(model, 96, 0, 72, 48, 0, true)
+    moi_tests(model, 72, 0, 48, 24, 0, false)
 end
 
 @testset "Test UpperBoundFeedforward to HydroDispatch with HydroCommitmentRunOfRiver model" begin
@@ -467,8 +467,8 @@ end
     moi_tests(model, 217, 0, 26, 24, 48, true)
 end
 
-@testset "Test SemiContinuousFeedforward to HydroEnergyReservoir with HydroCommitmentReservoirStorage model" begin
-    device_model = PSI.DeviceModel(HydroEnergyReservoir, HydroCommitmentReservoirStorage)
+@testset "Test SemiContinuousFeedforward to HydroEnergyReservoir with HydroDispatchReservoirStorage model" begin
+    device_model = PSI.DeviceModel(HydroEnergyReservoir, HydroDispatchReservoirStorage)
     ff_sc = SemiContinuousFeedforward(;
         component_type=HydroEnergyReservoir,
         source=PSI.OnVariable,
@@ -478,7 +478,7 @@ end
     c_sys5_hy = PSB.build_system(PSITestSystems, "c_sys5_hyd_ems")
     model = DecisionModel(MockOperationProblem, DCPPowerModel, c_sys5_hy)
     mock_construct_device!(model, device_model; built_for_recurrent_solves=true)
-    moi_tests(model, 217, 0, 48, 48, 48, true)
+    moi_tests(model, 193, 0, 24, 24, 48, false)
 end
 
 @testset "Test EnergyLimitFeedforward to HydroEnergyReservoir models" begin
