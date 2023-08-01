@@ -16,7 +16,7 @@ PSI.get_expression_type_for_reserve(::PSI.ActivePowerReserveVariable, ::Type{PSY
 # PSI.get_variable_lower_bound(::PSI.ActivePowerVariable, d::PSY.HydroGen, ::PSI.AbstractHydroFormulation) = PSY.get_active_power_limits(d).min
 # PSI.get_variable_lower_bound(::PSI.ActivePowerVariable, d::PSY.HydroGen, ::PSI.AbstractHydroUnitCommitment) = 0.0
 # PSI.get_variable_upper_bound(::PSI.ActivePowerVariable, d::PSY.HydroGen, ::PSI.AbstractHydroFormulation) = PSY.get_active_power_limits(d).max
-
+PSI.get_variable_binary(::PSI.ActivePowerVariable, ::Type{HydroPumpedStorage}, ::AbstractHydroReservoirFormulation) = false
 ############## PSI.ReactivePowerVariable, HydroGen ####################
 # These methods are defined in PowerSimulations
 # PSI.get_variable_binary(::PSI.ReactivePowerVariable, ::Type{<:PSY.HydroGen}, ::PSI.AbstractHydroFormulation) = false
