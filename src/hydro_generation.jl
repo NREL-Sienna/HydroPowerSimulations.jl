@@ -168,7 +168,7 @@ end
 
 function PSI.get_default_time_series_names(
     ::Type{PSY.HydroPumpedStorage},
-    ::Type{<:HydroDispatchPumpedStorage},
+    ::Type{HydroDispatchPumpedStorage},
 )
     return Dict{Type{<:PSI.TimeSeriesParameter}, String}(
         InflowTimeSeriesParameter => "inflow",
