@@ -23,10 +23,10 @@ Constructs a equality constraint to a fix a variable in one model using the vari
 """
 function PSI.add_feedforward_constraints!(
     container::PSI.OptimizationContainer,
-    ::PSI.DeviceModel,
-    devices::IS.FlattenIteratorWrapper{T},
+    model::PSI.DeviceModel{T, U},
+    devices::IS.FlattenIteratorWrapper{U},
     ff::PSI.EnergyTargetFeedforward,
-) where {T <: PSY.Component}
+) where {T <: PSI.AbstractHydroFormulation, U <: PSY.HydroGen}
     time_steps = PSI.get_time_steps(container)
     parameter_type = PSI.get_default_parameter_type(ff, T)
     param = PSI.get_parameter_array(container, parameter_type(), T)
@@ -67,10 +67,10 @@ end
 
 function PSI._add_feedforward_arguments!(
     container::PSI.OptimizationContainer,
-    model::PSI.DeviceModel,
-    devices::IS.FlattenIteratorWrapper{T},
+    model::PSI.DeviceModel{T, U},
+    devices::IS.FlattenIteratorWrapper{U},
     ff::PSI.EnergyTargetFeedforward,
-) where {T <: PSY.Component}
+) where {T <: PSI.AbstractHydroFormulation, U <: PSY.HydroGen}
     parameter_type = PSI.get_default_parameter_type(ff, T)
     PSI.add_parameters!(container, parameter_type, ff, model, devices)
     # Enabling this FF requires the addition of an extra variable

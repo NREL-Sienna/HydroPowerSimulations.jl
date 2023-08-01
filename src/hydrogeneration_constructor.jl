@@ -1,3 +1,4 @@
+#=
 """
 Construct model for HydroGen with RunOfRiver Dispatch Formulation
 """
@@ -105,6 +106,7 @@ function PSI.construct_device!(
     return
 end
 
+
 """
 Construct model for HydroGen with RunOfRiver Dispatch Formulation
 with only Active Power.
@@ -194,6 +196,7 @@ function PSI.construct_device!(
     PSI.add_constraint_dual!(container, sys, model)
     return
 end
+=#
 
 """
 Construct model for HydroGen with ReservoirBudget Dispatch Formulation
