@@ -18,7 +18,7 @@ export HydroCommitmentReservoirStorage
 export HydroDispatchPumpedStorage
 
 ######## Hydro Variables ########
-export EnergyVariableUp
+export HydroEnergyVariableUp
 export WaterSpillageVariable
 export HydroEnergyShortageVariable
 

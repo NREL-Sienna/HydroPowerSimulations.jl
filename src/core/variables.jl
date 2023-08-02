@@ -10,14 +10,14 @@ Struct to dispatch the creation of a variable for energy storage level (state of
 
 Docs abbreviation: ``E^{up}``
 """
-struct EnergyVariableUp <: PSI.VariableType end
+struct HydroEnergyVariableUp <: PSI.VariableType end
 
 """
 Struct to dispatch the creation of a variable for energy storage level (state of charge) of lower reservoir
 
 Docs abbreviation: ``E^{down}``
 """
-struct EnergyVariableDown <: PSI.VariableType end
+struct HydroEnergyVariableDown <: PSI.VariableType end
 
 """
 Struct to dispatch the creation of a slack variable for energy storage levels < target storage levels
@@ -31,6 +31,6 @@ Struct to dispatch the creation of a slack variable for energy storage levels > 
 
 Docs abbreviation: ``E^{surplus}``
 """
-struct EnergySurplusVariable <: PSI.VariableType end
+struct HydroEnergySurplusVariable <: PSI.VariableType end
 
 # convert_result_to_natural_units(::Type{WaterSpillageVariable }) = true # TODO: is this pu?

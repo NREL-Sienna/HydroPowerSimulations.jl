@@ -443,7 +443,7 @@ function PSI.construct_device!(
     )
     PSI.add_variables!(
         container,
-        EnergySurplusVariable,
+        HydroEnergySurplusVariable,
         devices,
         HydroDispatchReservoirStorage(),
     )
@@ -591,7 +591,7 @@ function PSI.construct_device!(
     )
     PSI.add_variables!(
         container,
-        EnergySurplusVariable,
+        HydroEnergySurplusVariable,
         devices,
         HydroDispatchReservoirStorage(),
     )
@@ -932,7 +932,7 @@ function PSI.construct_device!(
     )
     PSI.add_variables!(
         container,
-        EnergySurplusVariable,
+        HydroEnergySurplusVariable,
         devices,
         HydroCommitmentReservoirStorage(),
     )
@@ -1087,7 +1087,7 @@ function PSI.construct_device!(
     )
     PSI.add_variables!(
         container,
-        EnergySurplusVariable,
+        HydroEnergySurplusVariable,
         devices,
         HydroCommitmentReservoirStorage(),
     )
@@ -1206,8 +1206,8 @@ function PSI.construct_device!(
         devices,
         HydroDispatchPumpedStorage(),
     )
-    PSI.add_variables!(container, EnergyVariableUp, devices, HydroDispatchPumpedStorage())
-    PSI.add_variables!(container, EnergyVariableDown, devices, HydroDispatchPumpedStorage())
+    PSI.add_variables!(container, HydroEnergyVariableUp, devices, HydroDispatchPumpedStorage())
+    PSI.add_variables!(container, HydroEnergyVariableDown, devices, HydroDispatchPumpedStorage())
     PSI.add_variables!(
         container,
         WaterSpillageVariable,
