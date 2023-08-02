@@ -16,7 +16,6 @@ PSI.get_expression_type_for_reserve(::PSI.ActivePowerReserveVariable, ::Type{PSY
 # PSI.get_variable_lower_bound(::PSI.ActivePowerVariable, d::PSY.HydroGen, ::PSI.AbstractHydroFormulation) = PSY.get_active_power_limits(d).min
 # PSI.get_variable_lower_bound(::PSI.ActivePowerVariable, d::PSY.HydroGen, ::PSI.AbstractHydroUnitCommitment) = 0.0
 # PSI.get_variable_upper_bound(::PSI.ActivePowerVariable, d::PSY.HydroGen, ::PSI.AbstractHydroFormulation) = PSY.get_active_power_limits(d).max
-PSI.get_variable_binary(::PSI.ActivePowerVariable, ::Type{HydroPumpedStorage}, ::AbstractHydroReservoirFormulation) = false
 ############## PSI.ReactivePowerVariable, HydroGen ####################
 # These methods are defined in PowerSimulations
 # PSI.get_variable_binary(::PSI.ReactivePowerVariable, ::Type{<:PSY.HydroGen}, ::PSI.AbstractHydroFormulation) = false
@@ -32,10 +31,10 @@ PSI.get_variable_binary(::PSI.ActivePowerVariable, ::Type{HydroPumpedStorage}, :
 # PSI.get_variable_upper_bound(::PSI.EnergyVariable, d::PSY.HydroGen, ::PSI.AbstractHydroFormulation) = PSY.get_storage_capacity(d)
 
 ########################### EnergyVariableUp, HydroGen #################################
-# PSI.get_variable_binary(::EnergyVariableUp, ::Type{<:PSY.HydroGen}, ::PSI.AbstractHydroFormulation) = false
-# PSI.get_variable_warm_start_value(pv::EnergyVariableUp, d::PSY.HydroGen, ::PSI.AbstractHydroFormulation) = PSY.get_initial_storage(d).up
-# PSI.get_variable_lower_bound(::EnergyVariableUp, d::PSY.HydroGen, ::PSI.AbstractHydroFormulation) = 0.0
-# PSI.get_variable_upper_bound(::EnergyVariableUp, d::PSY.HydroGen, ::PSI.AbstractHydroFormulation) = PSY.get_storage_capacity(d).up
+PSI.get_variable_binary(::EnergyVariableUp, ::Type{<:PSY.HydroGen}, ::PSI.AbstractHydroFormulation) = false
+PSI.get_variable_warm_start_value(::EnergyVariableUp, d::PSY.HydroGen, ::PSI.AbstractHydroFormulation) = PSY.get_initial_storage(d).up
+PSI.get_variable_lower_bound(::EnergyVariableUp, d::PSY.HydroGen, ::PSI.AbstractHydroFormulation) = 0.0
+PSI.get_variable_upper_bound(::EnergyVariableUp, d::PSY.HydroGen, ::PSI.AbstractHydroFormulation) = PSY.get_storage_capacity(d).up
 
 ########################### EnergyVariableDown, HydroGen #################################
 PSI.get_variable_binary(::EnergyVariableDown, ::Type{<:PSY.HydroGen}, ::PSI.AbstractHydroFormulation) = false
@@ -44,18 +43,16 @@ PSI.get_variable_lower_bound(::EnergyVariableDown, d::PSY.HydroGen, ::PSI.Abstra
 PSI.get_variable_upper_bound(::EnergyVariableDown, d::PSY.HydroGen, ::PSI.AbstractHydroFormulation) = PSY.get_storage_capacity(d).down
 
 ########################### PSI.ActivePowerInVariable, HydroGen #################################
-# These methods are defined in PowerSimulations
-# PSI.get_variable_binary(::PSI.ActivePowerInVariable, ::Type{<:PSY.HydroGen}, ::PSI.AbstractHydroFormulation) = false
-# PSI.get_variable_lower_bound(::PSI.ActivePowerInVariable, d::PSY.HydroGen, ::PSI.AbstractHydroFormulation) = 0.0
-# PSI.get_variable_upper_bound(::PSI.ActivePowerInVariable, d::PSY.HydroGen, ::PSI.AbstractHydroFormulation) = nothing
-# PSI.get_variable_multiplier(::PSI.ActivePowerInVariable, d::Type{<:PSY.HydroGen}, ::PSI.AbstractHydroFormulation) = -1.0
+PSI.get_variable_binary(::PSI.ActivePowerInVariable, ::Type{<:PSY.HydroGen}, ::PSI.AbstractHydroFormulation) = false
+PSI.get_variable_lower_bound(::PSI.ActivePowerInVariable, d::PSY.HydroGen, ::PSI.AbstractHydroFormulation) = 0.0
+PSI.get_variable_upper_bound(::PSI.ActivePowerInVariable, d::PSY.HydroGen, ::PSI.AbstractHydroFormulation) = nothing
+PSI.get_variable_multiplier(::PSI.ActivePowerInVariable, d::Type{<:PSY.HydroGen}, ::PSI.AbstractHydroFormulation) = -1.0
 
 ########################### PSI.ActivePowerOutVariable, HydroGen #################################
-# These methods are defined in PowerSimulations
-# PSI.get_variable_binary(::PSI.ActivePowerOutVariable, ::Type{<:PSY.HydroGen}, ::PSI.AbstractHydroFormulation) = false
-# PSI.get_variable_lower_bound(::PSI.ActivePowerOutVariable, d::PSY.HydroGen, ::PSI.AbstractHydroFormulation) = 0.0
-# PSI.get_variable_upper_bound(::PSI.ActivePowerOutVariable, d::PSY.HydroGen, ::PSI.AbstractHydroFormulation) = nothing
-# PSI.get_variable_multiplier(::PSI.ActivePowerOutVariable, d::Type{<:PSY.HydroGen}, ::PSI.AbstractHydroFormulation) = 1.0
+PSI.get_variable_binary(::PSI.ActivePowerOutVariable, ::Type{<:PSY.HydroGen}, ::PSI.AbstractHydroFormulation) = false
+PSI.get_variable_lower_bound(::PSI.ActivePowerOutVariable, d::PSY.HydroGen, ::PSI.AbstractHydroFormulation) = 0.0
+PSI.get_variable_upper_bound(::PSI.ActivePowerOutVariable, d::PSY.HydroGen, ::PSI.AbstractHydroFormulation) = nothing
+PSI.get_variable_multiplier(::PSI.ActivePowerOutVariable, d::Type{<:PSY.HydroGen}, ::PSI.AbstractHydroFormulation) = 1.0
 
 ############## PSI.OnVariable, HydroGen ####################
 # These methods are defined in PowerSimulations
@@ -934,7 +931,7 @@ function PSI.update_initial_conditions!(
     for ic in ics
         var_val = PSI.get_system_state_value(
             state,
-            PSI.EnergyVariableDown(),
+            EnergyVariableDown(),
             PSI.get_component_type(ic),
         )
         PSI.set_ic_quantity!(ic, var_val[PSI.get_component_name(ic)])
