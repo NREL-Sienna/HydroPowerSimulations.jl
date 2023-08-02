@@ -25,10 +25,10 @@ PSI.get_expression_type_for_reserve(::PSI.ActivePowerReserveVariable, ::Type{PSY
 
 ############## PSI.EnergyVariable, HydroGen ####################
 # These methods are defined in PowerSimulations
-# PSI.get_variable_binary(::PSI.EnergyVariable, ::Type{<:PSY.HydroGen}, ::PSI.AbstractHydroFormulation) = false
-# PSI.get_variable_warm_start_value(pv::PSI.EnergyVariable, d::PSY.HydroGen, ::PSI.AbstractHydroFormulation) = PSY.get_initial_storage(d)
-# PSI.get_variable_lower_bound(::PSI.EnergyVariable, d::PSY.HydroGen, ::PSI.AbstractHydroFormulation) = 0.0
-# PSI.get_variable_upper_bound(::PSI.EnergyVariable, d::PSY.HydroGen, ::PSI.AbstractHydroFormulation) = PSY.get_storage_capacity(d)
+PSI.get_variable_binary(::PSI.EnergyVariable, ::Type{<:PSY.HydroGen}, ::PSI.AbstractHydroFormulation) = false
+PSI.get_variable_warm_start_value(pv::PSI.EnergyVariable, d::PSY.HydroGen, ::PSI.AbstractHydroFormulation) = PSY.get_initial_storage(d)
+PSI.get_variable_lower_bound(::PSI.EnergyVariable, d::PSY.HydroGen, ::PSI.AbstractHydroFormulation) = 0.0
+PSI.get_variable_upper_bound(::PSI.EnergyVariable, d::PSY.HydroGen, ::PSI.AbstractHydroFormulation) = PSY.get_storage_capacity(d)
 
 
 ########################### HydroEnergyVariableUp, HydroGen #################################
