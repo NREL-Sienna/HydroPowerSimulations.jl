@@ -1283,13 +1283,13 @@ function PSI.construct_device!(
         container,
         devices,
         HydroDispatchPumpedStorage(),
-        InitialEnergyLevelUp(),
+        InitialHydroEnergyLevelUp(),
     )
     PSI.add_initial_condition!(
         container,
         devices,
         HydroDispatchPumpedStorage(),
-        InitialEnergyLevelDown(),
+        InitialHydroEnergyLevelDown(),
     )
 
     # Energy Balance limits

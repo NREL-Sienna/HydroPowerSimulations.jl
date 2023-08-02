@@ -100,10 +100,10 @@ PSI.get_multiplier_value(::OutflowTimeSeriesParameter, d::PSY.HydroGen, ::PSI.Ab
 #PSI.initial_condition_variable(::PSI.DevicePower, d::PSY.HydroGen, ::PSI.AbstractHydroFormulation) = PSI.ActivePowerVariable()
 #PSI.initial_condition_default(::PSI.InitialEnergyLevel, d::PSY.HydroGen, ::PSI.AbstractHydroFormulation) = PSY.get_initial_storage(d)
 #PSI.initial_condition_variable(::PSI.InitialEnergyLevel, d::PSY.HydroGen, ::PSI.AbstractHydroFormulation) = PSI.EnergyVariable()
-PSI.initial_condition_default(::InitialEnergyLevelUp, d::PSY.HydroGen, ::PSI.AbstractHydroFormulation) = PSY.get_initial_storage(d).up
-PSI.initial_condition_variable(::InitialEnergyLevelUp, d::PSY.HydroGen, ::PSI.AbstractHydroFormulation) = HydroEnergyVariableUp()
-PSI.initial_condition_default(::InitialEnergyLevelDown, d::PSY.HydroGen, ::PSI.AbstractHydroFormulation) = PSY.get_initial_storage(d).down
-PSI.initial_condition_variable(::InitialEnergyLevelDown, d::PSY.HydroGen, ::PSI.AbstractHydroFormulation) = HydroEnergyVariableDown()
+PSI.initial_condition_default(::InitialHydroEnergyLevelUp, d::PSY.HydroGen, ::PSI.AbstractHydroFormulation) = PSY.get_initial_storage(d).up
+PSI.initial_condition_variable(::InitialHydroEnergyLevelUp, d::PSY.HydroGen, ::PSI.AbstractHydroFormulation) = HydroEnergyVariableUp()
+PSI.initial_condition_default(::InitialHydroEnergyLevelDown, d::PSY.HydroGen, ::PSI.AbstractHydroFormulation) = PSY.get_initial_storage(d).down
+PSI.initial_condition_variable(::InitialHydroEnergyLevelDown, d::PSY.HydroGen, ::PSI.AbstractHydroFormulation) = HydroEnergyVariableDown()
 #PSI.initial_condition_default(::PSI.InitialTimeDurationOn, d::PSY.HydroGen, ::PSI.AbstractHydroFormulation) = PSY.get_status(d) ? PSY.get_time_at_status(d) :  0.0
 #PSI.initial_condition_variable(::PSI.InitialTimeDurationOn, d::PSY.HydroGen, ::PSI.AbstractHydroFormulation) = PSI.OnVariable()
 #PSI.initial_condition_default(::PSI.InitialTimeDurationOff, d::PSY.HydroGen, ::PSI.AbstractHydroFormulation) = PSY.get_status(d) ? 0.0 : PSY.get_time_at_status(d)
@@ -513,7 +513,7 @@ function PSI.add_constraints!(
     resolution = PSI.get_resolution(container)
     fraction_of_hour = Dates.value(Dates.Minute(resolution)) / PSI.MINUTES_IN_HOUR
     names = [PSY.get_name(x) for x in devices]
-    initial_conditions = PSI.get_initial_condition(container, InitialEnergyLevelUp(), V)
+    initial_conditions = PSI.get_initial_condition(container, InitialHydroEnergyLevelUp(), V)
 
     energy_var = PSI.get_variable(container, HydroEnergyVariableUp(), V)
     powerin_var = PSI.get_variable(container, PSI.ActivePowerInVariable(), V)
@@ -580,7 +580,7 @@ function PSI.add_constraints!(
     resolution = PSI.get_resolution(container)
     fraction_of_hour = Dates.value(Dates.Minute(resolution)) / PSI.MINUTES_IN_HOUR
     names = [PSY.get_name(x) for x in devices]
-    initial_conditions = PSI.get_initial_condition(container, InitialEnergyLevelDown(), V)
+    initial_conditions = PSI.get_initial_condition(container, InitialHydroEnergyLevelDown(), V)
 
     energy_var = PSI.get_variable(container, HydroEnergyVariableDown(), V)
     powerin_var = PSI.get_variable(container, PSI.ActivePowerInVariable(), V)
@@ -870,7 +870,7 @@ function PSI.update_initial_conditions!(
     store::PSI.EmulationModelStore,
     ::Dates.Millisecond,
 ) where {
-    T <: PSI.InitialCondition{InitialEnergyLevelUp, S},
+    T <: PSI.InitialCondition{InitialHydroEnergyLevelUp, S},
 } where {S <: Union{Float64, JuMP.VariableRef}}
     for ic in ics
         var_val =
@@ -888,7 +888,7 @@ function PSI.update_initial_conditions!(
     store::PSI.EmulationModelStore,
     ::Dates.Millisecond,
 ) where {
-    T <: PSI.InitialCondition{InitialEnergyLevelDown, S},
+    T <: PSI.InitialCondition{InitialHydroEnergyLevelDown, S},
 } where {S <: Union{Float64, JuMP.VariableRef}}
     for ic in ics
         var_val = PSI.get_variable_value(
@@ -909,7 +909,7 @@ function PSI.update_initial_conditions!(
     state::PSI.SimulationState,
     ::Dates.Millisecond,
 ) where {
-    T <: PSI.InitialCondition{InitialEnergyLevelUp, S},
+    T <: PSI.InitialCondition{InitialHydroEnergyLevelUp, S},
 } where {S <: Union{Float64, JuMP.VariableRef}}
     for ic in ics
         var_val = PSI.get_system_state_value(
@@ -927,7 +927,7 @@ function PSI.update_initial_conditions!(
     state::PSI.SimulationState,
     ::Dates.Millisecond,
 ) where {
-    T <: PSI.InitialCondition{InitialEnergyLevelDown, S},
+    T <: PSI.InitialCondition{InitialHydroEnergyLevelDown, S},
 } where {S <: Union{Float64, JuMP.VariableRef}}
     for ic in ics
         var_val = PSI.get_system_state_value(
@@ -950,7 +950,7 @@ function PSI._get_initial_conditions_value(
     T <: PSI.InitialCondition{U, JuMP.VariableRef},
     V <: Union{PSI.AbstractDeviceFormulation, PSI.AbstractServiceFormulation},
     W <: PSY.Component,
-} where {U <: Union{InitialEnergyLevelUp, InitialEnergyLevelDown}}
+} where {U <: Union{InitialHydroEnergyLevelUp, InitialHydroEnergyLevelDown}}
     var_type = PSI.initial_condition_variable(U(), component, V())
     val = PSI.initial_condition_default(U(), component, V())
     @debug "Device $(PSY.get_name(component)) initialized PSI.DeviceStatus as $var_type" _group =
@@ -967,8 +967,8 @@ function PSI._get_initial_conditions_value(
 ) where {
     T <: PSI.InitialCondition{U, Float64},
     V <: Union{PSI.AbstractDeviceFormulation, PSI.AbstractServiceFormulation},
-    W <: PSY.Component,
-} where {U <: Union{InitialEnergyLevelUp, InitialEnergyLevelDown}}
+    W <: PSY.HydroGen,
+} where {U <: Union{InitialHydroEnergyLevelUp, InitialHydroEnergyLevelDown}}
     var_type = PSI.initial_condition_variable(U(), component, V())
     val = PSI.initial_condition_default(U(), component, V())
     @debug "Device $(PSY.get_name(component)) initialized PSI.DeviceStatus as $var_type" _group =

@@ -25,6 +25,10 @@ export HydroEnergyShortageVariable
 ######## Hydro parameters #######
 export EnergyTargetParameter
 
+######## Hydro Initial Conditions #######
+export InitialHydroEnergyLevelUp
+export InitialHydroEnergyLevelDown
+
 #################################################################################
 # Imports
 using PowerSystems
