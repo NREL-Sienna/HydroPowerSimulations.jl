@@ -252,7 +252,6 @@ function PSI.add_constraints!(
     return
 end
 
-
 function PSI.add_constraints!(
     container::PSI.OptimizationContainer,
     T::Type{PSI.ActivePowerVariableLimitsConstraint},
