@@ -580,7 +580,8 @@ function PSI.add_constraints!(
     resolution = PSI.get_resolution(container)
     fraction_of_hour = Dates.value(Dates.Minute(resolution)) / PSI.MINUTES_IN_HOUR
     names = [PSY.get_name(x) for x in devices]
-    initial_conditions = PSI.get_initial_condition(container, InitialHydroEnergyLevelDown(), V)
+    initial_conditions =
+        PSI.get_initial_condition(container, InitialHydroEnergyLevelDown(), V)
 
     energy_var = PSI.get_variable(container, HydroEnergyVariableDown(), V)
     powerin_var = PSI.get_variable(container, PSI.ActivePowerInVariable(), V)
