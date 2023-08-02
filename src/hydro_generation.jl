@@ -951,7 +951,7 @@ function PSI._get_initial_conditions_value(
     container::PSI.OptimizationContainer,
 ) where {
     T <: PSI.InitialCondition{U, JuMP.VariableRef},
-    V <: Union{PSI.AbstractDeviceFormulation, PSI.AbstractServiceFormulation},
+    V <: AbstractHydroFormulation,
     W <: PSY.Component,
 } where {U <: Union{InitialHydroEnergyLevelUp, InitialHydroEnergyLevelDown}}
     var_type = PSI.initial_condition_variable(U(), component, V())
@@ -969,7 +969,7 @@ function PSI._get_initial_conditions_value(
     container::PSI.OptimizationContainer,
 ) where {
     T <: PSI.InitialCondition{U, Float64},
-    V <: Union{PSI.AbstractDeviceFormulation, PSI.AbstractServiceFormulation},
+    V <: AbstractHydroFormulation,
     W <: PSY.HydroGen,
 } where {U <: Union{InitialHydroEnergyLevelUp, InitialHydroEnergyLevelDown}}
     var_type = PSI.initial_condition_variable(U(), component, V())
