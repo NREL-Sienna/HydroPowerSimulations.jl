@@ -775,7 +775,6 @@ function PSI.objective_function!(
     return
 end
 
-
 function PSI.objective_function!(
     container::PSI.OptimizationContainer,
     devices::IS.FlattenIteratorWrapper{T},
