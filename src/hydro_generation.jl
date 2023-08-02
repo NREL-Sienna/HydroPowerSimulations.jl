@@ -873,8 +873,11 @@ function PSI.update_initial_conditions!(
     T <: PSI.InitialCondition{InitialHydroEnergyLevelUp, S},
 } where {S <: Union{Float64, JuMP.VariableRef}}
     for ic in ics
-        var_val =
-            PSI.get_variable_value(store, HydroEnergyVariableUp(), PSI.get_component_type(ic))
+        var_val = PSI.get_variable_value(
+            store,
+            HydroEnergyVariableUp(),
+            PSI.get_component_type(ic),
+        )
         PSI.set_ic_quantity!(
             ic,
             PSI.get_last_recorded_value(var_val)[PSI.get_component_name(ic)],
