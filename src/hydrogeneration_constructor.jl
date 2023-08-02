@@ -106,7 +106,6 @@ function PSI.construct_device!(
     return
 end
 
-
 """
 Construct model for HydroGen with RunOfRiver Dispatch Formulation
 with only Active Power.
