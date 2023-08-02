@@ -1206,8 +1206,18 @@ function PSI.construct_device!(
         devices,
         HydroDispatchPumpedStorage(),
     )
-    PSI.add_variables!(container, HydroEnergyVariableUp, devices, HydroDispatchPumpedStorage())
-    PSI.add_variables!(container, HydroEnergyVariableDown, devices, HydroDispatchPumpedStorage())
+    PSI.add_variables!(
+        container,
+        HydroEnergyVariableUp,
+        devices,
+        HydroDispatchPumpedStorage(),
+    )
+    PSI.add_variables!(
+        container,
+        HydroEnergyVariableDown,
+        devices,
+        HydroDispatchPumpedStorage(),
+    )
     PSI.add_variables!(
         container,
         WaterSpillageVariable,
