@@ -98,8 +98,8 @@ PSI.get_multiplier_value(::OutflowTimeSeriesParameter, d::PSY.HydroGen, ::PSI.Ab
 #PSI.initial_condition_variable(::PSI.DeviceStatus, d::PSY.HydroGen, ::PSI.AbstractHydroFormulation) = PSI.OnVariable()
 #PSI.initial_condition_default(::PSI.DevicePower, d::PSY.HydroGen, ::PSI.AbstractHydroFormulation) = PSY.get_active_power(d)
 #PSI.initial_condition_variable(::PSI.DevicePower, d::PSY.HydroGen, ::PSI.AbstractHydroFormulation) = PSI.ActivePowerVariable()
-#PSI.initial_condition_default(::PSI.InitialEnergyLevel, d::PSY.HydroGen, ::PSI.AbstractHydroFormulation) = PSY.get_initial_storage(d)
-#PSI.initial_condition_variable(::PSI.InitialEnergyLevel, d::PSY.HydroGen, ::PSI.AbstractHydroFormulation) = PSI.EnergyVariable()
+PSI.initial_condition_default(::PSI.InitialEnergyLevel, d::PSY.HydroGen, ::PSI.AbstractHydroFormulation) = PSY.get_initial_storage(d)
+PSI.initial_condition_variable(::PSI.InitialEnergyLevel, d::PSY.HydroGen, ::PSI.AbstractHydroFormulation) = PSI.EnergyVariable()
 PSI.initial_condition_default(::InitialHydroEnergyLevelUp, d::PSY.HydroGen, ::PSI.AbstractHydroFormulation) = PSY.get_initial_storage(d).up
 PSI.initial_condition_variable(::InitialHydroEnergyLevelUp, d::PSY.HydroGen, ::PSI.AbstractHydroFormulation) = HydroEnergyVariableUp()
 PSI.initial_condition_default(::InitialHydroEnergyLevelDown, d::PSY.HydroGen, ::PSI.AbstractHydroFormulation) = PSY.get_initial_storage(d).down
