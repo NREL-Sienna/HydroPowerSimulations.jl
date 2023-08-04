@@ -1,2 +1,2 @@
-struct InitialEnergyLevelUp <: PSI.PSI.InitialConditionType end
-struct InitialEnergyLevelDown <: PSI.PSI.InitialConditionType end
+struct InitialHydroEnergyLevelUp <: PSI.InitialConditionType end
+struct InitialHydroEnergyLevelDown <: PSI.InitialConditionType end

@@ -18,12 +18,16 @@ export HydroCommitmentReservoirStorage
 export HydroDispatchPumpedStorage
 
 ######## Hydro Variables ########
-export EnergyVariableUp
+export HydroEnergyVariableUp
 export WaterSpillageVariable
 export HydroEnergyShortageVariable
 
 ######## Hydro parameters #######
 export EnergyTargetParameter
+
+######## Hydro Initial Conditions #######
+export InitialHydroEnergyLevelUp
+export InitialHydroEnergyLevelDown
 
 #################################################################################
 # Imports

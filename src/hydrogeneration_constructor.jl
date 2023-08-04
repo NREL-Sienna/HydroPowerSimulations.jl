@@ -1,3 +1,4 @@
+#=
 """
 Construct model for HydroGen with RunOfRiver Dispatch Formulation
 """
@@ -194,6 +195,7 @@ function PSI.construct_device!(
     PSI.add_constraint_dual!(container, sys, model)
     return
 end
+=#
 
 """
 Construct model for HydroGen with ReservoirBudget Dispatch Formulation
@@ -440,7 +442,7 @@ function PSI.construct_device!(
     )
     PSI.add_variables!(
         container,
-        EnergySurplusVariable,
+        HydroEnergySurplusVariable,
         devices,
         HydroDispatchReservoirStorage(),
     )
@@ -588,7 +590,7 @@ function PSI.construct_device!(
     )
     PSI.add_variables!(
         container,
-        EnergySurplusVariable,
+        HydroEnergySurplusVariable,
         devices,
         HydroDispatchReservoirStorage(),
     )
@@ -929,7 +931,7 @@ function PSI.construct_device!(
     )
     PSI.add_variables!(
         container,
-        EnergySurplusVariable,
+        HydroEnergySurplusVariable,
         devices,
         HydroCommitmentReservoirStorage(),
     )
@@ -1084,7 +1086,7 @@ function PSI.construct_device!(
     )
     PSI.add_variables!(
         container,
-        EnergySurplusVariable,
+        HydroEnergySurplusVariable,
         devices,
         HydroCommitmentReservoirStorage(),
     )
@@ -1203,8 +1205,18 @@ function PSI.construct_device!(
         devices,
         HydroDispatchPumpedStorage(),
     )
-    PSI.add_variables!(container, EnergyVariableUp, devices, HydroDispatchPumpedStorage())
-    PSI.add_variables!(container, EnergyVariableDown, devices, HydroDispatchPumpedStorage())
+    PSI.add_variables!(
+        container,
+        HydroEnergyVariableUp,
+        devices,
+        HydroDispatchPumpedStorage(),
+    )
+    PSI.add_variables!(
+        container,
+        HydroEnergyVariableDown,
+        devices,
+        HydroDispatchPumpedStorage(),
+    )
     PSI.add_variables!(
         container,
         WaterSpillageVariable,
@@ -1280,13 +1292,13 @@ function PSI.construct_device!(
         container,
         devices,
         HydroDispatchPumpedStorage(),
-        InitialEnergyLevelUp(),
+        InitialHydroEnergyLevelUp(),
     )
     PSI.add_initial_condition!(
         container,
         devices,
         HydroDispatchPumpedStorage(),
-        InitialEnergyLevelDown(),
+        InitialHydroEnergyLevelDown(),
     )
 
     # Energy Balance limits

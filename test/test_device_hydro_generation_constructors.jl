@@ -503,8 +503,8 @@ end
 
     ff_up = PSI.EnergyTargetFeedforward(;
         component_type=HydroPumpedStorage,
-        source=EnergyVariableUp,
-        affected_values=[EnergyVariableUp],
+        source=HydroEnergyVariableUp,
+        affected_values=[HydroEnergyVariableUp],
         target_period=12,
         penalty_cost=1e4,
     )
