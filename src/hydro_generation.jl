@@ -1,9 +1,9 @@
 #! format: off
 # These methods are defined in PowerSimulations
-# PSI.requires_initialization(::PSI.AbstractHydroFormulation) = false
+# PSI.requires_initialization(::AbstractHydroReservoirFormulation) = false
 # PSI.requires_initialization(::PSI.AbstractHydroUnitCommitment) = true
 
-# PSI.get_variable_multiplier(_, ::Type{<:PSY.HydroGen}, ::PSI.AbstractHydroFormulation) = 1.0
+# PSI.get_variable_multiplier(_, ::Type{<:PSY.HydroGen}, ::AbstractHydroReservoirFormulation) = 1.0
 # PSI.get_expression_type_for_reserve(::PSI.ActivePowerReserveVariable, ::Type{<:PSY.HydroGen}, ::Type{<:PSY.Reserve{PSY.ReserveUp}}) = PSI.ActivePowerRangeExpressionUB
 # PSI.get_expression_type_for_reserve(::PSI.ActivePowerReserveVariable, ::Type{<:PSY.HydroGen}, ::Type{<:PSY.Reserve{PSY.ReserveDown}}) = PSI.ActivePowerRangeExpressionLB
 PSI.get_expression_type_for_reserve(::PSI.ActivePowerReserveVariable, ::Type{PSY.HydroPumpedStorage}, ::Type{<:PSY.Reserve{PSY.ReserveUp}}) = PSI.ReserveRangeExpressionUB
@@ -11,143 +11,143 @@ PSI.get_expression_type_for_reserve(::PSI.ActivePowerReserveVariable, ::Type{PSY
 
 ########################### PSI.ActivePowerVariable, HydroGen #################################
 # These methods are defined in PowerSimulations
-# PSI.get_variable_binary(::PSI.ActivePowerVariable, ::Type{<:PSY.HydroGen}, ::PSI.AbstractHydroFormulation) = false
-# PSI.get_variable_warm_start_value(::PSI.ActivePowerVariable, d::PSY.HydroGen, ::PSI.AbstractHydroFormulation) = PSY.get_active_power(d)
-# PSI.get_variable_lower_bound(::PSI.ActivePowerVariable, d::PSY.HydroGen, ::PSI.AbstractHydroFormulation) = PSY.get_active_power_limits(d).min
+# PSI.get_variable_binary(::PSI.ActivePowerVariable, ::Type{<:PSY.HydroGen}, ::AbstractHydroReservoirFormulation) = false
+# PSI.get_variable_warm_start_value(::PSI.ActivePowerVariable, d::PSY.HydroGen, ::AbstractHydroReservoirFormulation) = PSY.get_active_power(d)
+# PSI.get_variable_lower_bound(::PSI.ActivePowerVariable, d::PSY.HydroGen, ::AbstractHydroReservoirFormulation) = PSY.get_active_power_limits(d).min
 # PSI.get_variable_lower_bound(::PSI.ActivePowerVariable, d::PSY.HydroGen, ::PSI.AbstractHydroUnitCommitment) = 0.0
-# PSI.get_variable_upper_bound(::PSI.ActivePowerVariable, d::PSY.HydroGen, ::PSI.AbstractHydroFormulation) = PSY.get_active_power_limits(d).max
+# PSI.get_variable_upper_bound(::PSI.ActivePowerVariable, d::PSY.HydroGen, ::AbstractHydroReservoirFormulation) = PSY.get_active_power_limits(d).max
 ############## PSI.ReactivePowerVariable, HydroGen ####################
 # These methods are defined in PowerSimulations
-# PSI.get_variable_binary(::PSI.ReactivePowerVariable, ::Type{<:PSY.HydroGen}, ::PSI.AbstractHydroFormulation) = false
-# PSI.get_variable_warm_start_value(::PSI.ReactivePowerVariable, d::PSY.HydroGen, ::PSI.AbstractHydroFormulation) = PSY.get_active_power(d)
-# PSI.get_variable_lower_bound(::PSI.ReactivePowerVariable, d::PSY.HydroGen, ::PSI.AbstractHydroFormulation) = PSY.get_active_power_limits(d).min
-# PSI.get_variable_upper_bound(::PSI.ReactivePowerVariable, d::PSY.HydroGen, ::PSI.AbstractHydroFormulation) = PSY.get_active_power_limits(d).max
+# PSI.get_variable_binary(::PSI.ReactivePowerVariable, ::Type{<:PSY.HydroGen}, ::AbstractHydroReservoirFormulation) = false
+# PSI.get_variable_warm_start_value(::PSI.ReactivePowerVariable, d::PSY.HydroGen, ::AbstractHydroReservoirFormulation) = PSY.get_active_power(d)
+# PSI.get_variable_lower_bound(::PSI.ReactivePowerVariable, d::PSY.HydroGen, ::AbstractHydroReservoirFormulation) = PSY.get_active_power_limits(d).min
+# PSI.get_variable_upper_bound(::PSI.ReactivePowerVariable, d::PSY.HydroGen, ::AbstractHydroReservoirFormulation) = PSY.get_active_power_limits(d).max
 
 ############## PSI.EnergyVariable, HydroGen ####################
 # These methods are defined in PowerSimulations
-PSI.get_variable_binary(::PSI.EnergyVariable, ::Type{<:PSY.HydroGen}, ::PSI.AbstractHydroFormulation) = false
-PSI.get_variable_warm_start_value(pv::PSI.EnergyVariable, d::PSY.HydroGen, ::PSI.AbstractHydroFormulation) = PSY.get_initial_storage(d)
-PSI.get_variable_lower_bound(::PSI.EnergyVariable, d::PSY.HydroGen, ::PSI.AbstractHydroFormulation) = 0.0
-PSI.get_variable_upper_bound(::PSI.EnergyVariable, d::PSY.HydroGen, ::PSI.AbstractHydroFormulation) = PSY.get_storage_capacity(d)
+PSI.get_variable_binary(::PSI.EnergyVariable, ::Type{<:PSY.HydroGen}, ::AbstractHydroReservoirFormulation) = false
+PSI.get_variable_warm_start_value(pv::PSI.EnergyVariable, d::PSY.HydroGen, ::AbstractHydroReservoirFormulation) = PSY.get_initial_storage(d)
+PSI.get_variable_lower_bound(::PSI.EnergyVariable, d::PSY.HydroGen, ::AbstractHydroReservoirFormulation) = 0.0
+PSI.get_variable_upper_bound(::PSI.EnergyVariable, d::PSY.HydroGen, ::AbstractHydroReservoirFormulation) = PSY.get_storage_capacity(d)
 
 
 ########################### HydroEnergyVariableUp, HydroGen #################################
-PSI.get_variable_binary(::HydroEnergyVariableUp, ::Type{<:PSY.HydroGen}, ::PSI.AbstractHydroFormulation) = false
-PSI.get_variable_warm_start_value(::HydroEnergyVariableUp, d::PSY.HydroGen, ::PSI.AbstractHydroFormulation) = PSY.get_initial_storage(d).up
-PSI.get_variable_lower_bound(::HydroEnergyVariableUp, d::PSY.HydroGen, ::PSI.AbstractHydroFormulation) = 0.0
-PSI.get_variable_upper_bound(::HydroEnergyVariableUp, d::PSY.HydroGen, ::PSI.AbstractHydroFormulation) = PSY.get_storage_capacity(d).up
+PSI.get_variable_binary(::HydroEnergyVariableUp, ::Type{<:PSY.HydroGen}, ::AbstractHydroReservoirFormulation) = false
+PSI.get_variable_warm_start_value(::HydroEnergyVariableUp, d::PSY.HydroGen, ::AbstractHydroReservoirFormulation) = PSY.get_initial_storage(d).up
+PSI.get_variable_lower_bound(::HydroEnergyVariableUp, d::PSY.HydroGen, ::AbstractHydroReservoirFormulation) = 0.0
+PSI.get_variable_upper_bound(::HydroEnergyVariableUp, d::PSY.HydroGen, ::AbstractHydroReservoirFormulation) = PSY.get_storage_capacity(d).up
 
 ########################### HydroEnergyVariableDown, HydroGen #################################
-PSI.get_variable_binary(::HydroEnergyVariableDown, ::Type{<:PSY.HydroGen}, ::PSI.AbstractHydroFormulation) = false
-PSI.get_variable_warm_start_value(::HydroEnergyVariableDown, d::PSY.HydroGen, ::PSI.AbstractHydroFormulation) = PSY.get_initial_storage(d).down
-PSI.get_variable_lower_bound(::HydroEnergyVariableDown, d::PSY.HydroGen, ::PSI.AbstractHydroFormulation) = 0.0
-PSI.get_variable_upper_bound(::HydroEnergyVariableDown, d::PSY.HydroGen, ::PSI.AbstractHydroFormulation) = PSY.get_storage_capacity(d).down
+PSI.get_variable_binary(::HydroEnergyVariableDown, ::Type{<:PSY.HydroGen}, ::AbstractHydroReservoirFormulation) = false
+PSI.get_variable_warm_start_value(::HydroEnergyVariableDown, d::PSY.HydroGen, ::AbstractHydroReservoirFormulation) = PSY.get_initial_storage(d).down
+PSI.get_variable_lower_bound(::HydroEnergyVariableDown, d::PSY.HydroGen, ::AbstractHydroReservoirFormulation) = 0.0
+PSI.get_variable_upper_bound(::HydroEnergyVariableDown, d::PSY.HydroGen, ::AbstractHydroReservoirFormulation) = PSY.get_storage_capacity(d).down
 
 ########################### PSI.ActivePowerInVariable, HydroGen #################################
-PSI.get_variable_binary(::PSI.ActivePowerInVariable, ::Type{<:PSY.HydroGen}, ::PSI.AbstractHydroFormulation) = false
-PSI.get_variable_lower_bound(::PSI.ActivePowerInVariable, d::PSY.HydroGen, ::PSI.AbstractHydroFormulation) = 0.0
-PSI.get_variable_upper_bound(::PSI.ActivePowerInVariable, d::PSY.HydroGen, ::PSI.AbstractHydroFormulation) = nothing
-PSI.get_variable_multiplier(::PSI.ActivePowerInVariable, d::Type{<:PSY.HydroGen}, ::PSI.AbstractHydroFormulation) = -1.0
+PSI.get_variable_binary(::PSI.ActivePowerInVariable, ::Type{<:PSY.HydroGen}, ::AbstractHydroReservoirFormulation) = false
+PSI.get_variable_lower_bound(::PSI.ActivePowerInVariable, d::PSY.HydroGen, ::AbstractHydroReservoirFormulation) = 0.0
+PSI.get_variable_upper_bound(::PSI.ActivePowerInVariable, d::PSY.HydroGen, ::AbstractHydroReservoirFormulation) = nothing
+PSI.get_variable_multiplier(::PSI.ActivePowerInVariable, d::Type{<:PSY.HydroGen}, ::AbstractHydroReservoirFormulation) = -1.0
 
 ########################### PSI.ActivePowerOutVariable, HydroGen #################################
-PSI.get_variable_binary(::PSI.ActivePowerOutVariable, ::Type{<:PSY.HydroGen}, ::PSI.AbstractHydroFormulation) = false
-PSI.get_variable_lower_bound(::PSI.ActivePowerOutVariable, d::PSY.HydroGen, ::PSI.AbstractHydroFormulation) = 0.0
-PSI.get_variable_upper_bound(::PSI.ActivePowerOutVariable, d::PSY.HydroGen, ::PSI.AbstractHydroFormulation) = nothing
-PSI.get_variable_multiplier(::PSI.ActivePowerOutVariable, d::Type{<:PSY.HydroGen}, ::PSI.AbstractHydroFormulation) = 1.0
+PSI.get_variable_binary(::PSI.ActivePowerOutVariable, ::Type{<:PSY.HydroGen}, ::AbstractHydroReservoirFormulation) = false
+PSI.get_variable_lower_bound(::PSI.ActivePowerOutVariable, d::PSY.HydroGen, ::AbstractHydroReservoirFormulation) = 0.0
+PSI.get_variable_upper_bound(::PSI.ActivePowerOutVariable, d::PSY.HydroGen, ::AbstractHydroReservoirFormulation) = nothing
+PSI.get_variable_multiplier(::PSI.ActivePowerOutVariable, d::Type{<:PSY.HydroGen}, ::AbstractHydroReservoirFormulation) = 1.0
 
 ############## PSI.OnVariable, HydroGen ####################
 # These methods are defined in PowerSimulations
-# PSI.get_variable_binary(::PSI.OnVariable, ::Type{<:PSY.HydroGen}, ::PSI.AbstractHydroFormulation) = true
-# PSI.get_variable_warm_start_value(::PSI.OnVariable, d::PSY.HydroGen, ::PSI.AbstractHydroFormulation) = PSY.get_active_power(d) > 0 ? 1.0 : 0.0
+# PSI.get_variable_binary(::PSI.OnVariable, ::Type{<:PSY.HydroGen}, ::AbstractHydroReservoirFormulation) = true
+# PSI.get_variable_warm_start_value(::PSI.OnVariable, d::PSY.HydroGen, ::AbstractHydroReservoirFormulation) = PSY.get_active_power(d) > 0 ? 1.0 : 0.0
 
 ############## WaterSpillageVariable, HydroGen ####################
-PSI.get_variable_binary(::WaterSpillageVariable, ::Type{<:PSY.HydroGen}, ::PSI.AbstractHydroFormulation) = false
-PSI.get_variable_lower_bound(::WaterSpillageVariable, d::PSY.HydroGen, ::PSI.AbstractHydroFormulation) = 0.0
+PSI.get_variable_binary(::WaterSpillageVariable, ::Type{<:PSY.HydroGen}, ::AbstractHydroReservoirFormulation) = false
+PSI.get_variable_lower_bound(::WaterSpillageVariable, d::PSY.HydroGen, ::AbstractHydroReservoirFormulation) = 0.0
 
 ############## PSI.ReservationVariable, HydroGen ####################
-PSI.get_variable_binary(::PSI.ReservationVariable, ::Type{<:PSY.HydroGen}, ::PSI.AbstractHydroFormulation) = true
-PSI.get_variable_binary(::PSI.ReservationVariable, ::Type{<:PSY.HydroPumpedStorage}, ::PSI.AbstractHydroFormulation) = true
+PSI.get_variable_binary(::PSI.ReservationVariable, ::Type{<:PSY.HydroGen}, ::AbstractHydroReservoirFormulation) = true
+PSI.get_variable_binary(::PSI.ReservationVariable, ::Type{<:PSY.HydroPumpedStorage}, ::AbstractHydroReservoirFormulation) = true
 
 ############## EnergyShortageVariable, HydroGen ####################
-PSI.get_variable_binary(::HydroEnergyShortageVariable, ::Type{<:PSY.HydroGen}, ::PSI.AbstractHydroFormulation) = false
-PSI.get_variable_lower_bound(::HydroEnergyShortageVariable, d::PSY.HydroGen, ::PSI.AbstractHydroFormulation) = 0.0
-PSI.get_variable_upper_bound(::HydroEnergyShortageVariable, d::PSY.HydroGen, ::PSI.AbstractHydroFormulation) = PSY.get_storage_capacity(d)
-PSI.get_variable_upper_bound(::HydroEnergyShortageVariable, d::PSY.HydroPumpedStorage, ::PSI.AbstractHydroFormulation) = PSY.get_storage_capacity(d).up
+PSI.get_variable_binary(::HydroEnergyShortageVariable, ::Type{<:PSY.HydroGen}, ::AbstractHydroReservoirFormulation) = false
+PSI.get_variable_lower_bound(::HydroEnergyShortageVariable, d::PSY.HydroGen, ::AbstractHydroReservoirFormulation) = 0.0
+PSI.get_variable_upper_bound(::HydroEnergyShortageVariable, d::PSY.HydroGen, ::AbstractHydroReservoirFormulation) = PSY.get_storage_capacity(d)
+PSI.get_variable_upper_bound(::HydroEnergyShortageVariable, d::PSY.HydroPumpedStorage, ::AbstractHydroReservoirFormulation) = PSY.get_storage_capacity(d).up
 
 ############## HydroEnergySurplusVariable, HydroGen ####################
-PSI.get_variable_binary(::HydroEnergySurplusVariable, ::Type{<:PSY.HydroGen}, ::PSI.AbstractHydroFormulation) = false
-PSI.get_variable_upper_bound(::HydroEnergySurplusVariable, d::PSY.HydroGen, ::PSI.AbstractHydroFormulation) = 0.0
-PSI.get_variable_lower_bound(::HydroEnergySurplusVariable, d::PSY.HydroGen, ::PSI.AbstractHydroFormulation) = - PSY.get_storage_capacity(d)
-PSI.get_variable_lower_bound(::HydroEnergySurplusVariable, d::PSY.HydroPumpedStorage, ::PSI.AbstractHydroFormulation) = - PSY.get_storage_capacity(d).up
+PSI.get_variable_binary(::HydroEnergySurplusVariable, ::Type{<:PSY.HydroGen}, ::AbstractHydroReservoirFormulation) = false
+PSI.get_variable_upper_bound(::HydroEnergySurplusVariable, d::PSY.HydroGen, ::AbstractHydroReservoirFormulation) = 0.0
+PSI.get_variable_lower_bound(::HydroEnergySurplusVariable, d::PSY.HydroGen, ::AbstractHydroReservoirFormulation) = - PSY.get_storage_capacity(d)
+PSI.get_variable_lower_bound(::HydroEnergySurplusVariable, d::PSY.HydroPumpedStorage, ::AbstractHydroReservoirFormulation) = - PSY.get_storage_capacity(d).up
 ########################### Parameter related set functions ################################
-PSI.get_multiplier_value(::EnergyBudgetTimeSeriesParameter, d::PSY.HydroGen, ::PSI.AbstractHydroFormulation) = PSY.get_max_active_power(d)
-PSI.get_multiplier_value(::EnergyBudgetTimeSeriesParameter, d::PSY.HydroEnergyReservoir, ::PSI.AbstractHydroFormulation) = PSY.get_storage_capacity(d)
-PSI.get_multiplier_value(::EnergyTargetTimeSeriesParameter, d::PSY.HydroGen, ::PSI.AbstractHydroFormulation) = PSY.get_storage_capacity(d)
-PSI.get_multiplier_value(::InflowTimeSeriesParameter, d::PSY.HydroGen, ::PSI.AbstractHydroFormulation) = PSY.get_inflow(d) * PSY.get_conversion_factor(d)
-PSI.get_multiplier_value(::OutflowTimeSeriesParameter, d::PSY.HydroGen, ::PSI.AbstractHydroFormulation) = PSY.get_outflow(d) * PSY.get_conversion_factor(d)
+PSI.get_multiplier_value(::EnergyBudgetTimeSeriesParameter, d::PSY.HydroGen, ::AbstractHydroReservoirFormulation) = PSY.get_max_active_power(d)
+PSI.get_multiplier_value(::EnergyBudgetTimeSeriesParameter, d::PSY.HydroEnergyReservoir, ::AbstractHydroReservoirFormulation) = PSY.get_storage_capacity(d)
+PSI.get_multiplier_value(::EnergyTargetTimeSeriesParameter, d::PSY.HydroGen, ::AbstractHydroReservoirFormulation) = PSY.get_storage_capacity(d)
+PSI.get_multiplier_value(::InflowTimeSeriesParameter, d::PSY.HydroGen, ::AbstractHydroReservoirFormulation) = PSY.get_inflow(d) * PSY.get_conversion_factor(d)
+PSI.get_multiplier_value(::OutflowTimeSeriesParameter, d::PSY.HydroGen, ::AbstractHydroReservoirFormulation) = PSY.get_outflow(d) * PSY.get_conversion_factor(d)
 # These methods are defined in PowerSimulations
-# PSI.get_multiplier_value(::PSI.TimeSeriesParameter, d::PSY.HydroGen, ::PSI.AbstractHydroFormulation) = PSY.get_max_active_power(d)
+# PSI.get_multiplier_value(::PSI.TimeSeriesParameter, d::PSY.HydroGen, ::AbstractHydroReservoirFormulation) = PSY.get_max_active_power(d)
 
-#PSI.get_parameter_multiplier(::PSI.VariableValueParameter, d::PSY.HydroGen, ::PSI.AbstractHydroFormulation) = 1.0
-#PSI.get_initial_parameter_value(::PSI.VariableValueParameter, d::PSY.HydroGen, ::PSI.AbstractHydroFormulation) = 1.0
-#PSI.get_expression_multiplier(::PSI.OnStatusParameter, ::PSI.ActivePowerRangeExpressionUB, d::PSY.HydroGen, ::PSI.AbstractHydroFormulation) = PSY.get_active_power_limits(d).max
-#PSI.get_expression_multiplier(::PSI.OnStatusParameter, ::PSI.ActivePowerRangeExpressionLB, d::PSY.HydroGen, ::PSI.AbstractHydroFormulation) = PSY.get_active_power_limits(d).min
+#PSI.get_parameter_multiplier(::PSI.VariableValueParameter, d::PSY.HydroGen, ::AbstractHydroReservoirFormulation) = 1.0
+#PSI.get_initial_parameter_value(::PSI.VariableValueParameter, d::PSY.HydroGen, ::AbstractHydroReservoirFormulation) = 1.0
+#PSI.get_expression_multiplier(::PSI.OnStatusParameter, ::PSI.ActivePowerRangeExpressionUB, d::PSY.HydroGen, ::AbstractHydroReservoirFormulation) = PSY.get_active_power_limits(d).max
+#PSI.get_expression_multiplier(::PSI.OnStatusParameter, ::PSI.ActivePowerRangeExpressionLB, d::PSY.HydroGen, ::AbstractHydroReservoirFormulation) = PSY.get_active_power_limits(d).min
 
 #################### Initial Conditions for models ###############
-#PSI.initial_condition_default(::PSI.DeviceStatus, d::PSY.HydroGen, ::PSI.AbstractHydroFormulation) = PSY.get_status(d)
-#PSI.initial_condition_variable(::PSI.DeviceStatus, d::PSY.HydroGen, ::PSI.AbstractHydroFormulation) = PSI.OnVariable()
-#PSI.initial_condition_default(::PSI.DevicePower, d::PSY.HydroGen, ::PSI.AbstractHydroFormulation) = PSY.get_active_power(d)
-#PSI.initial_condition_variable(::PSI.DevicePower, d::PSY.HydroGen, ::PSI.AbstractHydroFormulation) = PSI.ActivePowerVariable()
-PSI.initial_condition_default(::PSI.InitialEnergyLevel, d::PSY.HydroGen, ::PSI.AbstractHydroFormulation) = PSY.get_initial_storage(d)
-PSI.initial_condition_variable(::PSI.InitialEnergyLevel, d::PSY.HydroGen, ::PSI.AbstractHydroFormulation) = PSI.EnergyVariable()
-PSI.initial_condition_default(::InitialHydroEnergyLevelUp, d::PSY.HydroGen, ::PSI.AbstractHydroFormulation) = PSY.get_initial_storage(d).up
-PSI.initial_condition_variable(::InitialHydroEnergyLevelUp, d::PSY.HydroGen, ::PSI.AbstractHydroFormulation) = HydroEnergyVariableUp()
-PSI.initial_condition_default(::InitialHydroEnergyLevelDown, d::PSY.HydroGen, ::PSI.AbstractHydroFormulation) = PSY.get_initial_storage(d).down
-PSI.initial_condition_variable(::InitialHydroEnergyLevelDown, d::PSY.HydroGen, ::PSI.AbstractHydroFormulation) = HydroEnergyVariableDown()
-#PSI.initial_condition_default(::PSI.InitialTimeDurationOn, d::PSY.HydroGen, ::PSI.AbstractHydroFormulation) = PSY.get_status(d) ? PSY.get_time_at_status(d) :  0.0
-#PSI.initial_condition_variable(::PSI.InitialTimeDurationOn, d::PSY.HydroGen, ::PSI.AbstractHydroFormulation) = PSI.OnVariable()
-#PSI.initial_condition_default(::PSI.InitialTimeDurationOff, d::PSY.HydroGen, ::PSI.AbstractHydroFormulation) = PSY.get_status(d) ? 0.0 : PSY.get_time_at_status(d)
-#PSI.initial_condition_variable(::PSI.InitialTimeDurationOff, d::PSY.HydroGen, ::PSI.AbstractHydroFormulation) = PSI.OnVariable()
+#PSI.initial_condition_default(::PSI.DeviceStatus, d::PSY.HydroGen, ::AbstractHydroReservoirFormulation) = PSY.get_status(d)
+#PSI.initial_condition_variable(::PSI.DeviceStatus, d::PSY.HydroGen, ::AbstractHydroReservoirFormulation) = PSI.OnVariable()
+#PSI.initial_condition_default(::PSI.DevicePower, d::PSY.HydroGen, ::AbstractHydroReservoirFormulation) = PSY.get_active_power(d)
+#PSI.initial_condition_variable(::PSI.DevicePower, d::PSY.HydroGen, ::AbstractHydroReservoirFormulation) = PSI.ActivePowerVariable()
+PSI.initial_condition_default(::PSI.InitialEnergyLevel, d::PSY.HydroGen, ::AbstractHydroReservoirFormulation) = PSY.get_initial_storage(d)
+PSI.initial_condition_variable(::PSI.InitialEnergyLevel, d::PSY.HydroGen, ::AbstractHydroReservoirFormulation) = PSI.EnergyVariable()
+PSI.initial_condition_default(::InitialHydroEnergyLevelUp, d::PSY.HydroGen, ::AbstractHydroReservoirFormulation) = PSY.get_initial_storage(d).up
+PSI.initial_condition_variable(::InitialHydroEnergyLevelUp, d::PSY.HydroGen, ::AbstractHydroReservoirFormulation) = HydroEnergyVariableUp()
+PSI.initial_condition_default(::InitialHydroEnergyLevelDown, d::PSY.HydroGen, ::AbstractHydroReservoirFormulation) = PSY.get_initial_storage(d).down
+PSI.initial_condition_variable(::InitialHydroEnergyLevelDown, d::PSY.HydroGen, ::AbstractHydroReservoirFormulation) = HydroEnergyVariableDown()
+#PSI.initial_condition_default(::PSI.InitialTimeDurationOn, d::PSY.HydroGen, ::AbstractHydroReservoirFormulation) = PSY.get_status(d) ? PSY.get_time_at_status(d) :  0.0
+#PSI.initial_condition_variable(::PSI.InitialTimeDurationOn, d::PSY.HydroGen, ::AbstractHydroReservoirFormulation) = PSI.OnVariable()
+#PSI.initial_condition_default(::PSI.InitialTimeDurationOff, d::PSY.HydroGen, ::AbstractHydroReservoirFormulation) = PSY.get_status(d) ? 0.0 : PSY.get_time_at_status(d)
+#PSI.initial_condition_variable(::PSI.InitialTimeDurationOff, d::PSY.HydroGen, ::AbstractHydroReservoirFormulation) = PSI.OnVariable()
 
 ########################Objective Function##################################################
-# PSI.proportional_cost(cost::Nothing, ::PSY.HydroGen, ::PSI.ActivePowerVariable, ::PSI.AbstractHydroFormulation)=0.0
-# PSI.proportional_cost(cost::PSY.OperationalCost, ::PSI.OnVariable, ::PSY.HydroGen, ::PSI.AbstractHydroFormulation)=PSY.get_fixed(cost)
-PSI.proportional_cost(cost::PSY.StorageManagementCost, ::HydroEnergySurplusVariable, ::PSY.HydroGen, ::PSI.AbstractHydroFormulation)=PSY.get_energy_surplus_cost(cost)
-PSI.proportional_cost(cost::PSY.StorageManagementCost, ::HydroEnergyShortageVariable, ::PSY.HydroGen, ::PSI.AbstractHydroFormulation)=PSY.get_energy_shortage_cost(cost)
+# PSI.proportional_cost(cost::Nothing, ::PSY.HydroGen, ::PSI.ActivePowerVariable, ::AbstractHydroReservoirFormulation)=0.0
+# PSI.proportional_cost(cost::PSY.OperationalCost, ::PSI.OnVariable, ::PSY.HydroGen, ::AbstractHydroReservoirFormulation)=PSY.get_fixed(cost)
+PSI.proportional_cost(cost::PSY.StorageManagementCost, ::HydroEnergySurplusVariable, ::PSY.HydroGen, ::AbstractHydroReservoirFormulation)=PSY.get_energy_surplus_cost(cost)
+PSI.proportional_cost(cost::PSY.StorageManagementCost, ::HydroEnergyShortageVariable, ::PSY.HydroGen, ::AbstractHydroReservoirFormulation)=PSY.get_energy_shortage_cost(cost)
 
-# PSI.objective_function_multiplier(::PSI.ActivePowerVariable, ::PSI.AbstractHydroFormulation)=PSI.OBJECTIVE_FUNCTION_POSITIVE
-# PSI.objective_function_multiplier(::PSI.ActivePowerOutVariable, ::PSI.AbstractHydroFormulation)=PSI.OBJECTIVE_FUNCTION_POSITIVE
-# PSI.objective_function_multiplier(::PSI.OnVariable, ::PSI.AbstractHydroFormulation)=PSI.OBJECTIVE_FUNCTION_POSITIVE
-PSI.objective_function_multiplier(::HydroEnergySurplusVariable, ::PSI.AbstractHydroFormulation)=PSI.OBJECTIVE_FUNCTION_NEGATIVE
-PSI.objective_function_multiplier(::HydroEnergyShortageVariable, ::PSI.AbstractHydroFormulation)=PSI.OBJECTIVE_FUNCTION_POSITIVE
+# PSI.objective_function_multiplier(::PSI.ActivePowerVariable, ::AbstractHydroReservoirFormulation)=PSI.OBJECTIVE_FUNCTION_POSITIVE
+# PSI.objective_function_multiplier(::PSI.ActivePowerOutVariable, ::AbstractHydroReservoirFormulation)=PSI.OBJECTIVE_FUNCTION_POSITIVE
+# PSI.objective_function_multiplier(::PSI.OnVariable, ::AbstractHydroReservoirFormulation)=PSI.OBJECTIVE_FUNCTION_POSITIVE
+PSI.objective_function_multiplier(::HydroEnergySurplusVariable, ::AbstractHydroReservoirFormulation)=PSI.OBJECTIVE_FUNCTION_NEGATIVE
+PSI.objective_function_multiplier(::HydroEnergyShortageVariable, ::AbstractHydroReservoirFormulation)=PSI.OBJECTIVE_FUNCTION_POSITIVE
 
-# PSI.sos_status(::PSY.HydroGen, ::PSI.AbstractHydroFormulation)=PSI.SOSStatusVariable.NO_VARIABLE
+# PSI.sos_status(::PSY.HydroGen, ::AbstractHydroReservoirFormulation)=PSI.SOSStatusVariable.NO_VARIABLE
 # PSI.sos_status(::PSY.HydroGen, ::PSI.AbstractHydroUnitCommitment)=PSI.SOSStatusVariable.VARIABLE
 
-# PSI.variable_cost(::Nothing, ::PSI.ActivePowerVariable, ::PSY.HydroGen, ::PSI.AbstractHydroFormulation)=0.0
-# PSI.variable_cost(cost::PSY.OperationalCost, ::PSI.ActivePowerVariable, ::PSY.HydroGen, ::PSI.AbstractHydroFormulation)=PSY.get_variable(cost)
-# PSI.variable_cost(cost::PSY.OperationalCost, ::PSI.ActivePowerOutVariable, ::PSY.HydroGen, ::PSI.AbstractHydroFormulation)=PSY.get_variable(cost)
+# PSI.variable_cost(::Nothing, ::PSI.ActivePowerVariable, ::PSY.HydroGen, ::AbstractHydroReservoirFormulation)=0.0
+# PSI.variable_cost(cost::PSY.OperationalCost, ::PSI.ActivePowerVariable, ::PSY.HydroGen, ::AbstractHydroReservoirFormulation)=PSY.get_variable(cost)
+# PSI.variable_cost(cost::PSY.OperationalCost, ::PSI.ActivePowerOutVariable, ::PSY.HydroGen, ::AbstractHydroReservoirFormulation)=PSY.get_variable(cost)
 
 #! format: on
 
 # These methods are defined in PowerSimulations
 # function PSI.get_initial_conditions_device_model(
 #    ::PSI.OperationModel,
-#    model::PSI.DeviceModel{T, <:PSI.AbstractHydroFormulation},
+#    model::PSI.DeviceModel{T, <:AbstractHydroReservoirFormulation},
 #) where {T <: PSY.HydroEnergyReservoir}
 #    return model
 # end
 
 #function PSI.get_initial_conditions_device_model(
 #    ::PSI.OperationModel,
-#    ::PSI.DeviceModel{T, <:PSI.AbstractHydroFormulation},
+#    ::PSI.DeviceModel{T, <:AbstractHydroReservoirFormulation},
 #) where {T <: PSY.HydroDispatch}
 #    return PSI.DeviceModel(PSY.HydroDispatch, HydroDispatchRunOfRiver)
 #end
 
 function PSI.get_initial_conditions_device_model(
     ::PSI.OperationModel,
-    ::PSI.DeviceModel{T, <:PSI.AbstractHydroFormulation},
+    ::PSI.DeviceModel{T, <:AbstractHydroReservoirFormulation},
 ) where {T <: PSY.HydroPumpedStorage}
     return PSI.DeviceModel(PSY.HydroPumpedStorage, HydroDispatchPumpedStorage)
 end
@@ -184,7 +184,7 @@ end
 function PSI.get_default_attributes(
     ::Type{T},
     ::Type{D},
-) where {T <: PSY.HydroGen, D <: PSI.AbstractHydroFormulation}
+) where {T <: PSY.HydroGen, D <: AbstractHydroReservoirFormulation}
     return Dict{String, Any}("reservation" => false)
 end
 
@@ -295,7 +295,7 @@ Min and max reactive Power Variable limits
 function PSI.get_min_max_limits(
     x::PSY.HydroGen,
     ::Type{<:PSI.ReactivePowerVariableLimitsConstraint},
-    ::Type{<:PSI.AbstractHydroFormulation},
+    ::Type{<:AbstractHydroReservoirFormulation},
 )
     return PSY.get_reactive_power_limits(x)
 end
@@ -306,7 +306,7 @@ Min and max active Power Variable limits
 function PSI.get_min_max_limits(
     x::PSY.HydroGen,
     ::Type{<:PSI.ActivePowerVariableLimitsConstraint},
-    ::Type{<:PSI.AbstractHydroFormulation},
+    ::Type{<:AbstractHydroReservoirFormulation},
 )
     return PSY.get_active_power_limits(x)
 end
@@ -446,7 +446,7 @@ function PSI.add_constraints!(
     ::PSI.NetworkModel{X},
 ) where {
     V <: PSY.HydroEnergyReservoir,
-    W <: PSI.AbstractHydroFormulation,
+    W <: AbstractHydroReservoirFormulation,
     X <: PM.AbstractPowerModel,
 }
     time_steps = PSI.get_time_steps(container)
@@ -505,7 +505,7 @@ function PSI.add_constraints!(
     ::PSI.NetworkModel{X},
 ) where {
     V <: PSY.HydroPumpedStorage,
-    W <: PSI.AbstractHydroFormulation,
+    W <: AbstractHydroReservoirFormulation,
     X <: PM.AbstractPowerModel,
 }
     time_steps = PSI.get_time_steps(container)
@@ -573,7 +573,7 @@ function PSI.add_constraints!(
     ::PSI.NetworkModel{X},
 ) where {
     V <: PSY.HydroPumpedStorage,
-    W <: PSI.AbstractHydroFormulation,
+    W <: AbstractHydroReservoirFormulation,
     X <: PM.AbstractPowerModel,
 }
     time_steps = PSI.get_time_steps(container)
@@ -638,7 +638,7 @@ function PSI.add_constraints!(
     devices::IS.FlattenIteratorWrapper{V},
     model::PSI.DeviceModel{V, W},
     ::PSI.NetworkModel{X},
-) where {V <: PSY.HydroGen, W <: PSI.AbstractHydroFormulation, X <: PM.AbstractPowerModel}
+) where {V <: PSY.HydroGen, W <: AbstractHydroReservoirFormulation, X <: PM.AbstractPowerModel}
     time_steps = PSI.get_time_steps(container)
     set_name = [PSY.get_name(d) for d in devices]
     constraint = PSI.add_constraints_container!(
@@ -699,7 +699,7 @@ function PSI.add_constraints!(
     devices::IS.FlattenIteratorWrapper{V},
     model::PSI.DeviceModel{V, W},
     ::PSI.NetworkModel{X},
-) where {V <: PSY.HydroGen, W <: PSI.AbstractHydroFormulation, X <: PM.AbstractPowerModel}
+) where {V <: PSY.HydroGen, W <: AbstractHydroReservoirFormulation, X <: PM.AbstractPowerModel}
     time_steps = PSI.get_time_steps(container)
     set_name = [PSY.get_name(d) for d in devices]
     constraint =
@@ -951,7 +951,7 @@ function PSI._get_initial_conditions_value(
     container::PSI.OptimizationContainer,
 ) where {
     T <: PSI.InitialCondition{U, JuMP.VariableRef},
-    V <: PSI.AbstractHydroFormulation,
+    V <: AbstractHydroReservoirFormulation,
     W <: PSY.Component,
 } where {U <: Union{InitialHydroEnergyLevelUp, InitialHydroEnergyLevelDown}}
     var_type = PSI.initial_condition_variable(U(), component, V())
@@ -969,7 +969,7 @@ function PSI._get_initial_conditions_value(
     container::PSI.OptimizationContainer,
 ) where {
     T <: PSI.InitialCondition{U, Float64},
-    V <: PSI.AbstractHydroFormulation,
+    V <: AbstractHydroReservoirFormulation,
     W <: PSY.HydroGen,
 } where {U <: Union{InitialHydroEnergyLevelUp, InitialHydroEnergyLevelDown}}
     var_type = PSI.initial_condition_variable(U(), component, V())
