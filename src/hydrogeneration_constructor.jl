@@ -1,4 +1,3 @@
-#=
 """
 Construct model for HydroGen with RunOfRiver Dispatch Formulation
 """
@@ -10,7 +9,7 @@ function PSI.construct_device!(
     network_model::PSI.NetworkModel{S},
 ) where {
     H <: PSY.HydroGen,
-    D <: PSI.AbstractHydroDispatchFormulation,
+    D <: AbstractHydroDispatchFormulation,
     S <: PM.AbstractPowerModel,
 }
     devices = get_available_components(H, sys)
@@ -68,7 +67,7 @@ function PSI.construct_device!(
     network_model::PSI.NetworkModel{S},
 ) where {
     H <: PSY.HydroGen,
-    D <: PSI.AbstractHydroDispatchFormulation,
+    D <: AbstractHydroDispatchFormulation,
     S <: PM.AbstractPowerModel,
 }
     devices = get_available_components(H, sys)
@@ -118,7 +117,7 @@ function PSI.construct_device!(
     network_model::PSI.NetworkModel{S},
 ) where {
     H <: PSY.HydroGen,
-    D <: PSI.AbstractHydroDispatchFormulation,
+    D <: AbstractHydroDispatchFormulation,
     S <: PM.AbstractActivePowerModel,
 }
     devices = get_available_components(H, sys)
@@ -166,7 +165,7 @@ function PSI.construct_device!(
     network_model::PSI.NetworkModel{S},
 ) where {
     H <: PSY.HydroGen,
-    D <: PSI.AbstractHydroDispatchFormulation,
+    D <: AbstractHydroDispatchFormulation,
     S <: PM.AbstractActivePowerModel,
 }
     devices = get_available_components(H, sys)
@@ -195,7 +194,6 @@ function PSI.construct_device!(
     PSI.add_constraint_dual!(container, sys, model)
     return
 end
-=#
 
 """
 Construct model for HydroGen with ReservoirBudget Dispatch Formulation
