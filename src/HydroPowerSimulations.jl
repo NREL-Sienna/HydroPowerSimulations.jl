@@ -19,7 +19,6 @@ export HydroDispatchPumpedStorage
 export HydroDispatchRunOfRiver
 export HydroCommitmentRunOfRiver
 
-
 ######## Hydro Variables ########
 export HydroEnergyVariableUp
 export WaterSpillageVariable

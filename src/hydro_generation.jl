@@ -143,17 +143,17 @@ PSI.variable_cost(cost::PSY.OperationalCost, ::PSI.ActivePowerOutVariable, ::PSY
 
 # These methods are defined in PowerSimulations
 function PSI.get_initial_conditions_device_model(
-   ::PSI.OperationModel,
-   model::PSI.DeviceModel{T, <:AbstractHydroReservoirFormulation},
+    ::PSI.OperationModel,
+    model::PSI.DeviceModel{T, <:AbstractHydroReservoirFormulation},
 ) where {T <: PSY.HydroEnergyReservoir}
-   return model
+    return model
 end
 
 function PSI.get_initial_conditions_device_model(
-   ::PSI.OperationModel,
-   ::PSI.DeviceModel{T, <:AbstractHydroReservoirFormulation},
+    ::PSI.OperationModel,
+    ::PSI.DeviceModel{T, <:AbstractHydroReservoirFormulation},
 ) where {T <: PSY.HydroDispatch}
-   return PSI.DeviceModel(PSY.HydroDispatch, HydroDispatchRunOfRiver)
+    return PSI.DeviceModel(PSY.HydroDispatch, HydroDispatchRunOfRiver)
 end
 
 function PSI.get_initial_conditions_device_model(
@@ -179,14 +179,19 @@ end
 
 function PSI.get_default_time_series_names(
     ::Type{<:PSY.HydroGen},
-    ::Type{<:Union{PSI.FixedOutput, AbstractHydroDispatchFormulation, AbstractHydroUnitCommitment}},
+    ::Type{
+        <:Union{
+            PSI.FixedOutput,
+            AbstractHydroDispatchFormulation,
+            AbstractHydroUnitCommitment,
+        },
+    },
 )
     return Dict{Type{<:PSI.TimeSeriesParameter}, String}(
         PSI.ActivePowerTimeSeriesParameter => "max_active_power",
         PSI.ReactivePowerTimeSeriesParameter => "max_active_power",
     )
 end
-
 
 function PSI.get_default_time_series_names(
     ::Type{PSY.HydroEnergyReservoir},
@@ -393,11 +398,7 @@ function PSI.add_constraints!(
     devices::IS.FlattenIteratorWrapper{V},
     model::PSI.DeviceModel{V, W},
     ::PSI.NetworkModel{X},
-) where {
-    V <: PSY.HydroGen,
-    W <: AbstractHydroUnitCommitment,
-    X <: PM.AbstractPowerModel,
-}
+) where {V <: PSY.HydroGen, W <: AbstractHydroUnitCommitment, X <: PM.AbstractPowerModel}
     PSI.add_semicontinuous_range_constraints!(container, T, U, devices, model, X)
     return
 end
@@ -701,7 +702,11 @@ function PSI.add_constraints!(
     devices::IS.FlattenIteratorWrapper{V},
     model::PSI.DeviceModel{V, W},
     ::PSI.NetworkModel{X},
-) where {V <: PSY.HydroGen, W <: AbstractHydroReservoirFormulation, X <: PM.AbstractPowerModel}
+) where {
+    V <: PSY.HydroGen,
+    W <: AbstractHydroReservoirFormulation,
+    X <: PM.AbstractPowerModel,
+}
     time_steps = PSI.get_time_steps(container)
     set_name = [PSY.get_name(d) for d in devices]
     constraint = PSI.add_constraints_container!(
@@ -762,7 +767,11 @@ function PSI.add_constraints!(
     devices::IS.FlattenIteratorWrapper{V},
     model::PSI.DeviceModel{V, W},
     ::PSI.NetworkModel{X},
-) where {V <: PSY.HydroGen, W <: AbstractHydroReservoirFormulation, X <: PM.AbstractPowerModel}
+) where {
+    V <: PSY.HydroGen,
+    W <: AbstractHydroReservoirFormulation,
+    X <: PM.AbstractPowerModel,
+}
     time_steps = PSI.get_time_steps(container)
     set_name = [PSY.get_name(d) for d in devices]
     constraint =
@@ -828,7 +837,8 @@ end
 function PSI.objective_function!(
     container::PSI.OptimizationContainer,
     devices::IS.FlattenIteratorWrapper{T},
-    ::PSI.DeviceModel{T, U}, ::Type{<:PM.AbstractPowerModel},
+    ::PSI.DeviceModel{T, U},
+    ::Type{<:PM.AbstractPowerModel},
 ) where {T <: PSY.HydroGen, U <: AbstractHydroUnitCommitment}
     PSI.add_variable_cost!(container, PSI.ActivePowerVariable(), devices, U())
     PSI.add_proportional_cost!(container, PSI.OnVariable(), devices, U())
