@@ -377,7 +377,6 @@ function PSI.get_min_max_limits(
     return PSY.get_active_power_limits(x)
 end
 
-
 """
 Add power variable limits constraints for hydro unit commitment formulation
 """

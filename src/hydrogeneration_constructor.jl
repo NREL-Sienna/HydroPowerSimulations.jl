@@ -1394,18 +1394,18 @@ function PSI.construct_device!(
     S <: PM.AbstractActivePowerModel,
 }
     devices =
-    PSI.get_available_components(H, sys, PSI.get_attribute(model, "filter_function"))
+        PSI.get_available_components(H, sys, PSI.get_attribute(model, "filter_function"))
 
     PSI.add_variables!(container, PSI.ActivePowerVariable, devices, D())
     PSI.add_variables!(container, PSI.OnVariable, devices, D())
     PSI.add_variables!(container, PSI.EnergyOutput, devices, D())
     PSI.add_to_expression!(
-    container,
-    PSI.ActivePowerBalance,
-    PSI.ActivePowerVariable,
-    devices,
-    model,
-    network_model,
+        container,
+        PSI.ActivePowerBalance,
+        PSI.ActivePowerVariable,
+        devices,
+        model,
+        network_model,
     )
 
     PSI.add_parameters!(container, PSI.ActivePowerTimeSeriesParameter, devices, model)
@@ -1413,20 +1413,20 @@ function PSI.construct_device!(
     PSI.add_expressions!(container, PSI.ProductionCostExpression, devices, model)
 
     PSI.add_to_expression!(
-    container,
-    PSI.ActivePowerRangeExpressionLB,
-    PSI.ActivePowerVariable,
-    devices,
-    model,
-    network_model,
+        container,
+        PSI.ActivePowerRangeExpressionLB,
+        PSI.ActivePowerVariable,
+        devices,
+        model,
+        network_model,
     )
     PSI.add_to_expression!(
-    container,
-    PSI.ActivePowerRangeExpressionUB,
-    PSI.ActivePowerVariable,
-    devices,
-    model,
-    network_model,
+        container,
+        PSI.ActivePowerRangeExpressionUB,
+        PSI.ActivePowerVariable,
+        devices,
+        model,
+        network_model,
     )
     PSI.add_feedforward_arguments!(container, model, devices)
     return
