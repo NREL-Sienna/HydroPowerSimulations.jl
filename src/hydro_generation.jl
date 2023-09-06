@@ -150,6 +150,7 @@ function PSI.get_initial_conditions_device_model(
     return model
 end
 
+# TODO: This method is up for elimination
 function PSI.get_initial_conditions_device_model(
     ::PSI.OperationModel,
     ::PSI.DeviceModel{T, <:AbstractHydroReservoirFormulation},
@@ -160,14 +161,14 @@ end
 function PSI.get_initial_conditions_device_model(
     ::PSI.OperationModel,
     ::PSI.DeviceModel{T, <:AbstractHydroUnitCommitment},
-) where {T <: PSY.HydroDispatch}
-    return PSI.DeviceModel(PSY.HydroDispatch, HydroCommitmentRunOfRiver)
+) where {T <: PSY.HydroGen}
+    return PSI.DeviceModel(T, HydroCommitmentRunOfRiver)
 end
 
 function PSI.get_initial_conditions_device_model(
     ::PSI.OperationModel,
-    ::PSI.DeviceModel{T, <:AbstractHydroReservoirFormulation},
-) where {T <: PSY.HydroPumpedStorage}
+    ::PSI.DeviceModel{PSY.HydroPumpedStorage, <:AbstractHydroReservoirFormulation},
+)
     return PSI.DeviceModel(PSY.HydroPumpedStorage, HydroDispatchPumpedStorage)
 end
 

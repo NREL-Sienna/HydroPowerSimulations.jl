@@ -4,7 +4,6 @@ import DataStructures: OrderedDict
 pages = OrderedDict(
     "Welcome Page" => "index.md",
     "Quick Start Guide" => "quick_start_guide.md",
-    "Tutorials" => "tutorials/intro_page.md",
     "Public API Reference" => "api/public.md",
     "Internal API Reference" => "api/internal.md",
 )
@@ -16,7 +15,6 @@ makedocs(
         prettyurls=haskey(ENV, "GITHUB_ACTIONS"),
     ),
     sitename="HydroPowerSimulations.jl",
-    authors="Jose Daniel Lara, Rodrigo Henriquez-Auba",
     pages=Any[p for p in pages],
 )
 
