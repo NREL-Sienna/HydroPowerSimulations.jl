@@ -158,13 +158,6 @@ end
 
 function PSI.get_initial_conditions_device_model(
     ::PSI.OperationModel,
-    ::PSI.DeviceModel{T, <:AbstractHydroReservoirFormulation},
-) where {T <: PSY.HydroDispatch}
-    return PSI.DeviceModel(PSY.HydroDispatch, HydroDispatchRunOfRiver)
-end
-
-function PSI.get_initial_conditions_device_model(
-    ::PSI.OperationModel,
     ::PSI.DeviceModel{T, <:AbstractHydroUnitCommitment},
 ) where {T <: PSY.HydroDispatch}
     return PSI.DeviceModel(PSY.HydroDispatch, HydroCommitmentRunOfRiver)
