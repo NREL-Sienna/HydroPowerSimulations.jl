@@ -16,6 +16,8 @@ export HydroDispatchReservoirStorage
 export HydroCommitmentReservoirBudget
 export HydroCommitmentReservoirStorage
 export HydroDispatchPumpedStorage
+export HydroDispatchRunOfRiver
+export HydroCommitmentRunOfRiver
 
 ######## Hydro Variables ########
 export HydroEnergyVariableUp
@@ -43,9 +45,10 @@ const IS = InfrastructureSystems
 const PM = PowerModels
 const PSI = PowerSimulations
 
-import PowerSimulations: HydroDispatchRunOfRiver, HydroCommitmentRunOfRiver
-export HydroCommitmentRunOfRiver
-export HydroDispatchRunOfRiver
+# import PowerSimulations: HydroDispatchRunOfRiver, HydroCommitmentRunOfRiver
+# import PowerSimulations: HydroCommitmentRunOfRiver
+# export HydroCommitmentRunOfRiver
+# export HydroDispatchRunOfRiver
 
 #################################################################################
 # Includes
