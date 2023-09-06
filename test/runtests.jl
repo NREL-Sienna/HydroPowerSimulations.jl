@@ -45,17 +45,14 @@ HiGHS_optimizer = JuMP.optimizer_with_attributes(
     "mip_rel_gap" => 1e-1,
 )
 
+ENV["RUNNING_PSI_TESTS"] = "true"
+
 # Load
 PSI_DIR = string(dirname(dirname(pathof(PowerSimulations))))
 include(joinpath(PSI_DIR, "test/test_utils/mock_operation_models.jl"))
 include(joinpath(PSI_DIR, "test/test_utils/operations_problem_templates.jl"))
 include(joinpath(PSI_DIR, "test/test_utils/model_checks.jl"))
 include(joinpath(PSI_DIR, "test/test_utils/solver_definitions.jl"))
-
-# TEST_DIR = isempty(dirname(@__FILE__)) ? "test" : dirname(@__FILE__)
-# include(joinpath(TEST_DIR, "test_utils/function_utils.jl"))
-# include(joinpath(TEST_DIR, "test_utils/additional_templates.jl"))
-# include(joinpath(TEST_DIR, "test_utils/price_generation_utils.jl"))
 
 """
 Copied @includetests from https://github.com/ssfrr/TestSetExtensions.jl.
