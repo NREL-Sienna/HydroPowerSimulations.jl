@@ -1,4 +1,77 @@
 """
+Construct model for HydroGen with FixedOutput Formulation
+"""
+function PSI.construct_device!(
+    container::PSI.OptimizationContainer,
+    sys::PSY.System,
+    ::PSI.ArgumentConstructStage,
+    model::PSI.DeviceModel{H, PSI.FixedOutput},
+    network_model::PSI.NetworkModel{S},
+) where {H <: PSY.HydroGen, S <: PM.AbstractPowerModel}
+    devices =
+    PSI.get_available_components(H, sys, PSI.get_attribute(model, "filter_function"))
+
+    PSI.add_parameters!(container, PSI.ActivePowerTimeSeriesParameter, devices, model)
+    PSI.add_parameters!(container, PSI.ReactivePowerTimeSeriesParameter, devices, model)
+
+    # Expression
+    PSI.add_to_expression!(
+        container,
+        PSI.ActivePowerBalance,
+        PSI.ActivePowerTimeSeriesParameter,
+        devices,
+        model,
+        network_model,
+    )
+    PSI.add_to_expression!(
+        container,
+        PSI.ReactivePowerBalance,
+        PSI.ReactivePowerTimeSeriesParameter,
+        devices,
+        model,
+        network_model,
+    )
+    return
+end
+
+function PSI.construct_device!(
+    ::PSI.OptimizationContainer,
+    ::PSY.System,
+    ::PSI.ModelConstructStage,
+    ::PSI.DeviceModel{H, PSI.FixedOutput},
+    ::PSI.NetworkModel{S},
+) where {H <: PSY.HydroGen, S <: PM.AbstractPowerModel}
+    # FixedOutput doesn't add any constraints to the model. This function covers
+    # AbstractPowerModel and AbstractActivePowerModel
+    return
+end
+
+function PSI.construct_device!(
+    container::PSI.OptimizationContainer,
+    sys::PSY.System,
+    ::PSI.ArgumentConstructStage,
+    model::PSI.DeviceModel{H, PSI.FixedOutput},
+    network_model::PSI.NetworkModel{S},
+) where {H <: PSY.HydroGen, S <: PM.AbstractActivePowerModel}
+    devices =
+    PSI.get_available_components(H, sys, PSI.get_attribute(model, "filter_function"))
+
+    PSI.add_parameters!(container, PSI.ActivePowerTimeSeriesParameter, devices, model)
+
+    # Expression
+    PSI.add_to_expression!(
+        container,
+        PSI.ActivePowerBalance,
+        PSI.ActivePowerTimeSeriesParameter,
+        devices,
+        model,
+        network_model,
+    )
+    return
+end
+
+
+"""
 Construct model for HydroGen with RunOfRiver Dispatch Formulation
 """
 function PSI.construct_device!(
