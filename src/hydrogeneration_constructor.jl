@@ -9,7 +9,7 @@ function PSI.construct_device!(
     network_model::PSI.NetworkModel{S},
 ) where {H <: PSY.HydroGen, S <: PM.AbstractPowerModel}
     devices =
-    PSI.get_available_components(H, sys, PSI.get_attribute(model, "filter_function"))
+        PSI.get_available_components(H, sys, PSI.get_attribute(model, "filter_function"))
 
     PSI.add_parameters!(container, PSI.ActivePowerTimeSeriesParameter, devices, model)
     PSI.add_parameters!(container, PSI.ReactivePowerTimeSeriesParameter, devices, model)
@@ -54,7 +54,7 @@ function PSI.construct_device!(
     network_model::PSI.NetworkModel{S},
 ) where {H <: PSY.HydroGen, S <: PM.AbstractActivePowerModel}
     devices =
-    PSI.get_available_components(H, sys, PSI.get_attribute(model, "filter_function"))
+        PSI.get_available_components(H, sys, PSI.get_attribute(model, "filter_function"))
 
     PSI.add_parameters!(container, PSI.ActivePowerTimeSeriesParameter, devices, model)
 
@@ -69,7 +69,6 @@ function PSI.construct_device!(
     )
     return
 end
-
 
 """
 Construct model for HydroGen with RunOfRiver Dispatch Formulation
