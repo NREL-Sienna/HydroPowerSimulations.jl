@@ -498,10 +498,10 @@ end
     moi_tests(model, 110, 0, 25, 24, 24, true)
 end
 
-@testset "Test EnergyTargetFeedforward to HydroEnergyReservoir models" begin
+@testset "Test ReservoirTargetFeedforward to HydroEnergyReservoir models" begin
     device_model = PSI.DeviceModel(HydroPumpedStorage, HydroDispatchPumpedStorage)
 
-    ff_up = PSI.EnergyTargetFeedforward(;
+    ff_up = ReservoirTargetFeedforward(;
         component_type=HydroPumpedStorage,
         source=HydroEnergyVariableUp,
         affected_values=[HydroEnergyVariableUp],

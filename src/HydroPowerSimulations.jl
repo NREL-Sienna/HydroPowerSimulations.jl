@@ -25,11 +25,14 @@ export WaterSpillageVariable
 export HydroEnergyShortageVariable
 
 ######## Hydro parameters #######
-export EnergyTargetParameter
+export ReservoirTargetParameter
 
 ######## Hydro Initial Conditions #######
 export InitialHydroEnergyLevelUp
 export InitialHydroEnergyLevelDown
+
+######## Hydro feedforwards #######
+export ReservoirTargetFeedforward
 
 #################################################################################
 # Imports
