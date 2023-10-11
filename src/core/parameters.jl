@@ -22,6 +22,13 @@ struct OutflowTimeSeriesParameter <: PSI.TimeSeriesParameter end
 Parameter to define energy target
 """
 struct ReservoirTargetParameter <: PSI.VariableValueParameter end
+"""
+Parameter to define energy limit
+"""
+struct ReservoirLimitParameter <: PSI.VariableValueParameter end
+
+convert_result_to_natural_units(::Type{ReservoirLimitParameter}) = true
+convert_result_to_natural_units(::Type{ReservoirTargetParameter}) = true
 
 PSI.convert_result_to_natural_units(::Type{EnergyTargetTimeSeriesParameter}) = true
 PSI.convert_result_to_natural_units(::Type{EnergyBudgetTimeSeriesParameter}) = true

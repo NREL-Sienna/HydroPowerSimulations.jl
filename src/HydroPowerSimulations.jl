@@ -26,6 +26,7 @@ export HydroEnergyShortageVariable
 
 ######## Hydro parameters #######
 export ReservoirTargetParameter
+export ReservoirLimitParameter
 
 ######## Hydro Initial Conditions #######
 export InitialHydroEnergyLevelUp
@@ -33,6 +34,7 @@ export InitialHydroEnergyLevelDown
 
 ######## Hydro feedforwards #######
 export ReservoirTargetFeedforward
+export ReservoirLimitFeedforward
 
 #################################################################################
 # Imports
