@@ -405,9 +405,9 @@ end
     moi_tests(model, 72, 0, 48, 48, 0, false)
 end
 
-@testset "Test EnergyLimitFeedforward to HydroEnergyReservoir with HydroDispatchReservoirBudget model" begin
+@testset "Test ReservoirLimitFeedforward to HydroEnergyReservoir with HydroDispatchReservoirBudget model" begin
     device_model = PSI.DeviceModel(HydroEnergyReservoir, HydroDispatchReservoirBudget)
-    ff_il = EnergyLimitFeedforward(;
+    ff_il = ReservoirLimitFeedforward(;
         component_type=HydroEnergyReservoir,
         source=PSI.ActivePowerVariable,
         affected_values=[PSI.ActivePowerVariable],
@@ -421,9 +421,9 @@ end
     moi_tests(model, 72, 0, 27, 24, 0, false)
 end
 
-@testset "Test EnergyLimitFeedforward to HydroEnergyReservoir with HydroDispatchReservoirStorage model" begin
+@testset "Test ReservoirLimitFeedforward to HydroEnergyReservoir with HydroDispatchReservoirStorage model" begin
     device_model = PSI.DeviceModel(HydroEnergyReservoir, HydroDispatchReservoirStorage)
-    ff_il = EnergyLimitFeedforward(;
+    ff_il = ReservoirLimitFeedforward(;
         component_type=HydroEnergyReservoir,
         source=PSI.ActivePowerVariable,
         affected_values=[PSI.ActivePowerVariable],
@@ -452,9 +452,9 @@ end
     moi_tests(model, 193, 0, 24, 48, 48, false)
 end
 
-@testset "Test EnergyLimitFeedforward to HydroEnergyReservoir with HydroCommitmentReservoirStorage model" begin
+@testset "Test ReservoirLimitFeedforward to HydroEnergyReservoir with HydroCommitmentReservoirStorage model" begin
     device_model = PSI.DeviceModel(HydroEnergyReservoir, HydroCommitmentReservoirStorage)
-    ff_il = EnergyLimitFeedforward(;
+    ff_il = ReservoirLimitFeedforward(;
         component_type=HydroEnergyReservoir,
         source=PSI.ActivePowerVariable,
         affected_values=[PSI.ActivePowerVariable],
@@ -481,10 +481,10 @@ end
     moi_tests(model, 193, 0, 24, 24, 48, false)
 end
 
-@testset "Test EnergyLimitFeedforward to HydroEnergyReservoir models" begin
+@testset "Test ReservoirLimitFeedforward to HydroEnergyReservoir models" begin
     device_model = PSI.DeviceModel(HydroPumpedStorage, HydroDispatchPumpedStorage)
 
-    ff_il = EnergyLimitFeedforward(;
+    ff_il = ReservoirLimitFeedforward(;
         component_type=HydroPumpedStorage,
         source=PSI.ActivePowerOutVariable,
         affected_values=[PSI.ActivePowerOutVariable],
@@ -498,10 +498,10 @@ end
     moi_tests(model, 110, 0, 25, 24, 24, true)
 end
 
-@testset "Test EnergyTargetFeedforward to HydroEnergyReservoir models" begin
+@testset "Test ReservoirTargetFeedforward to HydroEnergyReservoir models" begin
     device_model = PSI.DeviceModel(HydroPumpedStorage, HydroDispatchPumpedStorage)
 
-    ff_up = PSI.EnergyTargetFeedforward(;
+    ff_up = ReservoirTargetFeedforward(;
         component_type=HydroPumpedStorage,
         source=HydroEnergyVariableUp,
         affected_values=[HydroEnergyVariableUp],

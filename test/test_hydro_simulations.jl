@@ -50,7 +50,7 @@
 
     feedforwards = Dict(
         "UC" => [
-            EnergyLimitFeedforward(;
+            ReservoirLimitFeedforward(;
                 source=PSI.ActivePowerVariable,
                 affected_values=[PSI.ActivePowerVariable],
                 component_type=HydroEnergyReservoir,
@@ -58,7 +58,7 @@
             ),
         ],
         "ED" => [
-            EnergyLimitFeedforward(;
+            ReservoirLimitFeedforward(;
                 source=PSI.ActivePowerVariable,
                 affected_values=[PSI.ActivePowerVariable],
                 component_type=HydroEnergyReservoir,
@@ -119,7 +119,7 @@ function test_2_stage_decision_models_with_feedforwards(in_memory)
                     source=PSI.OnVariable,
                     affected_values=[PSI.ActivePowerVariable],
                 ),
-                EnergyLimitFeedforward(;
+                ReservoirLimitFeedforward(;
                     component_type=HydroEnergyReservoir,
                     source=PSI.ActivePowerVariable,
                     affected_values=[PSI.ActivePowerVariable],
