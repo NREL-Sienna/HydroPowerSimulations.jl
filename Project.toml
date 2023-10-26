@@ -11,6 +11,7 @@ PowerSimulations = "e690365d-45e2-57bb-ac84-44ba829e73c4"
 PowerSystems = "bcd98974-b02a-5e2f-9ee0-a103f5c450dd"
 
 [compat]
+Dates = "1"
 InfrastructureSystems = "1"
 PowerSimulations = "^0.24"
 PowerSystems = "3"
