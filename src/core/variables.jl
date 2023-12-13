@@ -35,7 +35,6 @@ struct HydroEnergySurplusVariable <: PSI.VariableType end
 
 # convert_result_to_natural_units(::Type{WaterSpillageVariable }) = true # TODO: is this pu?
 
-
 """
 Auxiliary Variable for Hydro Models that solve for total energy output
 """

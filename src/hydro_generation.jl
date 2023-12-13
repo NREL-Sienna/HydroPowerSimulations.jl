@@ -839,12 +839,11 @@ function PSI.update_decision_state!(
 
     if simulation_time > PSI.get_end_of_step_timestamp(state_data)
         state_data_index = 1
-        state_data.timestamps[:] .=
-            range(
-                simulation_time;
-                step = state_resolution,
-                length = PSI.get_num_rows(state_data),
-            )
+        state_data.timestamps[:] .= range(
+            simulation_time;
+            step=state_resolution,
+            length=PSI.get_num_rows(state_data),
+        )
     else
         state_data_index = PSI.find_timestamp_index(state_timestamps, simulation_time)
     end

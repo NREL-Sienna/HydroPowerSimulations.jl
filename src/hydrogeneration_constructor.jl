@@ -291,7 +291,12 @@ function PSI.construct_device!(
         devices,
         HydroDispatchReservoirBudget(),
     )
-    PSI.add_variables!(container, HydroEnergyOutput, devices, HydroDispatchReservoirBudget())
+    PSI.add_variables!(
+        container,
+        HydroEnergyOutput,
+        devices,
+        HydroDispatchReservoirBudget(),
+    )
     PSI.add_parameters!(container, EnergyBudgetTimeSeriesParameter, devices, model)
 
     PSI.add_expressions!(container, PSI.ProductionCostExpression, devices, model)
@@ -397,7 +402,12 @@ function PSI.construct_device!(
         devices,
         HydroDispatchReservoirBudget(),
     )
-    PSI.add_variables!(container, HydroEnergyOutput, devices, HydroDispatchReservoirBudget())
+    PSI.add_variables!(
+        container,
+        HydroEnergyOutput,
+        devices,
+        HydroDispatchReservoirBudget(),
+    )
     PSI.add_parameters!(container, EnergyBudgetTimeSeriesParameter, devices, model)
 
     PSI.add_expressions!(container, PSI.ProductionCostExpression, devices, model)
