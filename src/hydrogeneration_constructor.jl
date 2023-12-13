@@ -88,7 +88,7 @@ function PSI.construct_device!(
 
     PSI.add_variables!(container, PSI.ActivePowerVariable, devices, D())
     PSI.add_variables!(container, PSI.ReactivePowerVariable, devices, D())
-    PSI.add_variables!(container, PSI.EnergyOutput, devices, D())
+    PSI.add_variables!(container, HydroEnergyOutput, devices, D())
     PSI.add_to_expression!(
         container,
         PSI.ActivePowerBalance,
@@ -195,7 +195,7 @@ function PSI.construct_device!(
     devices = get_available_components(H, sys)
 
     PSI.add_variables!(container, PSI.ActivePowerVariable, devices, D())
-    PSI.add_variables!(container, PSI.EnergyOutput, devices, D())
+    PSI.add_variables!(container, HydroEnergyOutput, devices, D())
     PSI.add_to_expression!(
         container,
         PSI.ActivePowerBalance,
@@ -291,7 +291,7 @@ function PSI.construct_device!(
         devices,
         HydroDispatchReservoirBudget(),
     )
-    PSI.add_variables!(container, PSI.EnergyOutput, devices, HydroDispatchReservoirBudget())
+    PSI.add_variables!(container, HydroEnergyOutput, devices, HydroDispatchReservoirBudget())
     PSI.add_parameters!(container, EnergyBudgetTimeSeriesParameter, devices, model)
 
     PSI.add_expressions!(container, PSI.ProductionCostExpression, devices, model)
@@ -397,7 +397,7 @@ function PSI.construct_device!(
         devices,
         HydroDispatchReservoirBudget(),
     )
-    PSI.add_variables!(container, PSI.EnergyOutput, devices, HydroDispatchReservoirBudget())
+    PSI.add_variables!(container, HydroEnergyOutput, devices, HydroDispatchReservoirBudget())
     PSI.add_parameters!(container, EnergyBudgetTimeSeriesParameter, devices, model)
 
     PSI.add_expressions!(container, PSI.ProductionCostExpression, devices, model)
@@ -518,7 +518,7 @@ function PSI.construct_device!(
     )
     PSI.add_variables!(
         container,
-        PSI.EnergyOutput,
+        HydroEnergyOutput,
         devices,
         HydroDispatchReservoirStorage(),
     )
@@ -666,7 +666,7 @@ function PSI.construct_device!(
     )
     PSI.add_variables!(
         container,
-        PSI.EnergyOutput,
+        HydroEnergyOutput,
         devices,
         HydroDispatchReservoirStorage(),
     )
@@ -770,7 +770,7 @@ function PSI.construct_device!(
     PSI.add_variables!(container, PSI.ActivePowerVariable, devices, D())
     PSI.add_variables!(container, PSI.ReactivePowerVariable, devices, D())
     PSI.add_variables!(container, PSI.OnVariable, devices, D())
-    PSI.add_variables!(container, PSI.EnergyOutput, devices, D())
+    PSI.add_variables!(container, HydroEnergyOutput, devices, D())
     PSI.add_to_expression!(
         container,
         PSI.ActivePowerBalance,
@@ -876,7 +876,7 @@ function PSI.construct_device!(
 
     PSI.add_variables!(container, PSI.ActivePowerVariable, devices, D())
     PSI.add_variables!(container, PSI.OnVariable, devices, D())
-    PSI.add_variables!(container, PSI.EnergyOutput, devices, D())
+    PSI.add_variables!(container, HydroEnergyOutput, devices, D())
     PSI.add_to_expression!(
         container,
         PSI.ActivePowerBalance,
@@ -1007,7 +1007,7 @@ function PSI.construct_device!(
     )
     PSI.add_variables!(
         container,
-        PSI.EnergyOutput,
+        HydroEnergyOutput,
         devices,
         HydroCommitmentReservoirStorage(),
     )
@@ -1171,7 +1171,7 @@ function PSI.construct_device!(
     )
     PSI.add_variables!(
         container,
-        PSI.EnergyOutput,
+        HydroEnergyOutput,
         devices,
         HydroCommitmentReservoirStorage(),
     )
@@ -1293,7 +1293,7 @@ function PSI.construct_device!(
         devices,
         HydroDispatchPumpedStorage(),
     )
-    PSI.add_variables!(container, PSI.EnergyOutput, devices, HydroDispatchPumpedStorage())
+    PSI.add_variables!(container, HydroEnergyOutput, devices, HydroDispatchPumpedStorage())
     if PSI.get_attribute(model, "reservation")
         PSI.add_variables!(
             container,
@@ -1407,7 +1407,7 @@ function PSI.construct_device!(
     PSI.add_variables!(container, PSI.ActivePowerVariable, devices, D())
     PSI.add_variables!(container, PSI.ReactivePowerVariable, devices, D())
     PSI.add_variables!(container, PSI.OnVariable, devices, D())
-    PSI.add_variables!(container, PSI.EnergyOutput, devices, D())
+    PSI.add_variables!(container, HydroEnergyOutput, devices, D())
     PSI.add_to_expression!(
         container,
         PSI.ActivePowerBalance,
@@ -1470,7 +1470,7 @@ function PSI.construct_device!(
 
     PSI.add_variables!(container, PSI.ActivePowerVariable, devices, D())
     PSI.add_variables!(container, PSI.OnVariable, devices, D())
-    PSI.add_variables!(container, PSI.EnergyOutput, devices, D())
+    PSI.add_variables!(container, HydroEnergyOutput, devices, D())
     PSI.add_to_expression!(
         container,
         PSI.ActivePowerBalance,
