@@ -785,7 +785,7 @@ end
 ##################################### Auxillary Variables ############################
 function PSI.calculate_aux_variable_value!(
     container::PSI.OptimizationContainer,
-    ::PSI.AuxVarKey{PSI.EnergyOutput, T},
+    ::PSI.AuxVarKey{HydroEnergyOutput, T},
     system::PSY.System,
 ) where {T <: PSY.HydroGen}
     devices = get_available_components(T, system)
@@ -793,7 +793,7 @@ function PSI.calculate_aux_variable_value!(
     resolution = PSI.get_resolution(container)
     fraction_of_hour = Dates.value(Dates.Minute(resolution)) / PSI.MINUTES_IN_HOUR
     p_variable_results = PSI.get_variable(container, PSI.ActivePowerVariable(), T)
-    aux_variable_container = PSI.get_aux_variable(container, PSI.EnergyOutput(), T)
+    aux_variable_container = PSI.get_aux_variable(container, HydroEnergyOutput(), T)
     for d in devices, t in time_steps
         name = PSY.get_name(d)
         aux_variable_container[name, t] =
@@ -805,7 +805,7 @@ end
 
 function PSI.calculate_aux_variable_value!(
     container::PSI.OptimizationContainer,
-    ::PSI.AuxVarKey{PSI.EnergyOutput, T},
+    ::PSI.AuxVarKey{HydroEnergyOutput, T},
     system::PSY.System,
 ) where {T <: PSY.HydroPumpedStorage}
     devices = get_available_components(T, system)
@@ -813,11 +813,52 @@ function PSI.calculate_aux_variable_value!(
     resolution = PSI.get_resolution(container)
     fraction_of_hour = Dates.value(Dates.Minute(resolution)) / PSI.MINUTES_IN_HOUR
     p_variable_results = PSI.get_variable(container, PSI.ActivePowerOutVariable(), T)
-    aux_variable_container = PSI.get_aux_variable(container, PSI.EnergyOutput(), T)
+    aux_variable_container = PSI.get_aux_variable(container, HydroEnergyOutput(), T)
     for d in devices, t in time_steps
         name = PSY.get_name(d)
         aux_variable_container[name, t] =
             PSI.jump_value(p_variable_results[name, t]) * fraction_of_hour
+    end
+
+    return
+end
+
+function PSI.update_decision_state!(
+    state::PSI.SimulationState,
+    key::PSI.AuxVarKey{HydroEnergyOutput, T},
+    store_data::PSI.DenseAxisArray{Float64, 2},
+    simulation_time::Dates.DateTime,
+    model_params::PSI.ModelStoreParams,
+) where {T <: PSY.Component}
+    state_data = PSI.get_decision_state_data(state, key)
+    model_resolution = PSI.get_resolution(model_params)
+    state_resolution = PSI.get_data_resolution(state_data)
+    resolution_ratio = model_resolution ÷ state_resolution
+    state_timestamps = state_data.timestamps
+    IS.@assert_op resolution_ratio >= 1
+
+    if simulation_time > PSI.get_end_of_step_timestamp(state_data)
+        state_data_index = 1
+        state_data.timestamps[:] .= range(
+            simulation_time;
+            step=state_resolution,
+            length=PSI.get_num_rows(state_data),
+        )
+    else
+        state_data_index = PSI.find_timestamp_index(state_timestamps, simulation_time)
+    end
+
+    offset = resolution_ratio - 1
+    result_time_index = axes(store_data)[2]
+    PSI.set_update_timestamp!(state_data, simulation_time)
+    column_names = axes(state_data.values)[1]
+    for t in result_time_index
+        state_range = state_data_index:(state_data_index + offset)
+        for name in column_names, i in state_range
+            state_data.values[name, i] = store_data[name, t] / resolution_ratio
+        end
+        PSI.set_last_recorded_row!(state_data, state_range[end])
+        state_data_index += resolution_ratio
     end
 
     return

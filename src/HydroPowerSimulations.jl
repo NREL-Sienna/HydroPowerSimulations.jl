@@ -24,6 +24,9 @@ export HydroEnergyVariableUp
 export WaterSpillageVariable
 export HydroEnergyShortageVariable
 
+######## Hydro Aux Variables ########
+export HydroEnergyOutput
+
 ######## Hydro parameters #######
 export ReservoirTargetParameter
 export ReservoirLimitParameter
