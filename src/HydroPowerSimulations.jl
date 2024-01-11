@@ -49,7 +49,7 @@ import JuMP
 
 const PSY = PowerSystems
 const IS = InfrastructureSystems
-const PM = PSI.PM
+const PM = PowerSimulations.PM
 
 # import PowerSimulations: HydroDispatchRunOfRiver, HydroCommitmentRunOfRiver
 # import PowerSimulations: HydroCommitmentRunOfRiver
