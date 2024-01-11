@@ -45,13 +45,11 @@ using PowerSystems
 import InfrastructureSystems
 import Dates
 import PowerSimulations
-import PowerModels
 import JuMP
 
 const PSY = PowerSystems
 const IS = InfrastructureSystems
-const PM = PowerModels
-const PSI = PowerSimulations
+const PM = PSI.PM
 
 # import PowerSimulations: HydroDispatchRunOfRiver, HydroCommitmentRunOfRiver
 # import PowerSimulations: HydroCommitmentRunOfRiver
