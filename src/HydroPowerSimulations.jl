@@ -50,6 +50,7 @@ import JuMP
 const PSY = PowerSystems
 const IS = InfrastructureSystems
 const PSI = PowerSimulations
+# Import PM types this way to avoid dependency issues with PowerSimulations
 const PM = PowerSimulations.PM
 
 # import PowerSimulations: HydroDispatchRunOfRiver, HydroCommitmentRunOfRiver
