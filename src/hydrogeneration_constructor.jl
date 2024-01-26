@@ -276,7 +276,7 @@ function PSI.construct_device!(
     ::PSI.ArgumentConstructStage,
     model::PSI.DeviceModel{H, HydroDispatchReservoirBudget},
     network_model::PSI.NetworkModel{S},
-) where {H <: PSY.HydroEnergyReservoir, S <: PM.AbstractPowerModel}
+) where {H <: PSY.HydroGen, S <: PM.AbstractPowerModel}
     devices = get_available_components(H, sys)
 
     PSI.add_variables!(
@@ -343,7 +343,7 @@ function PSI.construct_device!(
     ::PSI.ModelConstructStage,
     model::PSI.DeviceModel{H, HydroDispatchReservoirBudget},
     network_model::PSI.NetworkModel{S},
-) where {H <: PSY.HydroEnergyReservoir, S <: PM.AbstractPowerModel}
+) where {H <: PSY.HydroGen, S <: PM.AbstractPowerModel}
     devices = get_available_components(H, sys)
 
     PSI.add_constraints!(
@@ -393,7 +393,7 @@ function PSI.construct_device!(
     ::PSI.ArgumentConstructStage,
     model::PSI.DeviceModel{H, HydroDispatchReservoirBudget},
     network_model::PSI.NetworkModel{S},
-) where {H <: PSY.HydroEnergyReservoir, S <: PM.AbstractActivePowerModel}
+) where {H <: PSY.HydroGen, S <: PM.AbstractActivePowerModel}
     devices = get_available_components(H, sys)
 
     PSI.add_variables!(
@@ -447,7 +447,7 @@ function PSI.construct_device!(
     ::PSI.ModelConstructStage,
     model::PSI.DeviceModel{H, HydroDispatchReservoirBudget},
     network_model::PSI.NetworkModel{S},
-) where {H <: PSY.HydroEnergyReservoir, S <: PM.AbstractActivePowerModel}
+) where {H <: PSY.HydroGen, S <: PM.AbstractActivePowerModel}
     devices = get_available_components(H, sys)
 
     PSI.add_constraints!(
@@ -487,7 +487,7 @@ function PSI.construct_device!(
     ::PSI.ArgumentConstructStage,
     model::PSI.DeviceModel{H, HydroDispatchReservoirStorage},
     network_model::PSI.NetworkModel{S},
-) where {H <: PSY.HydroEnergyReservoir, S <: PM.AbstractPowerModel}
+) where {H <: PSY.HydroGen, S <: PM.AbstractPowerModel}
     devices = get_available_components(H, sys)
 
     PSI.add_variables!(
@@ -579,7 +579,7 @@ function PSI.construct_device!(
     ::PSI.ModelConstructStage,
     model::PSI.DeviceModel{H, HydroDispatchReservoirStorage},
     network_model::PSI.NetworkModel{S},
-) where {H <: PSY.HydroEnergyReservoir, S <: PM.AbstractPowerModel}
+) where {H <: PSY.HydroGen, S <: PM.AbstractPowerModel}
     devices = get_available_components(H, sys)
 
     PSI.add_constraints!(
@@ -641,7 +641,7 @@ function PSI.construct_device!(
     ::PSI.ArgumentConstructStage,
     model::PSI.DeviceModel{H, HydroDispatchReservoirStorage},
     network_model::PSI.NetworkModel{S},
-) where {H <: PSY.HydroEnergyReservoir, S <: PM.AbstractActivePowerModel}
+) where {H <: PSY.HydroGen, S <: PM.AbstractActivePowerModel}
     devices = get_available_components(H, sys)
 
     PSI.add_variables!(
@@ -722,7 +722,7 @@ function PSI.construct_device!(
     ::PSI.ModelConstructStage,
     model::PSI.DeviceModel{H, HydroDispatchReservoirStorage},
     network_model::PSI.NetworkModel{S},
-) where {H <: PSY.HydroEnergyReservoir, S <: PM.AbstractActivePowerModel}
+) where {H <: PSY.HydroGen, S <: PM.AbstractActivePowerModel}
     devices = get_available_components(H, sys)
 
     PSI.add_constraints!(
