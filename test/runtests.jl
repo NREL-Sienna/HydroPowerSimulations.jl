@@ -49,10 +49,10 @@ ENV["RUNNING_PSI_TESTS"] = "true"
 
 # Load
 PSI_DIR = string(dirname(dirname(pathof(PowerSimulations))))
+include(joinpath(PSI_DIR, "test/test_utils/solver_definitions.jl"))
 include(joinpath(PSI_DIR, "test/test_utils/mock_operation_models.jl"))
 include(joinpath(PSI_DIR, "test/test_utils/operations_problem_templates.jl"))
 include(joinpath(PSI_DIR, "test/test_utils/model_checks.jl"))
-include(joinpath(PSI_DIR, "test/test_utils/solver_definitions.jl"))
 
 """
 Copied @includetests from https://github.com/ssfrr/TestSetExtensions.jl.
