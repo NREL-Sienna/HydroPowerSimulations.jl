@@ -607,7 +607,7 @@ function PSI.add_constraints!(
                 PSI.get_parameter_column_refs(param_container, name)[t] *
                 multiplier[name, t] +
                 (
-                    powerin_var[name, 1] -
+                    powerin_var[name, t] -
                     (powerout_var[name, t] + spillage_var[name, t]) / efficiency
                 ) * fraction_of_hour
             )
