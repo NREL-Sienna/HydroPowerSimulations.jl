@@ -597,6 +597,7 @@ function PSI.add_constraints!(
                 (spillage_var[name, 1] + powerout_var[name, 1]) / efficiency
             ) * fraction_of_hour +
             PSI.get_parameter_column_refs(param_container, name)[1] * multiplier[name, 1]
+            # Be consistent on this parameter definition
         )
 
         for t in time_steps[2:end]
