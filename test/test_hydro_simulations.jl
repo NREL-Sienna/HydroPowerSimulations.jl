@@ -1,3 +1,35 @@
+@testset "Single-stage Hydro Pumped Simulation" begin
+    output_dir = mktempdir(; cleanup=true)
+    sys_ed = PSB.build_system(PSITestSystems, "c_sys5_phes_ed")
+
+    template_ed = ProblemTemplate(CopperPlatePowerModel)
+    set_device_model!(template_ed, PowerLoad, StaticPowerLoad)
+    set_device_model!(template_ed, ThermalStandard, ThermalBasicUnitCommitment)
+    set_device_model!(template_ed, HydroPumpedStorage, HydroDispatchPumpedStorage)
+
+    model = DecisionModel(
+        template_ed,
+        sys_ed,
+        name="ED",
+        optimizer=HiGHS_optimizer,
+        optimizer_solve_log_print=true,
+        store_variable_names=true,
+    )
+
+    @test build!(model, output_dir=output_dir) == PSI.BuildStatus.BUILT
+    @test solve!(model; optimizer=HiGHS_optimizer, output_dir=output_dir) ==
+          RunStatus.SUCCESSFUL
+
+    results = ProblemResults(model)
+    variables = read_variables(results)
+
+    # Assert that the water level of the up reservoir level is zero at
+    # the last simulation step.
+    reservoir_up_level = "HydroEnergyVariableUp__HydroPumpedStorage"
+    last_value = last(variables[reservoir_up_level])["HydroPumpedStorage"]
+    @test isapprox(last_value, 0, atol=1e-5)
+end
+
 @testset "Multi-Stage Hydro Simulation Build" begin
     sys_md = PSB.build_system(PSISystems, "5_bus_hydro_wk_sys")
 
