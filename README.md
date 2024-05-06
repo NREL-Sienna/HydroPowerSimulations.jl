@@ -11,4 +11,4 @@ Contributions to the development and enahancement of HydroPowerSimulations is we
 
 ## License
 
-HydroPowerSimulations is released under a BSD [license](https://github.com/NREL-Sienna/HydroPowerSimulations/blob/master/LICENSE). HydroPowerSimulations has been developed as part of the R2D2 Project at the U.S. Department of Energy's National Renewable Energy Laboratory ([NREL](https://www.nrel.gov/)) Software Record SWR-23-110
+HydroPowerSimulations is released under a BSD [license](https://github.com/NREL-Sienna/HydroPowerSimulations/blob/master/LICENSE). HydroPowerSimulations has been developed as part of the Flexible Linked Analysis of Streamflow and Hydropower (FLASH) and Reliability and Resilience of coordinated water Distribution and power Distribution (R2D2) projects at the U.S. Department of Energy's National Renewable Energy Laboratory ([NREL](https://www.nrel.gov/)) Software Record SWR-23-110
