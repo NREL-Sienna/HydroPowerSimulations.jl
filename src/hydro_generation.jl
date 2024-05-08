@@ -116,8 +116,8 @@ PSI.initial_condition_variable(::PSI.InitialTimeDurationOff, d::PSY.HydroGen, ::
 ########################Objective Function##################################################
 PSI.proportional_cost(cost::Nothing, ::PSY.HydroGen, ::PSI.ActivePowerVariable, ::AbstractHydroFormulation)=0.0
 PSI.proportional_cost(cost::PSY.OperationalCost, ::PSI.OnVariable, ::PSY.HydroGen, ::AbstractHydroFormulation)=PSY.get_fixed(cost)
-PSI.proportional_cost(cost::PSY.StorageManagementCost, ::HydroEnergySurplusVariable, ::PSY.HydroGen, ::AbstractHydroReservoirFormulation)=PSY.get_energy_surplus_cost(cost)
-PSI.proportional_cost(cost::PSY.StorageManagementCost, ::HydroEnergyShortageVariable, ::PSY.HydroGen, ::AbstractHydroReservoirFormulation)=PSY.get_energy_shortage_cost(cost)
+PSI.proportional_cost(cost::PSY.HydroGenerationCost , ::HydroEnergySurplusVariable, ::PSY.HydroGen, ::AbstractHydroReservoirFormulation)=PSY.get_energy_surplus_cost(cost)
+PSI.proportional_cost(cost::PSY.HydroGenerationCost , ::HydroEnergyShortageVariable, ::PSY.HydroGen, ::AbstractHydroReservoirFormulation)=PSY.get_energy_shortage_cost(cost)
 
 PSI.objective_function_multiplier(::PSI.ActivePowerVariable, ::AbstractHydroFormulation)=PSI.OBJECTIVE_FUNCTION_POSITIVE
 PSI.objective_function_multiplier(::PSI.ActivePowerOutVariable, ::HydroDispatchPumpedStorage)=PSI.OBJECTIVE_FUNCTION_POSITIVE
@@ -717,7 +717,7 @@ function PSI.add_constraints!(
     for d in devices
         name = PSY.get_name(d)
         cost_data = PSY.get_operation_cost(d)
-        if isa(cost_data, PSY.StorageManagementCost)
+        if isa(cost_data, PSY.HydroGenerationCost )
             shortage_cost = PSY.get_energy_shortage_cost(cost_data)
         else
             @debug "Data for device $name doesn't contain shortage costs"
