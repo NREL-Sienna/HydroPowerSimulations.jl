@@ -718,8 +718,8 @@ function PSI.add_constraints!(
     for d in devices
         name = PSY.get_name(d)
         cost_data = PSY.get_operation_cost(d)
-        if isa(cost_data, PSY.HydroGenerationCost )
         if isa(cost_data, PSY.HydroGenerationCost)
+            shortage_cost = PSY.get_energy_shortage_cost(cost_data)
         else
             @debug "Data for device $name doesn't contain shortage costs"
             shortage_cost = 0.0
