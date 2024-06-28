@@ -116,8 +116,8 @@ PSI.initial_condition_variable(::PSI.InitialTimeDurationOff, d::PSY.HydroGen, ::
 ########################Objective Function##################################################
 PSI.proportional_cost(cost::Nothing, ::PSY.HydroGen, ::PSI.ActivePowerVariable, ::AbstractHydroFormulation)=0.0
 PSI.proportional_cost(cost::PSY.OperationalCost, ::PSI.OnVariable, ::PSY.HydroGen, ::AbstractHydroFormulation)=PSY.get_fixed(cost)
-PSI.proportional_cost(cost::PSY.StorageManagementCost, ::HydroEnergySurplusVariable, ::PSY.HydroGen, ::AbstractHydroReservoirFormulation)=PSY.get_energy_surplus_cost(cost)
-PSI.proportional_cost(cost::PSY.StorageManagementCost, ::HydroEnergyShortageVariable, ::PSY.HydroGen, ::AbstractHydroReservoirFormulation)=PSY.get_energy_shortage_cost(cost)
+PSI.proportional_cost(cost::PSY.HydroGenerationCost , ::HydroEnergySurplusVariable, ::PSY.HydroGen, ::AbstractHydroReservoirFormulation)=PSY.get_energy_surplus_cost(cost)
+PSI.proportional_cost(cost::PSY.HydroGenerationCost , ::HydroEnergyShortageVariable, ::PSY.HydroGen, ::AbstractHydroReservoirFormulation)=PSY.get_energy_shortage_cost(cost)
 
 PSI.objective_function_multiplier(::PSI.ActivePowerVariable, ::AbstractHydroFormulation)=PSI.OBJECTIVE_FUNCTION_POSITIVE
 PSI.objective_function_multiplier(::PSI.ActivePowerOutVariable, ::HydroDispatchPumpedStorage)=PSI.OBJECTIVE_FUNCTION_POSITIVE
@@ -718,8 +718,8 @@ function PSI.add_constraints!(
     for d in devices
         name = PSY.get_name(d)
         cost_data = PSY.get_operation_cost(d)
-        if isa(cost_data, PSY.StorageManagementCost)
-            shortage_cost = PSY.get_energy_shortage_cost(cost_data)
+        if isa(cost_data, PSY.HydroGenerationCost )
+        if isa(cost_data, PSY.HydroGenerationCost)
         else
             @debug "Data for device $name doesn't contain shortage costs"
             shortage_cost = 0.0
@@ -789,14 +789,13 @@ function PSI.calculate_aux_variable_value!(
     ::PSI.AuxVarKey{HydroEnergyOutput, T},
     system::PSY.System,
 ) where {T <: PSY.HydroGen}
-    devices = get_available_components(T, system)
     time_steps = PSI.get_time_steps(container)
     resolution = PSI.get_resolution(container)
     fraction_of_hour = Dates.value(Dates.Minute(resolution)) / PSI.MINUTES_IN_HOUR
     p_variable_results = PSI.get_variable(container, PSI.ActivePowerVariable(), T)
     aux_variable_container = PSI.get_aux_variable(container, HydroEnergyOutput(), T)
-    for d in devices, t in time_steps
-        name = PSY.get_name(d)
+    devices_names = axes(aux_variable_container, 1)
+    for name in devices_names, t in time_steps
         aux_variable_container[name, t] =
             PSI.jump_value(p_variable_results[name, t]) * fraction_of_hour
     end
@@ -809,14 +808,13 @@ function PSI.calculate_aux_variable_value!(
     ::PSI.AuxVarKey{HydroEnergyOutput, T},
     system::PSY.System,
 ) where {T <: PSY.HydroPumpedStorage}
-    devices = get_available_components(T, system)
     time_steps = PSI.get_time_steps(container)
     resolution = PSI.get_resolution(container)
     fraction_of_hour = Dates.value(Dates.Minute(resolution)) / PSI.MINUTES_IN_HOUR
     p_variable_results = PSI.get_variable(container, PSI.ActivePowerOutVariable(), T)
     aux_variable_container = PSI.get_aux_variable(container, HydroEnergyOutput(), T)
-    for d in devices, t in time_steps
-        name = PSY.get_name(d)
+    devices_names = axes(aux_variable_container, 1)
+    for name in devices_names, t in time_steps
         aux_variable_container[name, t] =
             PSI.jump_value(p_variable_results[name, t]) * fraction_of_hour
     end
