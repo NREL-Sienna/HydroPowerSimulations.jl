@@ -148,7 +148,8 @@ end
                 sys;
                 optimizer=ipopt_optimizer,
             )
-            @test build!(ED; output_dir=mktempdir(; cleanup=true)) == PSI.ModelBuildStatus.BUILT
+            @test build!(ED; output_dir=mktempdir(; cleanup=true)) ==
+                  PSI.ModelBuildStatus.BUILT
             psi_checksolve_test(
                 ED,
                 [MOI.OPTIMAL, MOI.LOCALLY_SOLVED],
@@ -198,7 +199,8 @@ end
                 sys;
                 optimizer=ipopt_optimizer,
             )
-            @test build!(ED; output_dir=mktempdir(; cleanup=true)) == PSI.ModelBuildStatus.BUILT
+            @test build!(ED; output_dir=mktempdir(; cleanup=true)) ==
+                  PSI.ModelBuildStatus.BUILT
             psi_checksolve_test(
                 ED,
                 [MOI.OPTIMAL, MOI.LOCALLY_SOLVED],
@@ -232,7 +234,8 @@ end
                 sys;
                 optimizer=GLPK_optimizer,
             )
-            @test build!(ED; output_dir=mktempdir(; cleanup=true)) == PSI.ModelBuildStatus.BUILT
+            @test build!(ED; output_dir=mktempdir(; cleanup=true)) ==
+                  PSI.ModelBuildStatus.BUILT
             psi_checksolve_test(
                 ED,
                 [MOI.OPTIMAL, MOI.LOCALLY_SOLVED],
