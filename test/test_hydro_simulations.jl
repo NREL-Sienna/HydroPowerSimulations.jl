@@ -17,8 +17,7 @@
     )
 
     @test build!(model, output_dir=output_dir) == PSI.ModelBuildStatus.BUILT
-    @test solve!(model; optimizer=HiGHS_optimizer, output_dir=output_dir) ==
-          IS.RunStatus.SUCCESSFUL
+    @test solve!(model; optimizer=HiGHS_optimizer, output_dir=output_dir) == IS.Simulation.RunStatus.SUCCESSFULLY_FINALIZED
 
     results = OptimizationProblemResults(model)
     variables = read_variables(results)
@@ -34,7 +33,7 @@ end
     sys_md = PSB.build_system(PSISystems, "5_bus_hydro_wk_sys")
 
     sys_uc = PSB.build_system(PSISystems, "5_bus_hydro_uc_sys")
-    transform_single_time_series!(sys_uc, 48, Dates.Hour(24))
+    transform_single_time_series!(sys_uc, Hour(2), Dates.Hour(24))
 
     sys_ed = PSB.build_system(PSISystems, "5_bus_hydro_ed_sys")
 
