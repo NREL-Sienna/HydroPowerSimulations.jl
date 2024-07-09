@@ -1333,8 +1333,8 @@ function PSI.construct_device!(
         network_model,
     )
 
-    PSI.add_expressions!(container, PSI.ReserveRangeExpressionLB, devices, model)
-    PSI.add_expressions!(container, PSI.ReserveRangeExpressionUB, devices, model)
+    PSI.add_expressions!(container, ReserveRangeExpressionLB, devices, model)
+    PSI.add_expressions!(container, ReserveRangeExpressionUB, devices, model)
 
     PSI.add_feedforward_arguments!(container, model, devices)
     return

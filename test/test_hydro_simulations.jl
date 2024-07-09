@@ -16,11 +16,11 @@
         store_variable_names=true,
     )
 
-    @test build!(model, output_dir=output_dir) == PSI.BuildStatus.BUILT
+    @test build!(model, output_dir=output_dir) == PSI.ModelBuildStatus.BUILT
     @test solve!(model; optimizer=HiGHS_optimizer, output_dir=output_dir) ==
-          RunStatus.SUCCESSFUL
+          IS.Simulation.RunStatus.SUCCESSFULLY_FINALIZED
 
-    results = ProblemResults(model)
+    results = OptimizationProblemResults(model)
     variables = read_variables(results)
 
     # Assert that the water level of the up reservoir level is zero at
@@ -34,9 +34,10 @@ end
     sys_md = PSB.build_system(PSISystems, "5_bus_hydro_wk_sys")
 
     sys_uc = PSB.build_system(PSISystems, "5_bus_hydro_uc_sys")
-    transform_single_time_series!(sys_uc, 48, Dates.Hour(24))
+    transform_single_time_series!(sys_uc, Hour(24), Dates.Hour(24))
 
     sys_ed = PSB.build_system(PSISystems, "5_bus_hydro_ed_sys")
+    transform_single_time_series!(sys_ed, Hour(12), Dates.Hour(1))
 
     template = ProblemTemplate(CopperPlatePowerModel)
     set_device_model!(template, ThermalStandard, ThermalBasicUnitCommitment)
@@ -112,7 +113,7 @@ end
         sequence=test_sequence,
         simulation_folder=mktempdir(; cleanup=true),
     )
-    @test build!(sim; serialize=false) == PSI.BuildStatus.BUILT
+    @test build!(sim; serialize=false) == PSI.SimulationBuildStatus.BUILT
 end
 
 function test_2_stage_decision_models_with_feedforwards(in_memory)
@@ -170,9 +171,9 @@ function test_2_stage_decision_models_with_feedforwards(in_memory)
     )
 
     build_out = build!(sim; console_level=Logging.Error)
-    @test build_out == PSI.BuildStatus.BUILT
+    @test build_out == PSI.SimulationBuildStatus.BUILT
     execute_out = execute!(sim; in_memory=in_memory)
-    @test execute_out == PSI.RunStatus.SUCCESSFUL
+    @test execute_out == PSI.RunStatus.SUCCESSFULLY_FINALIZED
 end
 
 @testset "2-Stage Decision Models with FeedForwards" begin

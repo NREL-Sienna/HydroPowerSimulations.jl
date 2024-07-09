@@ -19,7 +19,7 @@ struct ReservoirTargetFeedforward <: PSI.AbstractAffectFeedforward
         affected_values::Vector{DataType},
         target_period::Int,
         penalty_cost::Float64,
-        meta=PSI.CONTAINER_KEY_EMPTY_META,
+        meta=ISOPT.CONTAINER_KEY_EMPTY_META,
     ) where {T}
         values_vector = Vector{PSI.VariableKey}(undef, length(affected_values))
         for (ix, v) in enumerate(affected_values)
@@ -142,7 +142,7 @@ struct ReservoirLimitFeedforward <: PSI.AbstractAffectFeedforward
         source::Type{T},
         affected_values::Vector{DataType},
         number_of_periods::Int,
-        meta=PSI.CONTAINER_KEY_EMPTY_META,
+        meta=ISOPT.CONTAINER_KEY_EMPTY_META,
     ) where {T}
         values_vector = Vector{PSI.VariableKey}(undef, length(affected_values))
         for (ix, v) in enumerate(affected_values)
@@ -259,8 +259,7 @@ function PSI.update_parameter_values!(
         PSI.get_dataset_values(input, PSI.get_attribute_key(parameter_attributes))
     component_names, time = axes(parameter_array)
     resolution = PSI.get_resolution(model)
-    interval_time_steps =
-        Int(PSI.get_interval(model.internal.store_parameters) / resolution)
+    interval_time_steps = Int(PSI.get_interval(PSI.get_store_params(model)) / resolution)
     state_data = PSI.get_dataset(input, PSI.get_attribute_key(parameter_attributes))
     state_timestamps = state_data.timestamps
     max_state_index = PSI.get_num_rows(state_data)
