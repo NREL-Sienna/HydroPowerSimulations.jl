@@ -170,7 +170,7 @@ function test_2_stage_decision_models_with_feedforwards(in_memory)
     )
 
     build_out = build!(sim; console_level=Logging.Error)
-    @test build_out == PSI.ModelBuildStatus.BUILT
+    @test build_out == PSI.SimulationBuildStatus.BUILT
     execute_out = execute!(sim; in_memory=in_memory)
     @test execute_out == PSI.RunStatus.SUCCESSFULLY_FINALIZED
 end
