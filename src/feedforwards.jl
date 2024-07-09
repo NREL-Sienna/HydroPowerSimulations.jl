@@ -259,8 +259,7 @@ function PSI.update_parameter_values!(
         PSI.get_dataset_values(input, PSI.get_attribute_key(parameter_attributes))
     component_names, time = axes(parameter_array)
     resolution = PSI.get_resolution(model)
-    interval_time_steps =
-        Int(PSI.get_interval(PSI.get_store_params(model)) / resolution)
+    interval_time_steps = Int(PSI.get_interval(PSI.get_store_params(model)) / resolution)
     state_data = PSI.get_dataset(input, PSI.get_attribute_key(parameter_attributes))
     state_timestamps = state_data.timestamps
     max_state_index = PSI.get_num_rows(state_data)

@@ -17,7 +17,8 @@
     )
 
     @test build!(model, output_dir=output_dir) == PSI.ModelBuildStatus.BUILT
-    @test solve!(model; optimizer=HiGHS_optimizer, output_dir=output_dir) == IS.Simulation.RunStatus.SUCCESSFULLY_FINALIZED
+    @test solve!(model; optimizer=HiGHS_optimizer, output_dir=output_dir) ==
+          IS.Simulation.RunStatus.SUCCESSFULLY_FINALIZED
 
     results = OptimizationProblemResults(model)
     variables = read_variables(results)
