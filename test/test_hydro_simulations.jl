@@ -33,9 +33,10 @@ end
     sys_md = PSB.build_system(PSISystems, "5_bus_hydro_wk_sys")
 
     sys_uc = PSB.build_system(PSISystems, "5_bus_hydro_uc_sys")
-    transform_single_time_series!(sys_uc, Hour(2), Dates.Hour(24))
+    transform_single_time_series!(sys_uc, Hour(24), Dates.Hour(24))
 
     sys_ed = PSB.build_system(PSISystems, "5_bus_hydro_ed_sys")
+    transform_single_time_series!(sys_ed, Hour(12), Dates.Hour(1))
 
     template = ProblemTemplate(CopperPlatePowerModel)
     set_device_model!(template, ThermalStandard, ThermalBasicUnitCommitment)
@@ -111,7 +112,7 @@ end
         sequence=test_sequence,
         simulation_folder=mktempdir(; cleanup=true),
     )
-    @test build!(sim; serialize=false) == PSI.ModelBuildStatus.BUILT
+    @test build!(sim; serialize=false) == PSI.SimulationBuildStatus.BUILT
 end
 
 function test_2_stage_decision_models_with_feedforwards(in_memory)
