@@ -241,10 +241,10 @@ end
 # TODO: It also needs the add parameters code
 
 function PSI.update_parameter_values!(
-    model::PSI.OperationModel,
+    model::PSI.DecisionModel,
     key::PSI.ParameterKey{T, U},
     input::PSI.DatasetContainer{PSI.InMemoryDataset},
-) where {T <: ReservoirLimitParameter, U <: PSY.Generator}
+) where {T <: ReservoirLimitParameter, U <: PSY.HydroGen}
     # Enable again for detailed debugging
     # TimerOutputs.@timeit RUN_SIMULATION_TIMER "$T $U Parameter Update" begin
     optimization_container = PSI.get_optimization_container(model)
