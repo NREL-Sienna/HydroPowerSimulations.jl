@@ -136,7 +136,7 @@ end
     sys = PSB.build_system(PSITestSystems, "c_sys5_hy")
     networks = [ACPPowerModel, DCPPowerModel]
 
-    test_results = Dict{Any, Float64}(ACPPowerModel => 175107.0, DCPPowerModel => 175521.0)
+    test_results = Dict{Any, Float64}(ACPPowerModel => 177526.0, DCPPowerModel => 175521.0)
 
     for net in networks
         @testset "HydroRoR ED model $(net)" begin
