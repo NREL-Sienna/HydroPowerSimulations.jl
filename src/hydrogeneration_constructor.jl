@@ -1332,9 +1332,26 @@ function PSI.construct_device!(
         model,
         network_model,
     )
-
-    PSI.add_expressions!(container, PSI.ReserveRangeExpressionLB, devices, model)
-    PSI.add_expressions!(container, PSI.ReserveRangeExpressionUB, devices, model)
+    if PSI.has_service_model(model)
+        PSI.add_to_expression!(
+            container,
+            ReserveRangeExpressionUB,
+            PSI.ActivePowerVariable,
+            devices,
+            model,
+            network_model,
+        )
+        PSI.add_to_expression!(
+            container,
+            ReserveRangeExpressionLB,
+            PSI.ActivePowerVariable,
+            devices,
+            model,
+            network_model,
+        )
+    end
+    # PSI.add_range_constraints!(container, ReserveRangeExpressionLB, devices, model)
+    # PSI.add_range_constraints!(container, ReserveRangeExpressionUB, devices, model)
 
     PSI.add_feedforward_arguments!(container, model, devices)
     return

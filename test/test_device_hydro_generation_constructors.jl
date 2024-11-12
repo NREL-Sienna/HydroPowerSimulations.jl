@@ -546,3 +546,25 @@ end
     # The value of this test needs to be revised
     # moi_tests(model, 240, 0, 48, 96, 72, false)
 end
+
+@testset "Test Reserves from HydroPumpedStorage" begin
+    template = ProblemTemplate(CopperPlatePowerModel)
+    set_device_model!(template, PowerLoad, StaticPowerLoad)
+    set_device_model!(template, HydroPumpedStorage, HydroDispatchPumpedStorage)
+    set_service_model!(
+        template,
+        ServiceModel(VariableReserve{ReserveUp}, RangeReserve, "Reserve5"),
+    )
+    set_service_model!(
+        template,
+        ServiceModel(VariableReserve{ReserveDown}, RangeReserve, "Reserve6"),
+    )
+    set_service_model!(
+        template,
+        ServiceModel(ReserveDemandCurve{ReserveUp}, StepwiseCostReserve, "ORDC1"),
+    )
+
+    c_sys5_phes_ed = PSB.build_system(PSITestSystems, "c_sys5_phes_ed", reserves=true)
+    model = DecisionModel(template, c_sys5_phes_ed)
+    @test build!(model; output_dir=mktempdir(; cleanup=true)) == PSI.ModelBuildStatus.BUILT
+end

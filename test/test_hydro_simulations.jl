@@ -181,3 +181,35 @@ end
         test_2_stage_decision_models_with_feedforwards(in_memory)
     end
 end
+
+@testset "HydroPumpedStorage simulation with Reserves" begin
+
+    output_dir = mktempdir(; cleanup=true)
+    sys_ed = PSB.build_system(PSITestSystems, "c_sys5_phes_ed"; add_reserves=true)
+
+    template = ProblemTemplate(CopperPlatePowerModel)
+    set_device_model!(template, PowerLoad, StaticPowerLoad)
+    set_device_model!(template, HydroPumpedStorage, HydroDispatchPumpedStorage)
+    set_device_model!(template, ThermalStandard, ThermalBasicUnitCommitment)
+    set_service_model!(
+        template,
+        ServiceModel(VariableReserve{ReserveUp}, RangeReserve, "Reserve5"),
+    )
+    set_service_model!(
+        template,
+        ServiceModel(VariableReserve{ReserveDown}, RangeReserve, "Reserve6"),
+    )
+
+    model = DecisionModel(
+        template,
+        sys_ed,
+        name="ED",
+        optimizer=HiGHS_optimizer,
+        optimizer_solve_log_print=true,
+        store_variable_names=true,
+    )
+    @test build!(model, output_dir=output_dir) == PSI.ModelBuildStatus.BUILT
+    @test solve!(model; optimizer=HiGHS_optimizer, output_dir=output_dir) ==
+          IS.Simulation.RunStatus.SUCCESSFULLY_FINALIZED
+
+end

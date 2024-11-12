@@ -6,8 +6,8 @@ PSI.requires_initialization(::AbstractHydroUnitCommitment) = true
 PSI.get_variable_multiplier(_, ::Type{<:PSY.HydroGen}, ::AbstractHydroFormulation) = 1.0
 PSI.get_expression_type_for_reserve(::PSI.ActivePowerReserveVariable, ::Type{<:PSY.HydroGen}, ::Type{<:PSY.Reserve{PSY.ReserveUp}}) = PSI.ActivePowerRangeExpressionUB
 PSI.get_expression_type_for_reserve(::PSI.ActivePowerReserveVariable, ::Type{<:PSY.HydroGen}, ::Type{<:PSY.Reserve{PSY.ReserveDown}}) = PSI.ActivePowerRangeExpressionLB
-PSI.get_expression_type_for_reserve(::PSI.ActivePowerReserveVariable, ::Type{PSY.HydroPumpedStorage}, ::Type{<:PSY.Reserve{PSY.ReserveUp}}) = PSI.ReserveRangeExpressionUB
-PSI.get_expression_type_for_reserve(::PSI.ActivePowerReserveVariable, ::Type{PSY.HydroPumpedStorage}, ::Type{<:PSY.Reserve{PSY.ReserveDown}}) = PSI.ReserveRangeExpressionLB
+PSI.get_expression_type_for_reserve(::PSI.ActivePowerReserveVariable, ::Type{PSY.HydroPumpedStorage}, ::Type{<:PSY.Reserve{PSY.ReserveUp}}) = ReserveRangeExpressionUB
+PSI.get_expression_type_for_reserve(::PSI.ActivePowerReserveVariable, ::Type{PSY.HydroPumpedStorage}, ::Type{<:PSY.Reserve{PSY.ReserveDown}}) = ReserveRangeExpressionLB
 
 ########################### PSI.ActivePowerVariable, HydroGen #################################
 # These methods are defined in PowerSimulations
@@ -1081,4 +1081,16 @@ function PSI._get_initial_conditions_value(
     @debug "Device $(PSY.get_name(component)) initialized PSI.DeviceStatus as $var_type" _group =
         PSI.LOG_GROUP_BUILD_INITIAL_CONDITIONS
     return T(component, val)
+end
+
+function add_constraints!(
+    container::PSI.OptimizationContainer,
+    T::Type{<:ReserveRangeExpressionUB},
+    U::Type{<:PSI.ActivePowerReserveVariable},
+    devices::IS.FlattenIteratorWrapper{V},
+    model::PSI.DeviceModel{V, W},
+    ::PSI.NetworkModel{X},
+) where {V <: PSY.HydroGen, W <: PSI.AbstractDeviceFormulation, X <: PM.AbstractPowerModel}
+    PSI.add_range_constraints!(container, T, U, devices, model, X)
+    return
 end
