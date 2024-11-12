@@ -183,7 +183,6 @@ end
 end
 
 @testset "HydroPumpedStorage simulation with Reserves" begin
-
     output_dir = mktempdir(; cleanup=true)
     sys_ed = PSB.build_system(PSITestSystems, "c_sys5_phes_ed"; add_reserves=true)
 
@@ -211,5 +210,4 @@ end
     @test build!(model, output_dir=output_dir) == PSI.ModelBuildStatus.BUILT
     @test solve!(model; optimizer=HiGHS_optimizer, output_dir=output_dir) ==
           IS.Simulation.RunStatus.SUCCESSFULLY_FINALIZED
-
 end
