@@ -184,7 +184,7 @@ end
 
 @testset "HydroPumpedStorage simulation with Reserves" begin
     output_dir = mktempdir(; cleanup=true)
-    sys_ed = PSB.build_system(PSITestSystems, "c_sys5_phes_ed"; add_reserves=true)
+    sys = PSB.build_system(PSITestSystems, "c_sys5_phes_ed"; add_reserves=true)
 
     template = ProblemTemplate(CopperPlatePowerModel)
     set_device_model!(template, PowerLoad, StaticPowerLoad)
@@ -201,7 +201,7 @@ end
 
     model = DecisionModel(
         template,
-        sys_ed,
+        sys,
         name="ED",
         optimizer=HiGHS_optimizer,
         optimizer_solve_log_print=true,

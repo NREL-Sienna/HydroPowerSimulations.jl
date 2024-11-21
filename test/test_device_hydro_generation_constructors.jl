@@ -553,18 +553,14 @@ end
     set_device_model!(template, HydroPumpedStorage, HydroDispatchPumpedStorage)
     set_service_model!(
         template,
-        ServiceModel(VariableReserve{ReserveUp}, RangeReserve, "Reserve5"),
+        ServiceModel(VariableReserve{ReserveUp}, RangeReserve, "Reserve7"),
     )
     set_service_model!(
         template,
-        ServiceModel(VariableReserve{ReserveDown}, RangeReserve, "Reserve6"),
-    )
-    set_service_model!(
-        template,
-        ServiceModel(ReserveDemandCurve{ReserveUp}, StepwiseCostReserve, "ORDC1"),
+        ServiceModel(VariableReserve{ReserveDown}, RangeReserve, "Reserve8"),
     )
 
-    c_sys5_phes_ed = PSB.build_system(PSITestSystems, "c_sys5_phes_ed", reserves=true)
+    c_sys5_phes_ed = PSB.build_system(PSITestSystems, "c_sys5_phes_ed", add_reserves=true)
     model = DecisionModel(template, c_sys5_phes_ed)
     @test build!(model; output_dir=mktempdir(; cleanup=true)) == PSI.ModelBuildStatus.BUILT
 end

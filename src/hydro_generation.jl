@@ -1083,7 +1083,7 @@ function PSI._get_initial_conditions_value(
     return T(component, val)
 end
 
-function add_constraints!(
+function PSI.add_constraints!(
     container::PSI.OptimizationContainer,
     T::Type{<:ReserveRangeExpressionUB},
     U::Type{<:PSI.ActivePowerReserveVariable},
@@ -1092,5 +1092,31 @@ function add_constraints!(
     ::PSI.NetworkModel{X},
 ) where {V <: PSY.HydroGen, W <: PSI.AbstractDeviceFormulation, X <: PM.AbstractPowerModel}
     PSI.add_range_constraints!(container, T, U, devices, model, X)
+    return
+end
+
+function PSI.add_to_expression!(
+    container::PSI.OptimizationContainer,
+    ::Type{T},
+    ::Type{U},
+    devices::Union{Vector{V}, IS.FlattenIteratorWrapper{V}},
+    model::PSI.DeviceModel{V, W},
+    network_model::PSI.NetworkModel{X},
+) where {
+    T <: Union{ReserveRangeExpressionLB, ReserveRangeExpressionUB},
+    U <: PSI.VariableType,
+    V <: PSY.Device,
+    W <: PSI.AbstractDeviceFormulation,
+    X <: PM.AbstractPowerModel,
+}
+    variable = PSI.get_variable(container, U(), V)
+    if !PSI.has_container_key(container, T, V)
+        PSI.add_expressions!(container, T, devices, model)
+    end
+    expression = PSI.get_expression(container, T(), V)
+    for d in devices, t in PSI.get_time_steps(container)
+        name = PSY.get_name(d)
+        PSI._add_to_jump_expression!(expression[name, t], variable[name, t], 1.0)
+    end
     return
 end

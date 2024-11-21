@@ -1336,7 +1336,7 @@ function PSI.construct_device!(
         PSI.add_to_expression!(
             container,
             ReserveRangeExpressionUB,
-            PSI.ActivePowerVariable,
+            PSI.ActivePowerOutVariable,
             devices,
             model,
             network_model,
@@ -1344,7 +1344,7 @@ function PSI.construct_device!(
         PSI.add_to_expression!(
             container,
             ReserveRangeExpressionLB,
-            PSI.ActivePowerVariable,
+            PSI.ActivePowerOutVariable,
             devices,
             model,
             network_model,
