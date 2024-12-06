@@ -1120,3 +1120,55 @@ function PSI.add_to_expression!(
     end
     return
 end
+
+function PSI.add_to_expression!(
+    container::PSI.OptimizationContainer,
+    ::Type{T},
+    ::Type{U},
+    devices::Union{Vector{V}, IS.FlattenIteratorWrapper{V}},
+    model::PSI.ServiceModel{X, W},
+) where {
+    T <: ReserveRangeExpressionUB,
+    U <: PSI.VariableType,
+    V <: PSY.HydroGen,
+    X <: PSY.Reserve{PSY.ReserveUp},
+    W <: PSI.AbstractReservesFormulation,
+}
+    service_name = PSI.get_service_name(model)
+    variable = PSI.get_variable(container, U(), X, service_name)
+    if !PSI.has_container_key(container, T, V)
+        PSI.add_expressions!(container, T, devices, model)
+    end
+    expression = PSI.get_expression(container, T(), V)
+    for d in devices, t in PSI.get_time_steps(container)
+        name = PSY.get_name(d)
+        PSI._add_to_jump_expression!(expression[name, t], variable[name, t], 1.0)
+    end
+    return
+end
+
+function PSI.add_to_expression!(
+    container::PSI.OptimizationContainer,
+    ::Type{T},
+    ::Type{U},
+    devices::Union{Vector{V}, IS.FlattenIteratorWrapper{V}},
+    model::PSI.ServiceModel{X, W},
+) where {
+    T <: ReserveRangeExpressionLB,
+    U <: PSI.VariableType,
+    V <: PSY.HydroGen,
+    X <: PSY.Reserve{PSY.ReserveDown},
+    W <: PSI.AbstractReservesFormulation,
+}
+    service_name = PSI.get_service_name(model)
+    variable = PSI.get_variable(container, U(), X, service_name)
+    if !PSI.has_container_key(container, T, V)
+        PSI.add_expressions!(container, T, devices, model)
+    end
+    expression = PSI.get_expression(container, T(), V)
+    for d in devices, t in PSI.get_time_steps(container)
+        name = PSY.get_name(d)
+        PSI._add_to_jump_expression!(expression[name, t], variable[name, t], -1.0)
+    end
+    return
+end
