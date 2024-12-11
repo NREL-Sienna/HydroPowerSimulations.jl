@@ -138,7 +138,7 @@ function test_2_stage_decision_models_with_feedforwards(in_memory)
     c_sys5_hy_ed = PSB.build_system(PSITestSystems, "c_sys5_hy_ed")
     models = SimulationModels(;
         decision_models=[
-            DecisionModel(template_uc, c_sys5_hy_uc; name="UC", optimizer=GLPK_optimizer),
+            DecisionModel(template_uc, c_sys5_hy_uc; name="UC", optimizer=HiGHS_optimizer),
             DecisionModel(template_ed, c_sys5_hy_ed; name="ED", optimizer=ipopt_optimizer),
         ],
     )
@@ -185,18 +185,44 @@ end
 @testset "HydroPumpedStorage simulation with Reserves" begin
     output_dir = mktempdir(; cleanup=true)
     sys = PSB.build_system(PSITestSystems, "c_sys5_phes_ed"; add_reserves=true)
+    res5 = only(get_components(VariableReserve{ReserveUp}, sys))
+    set_requirement!(res5, 0.1)
 
+    res6 = only(get_components(VariableReserve{ReserveDown}, sys))
+    set_requirement!(res6, 0.1)
     template = ProblemTemplate(CopperPlatePowerModel)
     set_device_model!(template, PowerLoad, StaticPowerLoad)
-    set_device_model!(template, HydroPumpedStorage, HydroDispatchPumpedStorage)
-    set_device_model!(template, ThermalStandard, ThermalBasicUnitCommitment)
-    set_service_model!(
+    set_device_model!(
         template,
-        ServiceModel(VariableReserve{ReserveUp}, RangeReserve, "Reserve5"),
+        DeviceModel(
+            HydroPumpedStorage,
+            HydroDispatchPumpedStorage;
+            attributes=Dict{String, Any}("reservation" => false),
+        ),
     )
-    set_service_model!(
+    set_device_model!(template, ThermalStandard, ThermalBasicUnitCommitment)
+    set_service_model!(template, ServiceModel(VariableReserve{ReserveUp}, RangeReserve))
+    set_service_model!(template, ServiceModel(VariableReserve{ReserveDown}, RangeReserve))
+
+    model = DecisionModel(
         template,
-        ServiceModel(VariableReserve{ReserveDown}, RangeReserve, "Reserve6"),
+        sys,
+        name="ED",
+        optimizer=HiGHS_optimizer,
+        optimizer_solve_log_print=true,
+        store_variable_names=true,
+    )
+    @test build!(model, output_dir=output_dir) == PSI.ModelBuildStatus.BUILT
+    @test solve!(model; optimizer=HiGHS_optimizer, output_dir=output_dir) ==
+          IS.Simulation.RunStatus.SUCCESSFULLY_FINALIZED
+
+    set_device_model!(
+        template,
+        DeviceModel(
+            HydroPumpedStorage,
+            HydroDispatchPumpedStorage;
+            attributes=Dict{String, Any}("reservation" => true),
+        ),
     )
 
     model = DecisionModel(

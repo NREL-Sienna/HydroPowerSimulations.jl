@@ -136,7 +136,7 @@ end
     sys = PSB.build_system(PSITestSystems, "c_sys5_hy")
     networks = [ACPPowerModel, DCPPowerModel]
 
-    test_results = Dict{Any, Float64}(ACPPowerModel => 177526.0, DCPPowerModel => 175521.0)
+    test_results = Dict{Any, Float64}(ACPPowerModel => 175107.0, DCPPowerModel => 175521.0)
 
     for net in networks
         @testset "HydroRoR ED model $(net)" begin
@@ -168,7 +168,7 @@ end
     set_device_model!(template, HydroDispatch, HydroCommitmentRunOfRiver)
 
     @testset "HydroRoR ED model $(net)" begin
-        ED = DecisionModel(UnitCommitmentProblem, template, sys; optimizer=GLPK_optimizer)
+        ED = DecisionModel(UnitCommitmentProblem, template, sys; optimizer=HiGHS_optimizer)
         @test build!(ED; output_dir=mktempdir(; cleanup=true)) == PSI.ModelBuildStatus.BUILT
         psi_checksolve_test(ED, [MOI.OPTIMAL, MOI.LOCALLY_SOLVED], 175521.0, 1000)
     end
@@ -232,7 +232,7 @@ end
                 UnitCommitmentProblem,
                 template,
                 sys;
-                optimizer=GLPK_optimizer,
+                optimizer=HiGHS_optimizer,
             )
             @test build!(ED; output_dir=mktempdir(; cleanup=true)) ==
                   PSI.ModelBuildStatus.BUILT
