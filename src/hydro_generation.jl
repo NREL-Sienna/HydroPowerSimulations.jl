@@ -492,6 +492,94 @@ function PSI.get_min_max_limits(
     return PSY.get_active_power_limits_pump(x)
 end
 
+######################## Energy Limits Constraints #############################
+
+function _add_output_limit_constraints!(
+    container::PSI.OptimizationContainer,
+    ::Type{PSI.OutputActivePowerVariableLimitsConstraint},
+    devices::IS.FlattenIteratorWrapper{V},
+    model::PSI.DeviceModel{V, W},
+    network_model::PSI.NetworkModel{X},
+) where {
+    V <: PSY.HydroPumpedStorage,
+    W <: AbstractHydroReservoirFormulation,
+    X <: PM.AbstractPowerModel,
+}
+    if !PSI.has_service_model(model)
+        PSI.add_constraints!(
+            container,
+            PSI.OutputActivePowerVariableLimitsConstraint,
+            PSI.ActivePowerOutVariable,
+            devices,
+            model,
+            network_model,
+        )
+    else
+        if PSI.get_attribute(model, "reservation")
+            array_lb = PSI.get_expression(
+                container,
+                ReserveRangeExpressionLB(),
+                PSY.HydroPumpedStorage,
+            )
+            PSI._add_reserve_lower_bound_range_constraints_impl!(
+                container,
+                PSI.OutputActivePowerVariableLimitsConstraint,
+                array_lb,
+                devices,
+                model,
+            )
+            array_ub = PSI.get_expression(
+                container,
+                ReserveRangeExpressionUB(),
+                PSY.HydroPumpedStorage,
+            )
+            PSI._add_reserve_upper_bound_range_constraints_impl!(
+                container,
+                PSI.OutputActivePowerVariableLimitsConstraint,
+                array_ub,
+                devices,
+                model,
+            )
+        else
+            array_lb = PSI.get_expression(
+                container,
+                ReserveRangeExpressionLB(),
+                PSY.HydroPumpedStorage,
+            )
+            PSI._add_lower_bound_range_constraints_impl!(
+                container,
+                PSI.OutputActivePowerVariableLimitsConstraint,
+                array_lb,
+                devices,
+                model,
+            )
+            array_ub = PSI.get_expression(
+                container,
+                ReserveRangeExpressionUB(),
+                PSY.HydroPumpedStorage,
+            )
+            PSI._add_upper_bound_range_constraints_impl!(
+                container,
+                PSI.OutputActivePowerVariableLimitsConstraint,
+                array_ub,
+                devices,
+                model,
+            )
+        end
+    end
+end
+function _add_output_limits_with_reserves!(
+    container::PSI.OptimizationContainer,
+    ::Type{PSI.OutputActivePowerVariableLimitsConstraint},
+    devices::IS.FlattenIteratorWrapper{V},
+    model::PSI.DeviceModel{V, W},
+    network_model::PSI.NetworkModel{X},
+) where {
+    V <: PSY.HydroPumpedStorage,
+    W <: AbstractHydroReservoirFormulation,
+    X <: PM.AbstractPowerModel,
+} end
+
 ######################## Energy balance constraints ############################
 
 """

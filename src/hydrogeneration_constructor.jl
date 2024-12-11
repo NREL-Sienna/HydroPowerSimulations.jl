@@ -1366,14 +1366,14 @@ function PSI.construct_device!(
 ) where {H <: PSY.HydroPumpedStorage, S <: PM.AbstractActivePowerModel}
     devices = PSI.get_available_components(model, sys)
 
-    PSI.add_constraints!(
+    _add_output_limit_constraints!(
         container,
         PSI.OutputActivePowerVariableLimitsConstraint,
-        PSI.ActivePowerOutVariable,
         devices,
         model,
         network_model,
     )
+
     PSI.add_constraints!(
         container,
         PSI.InputActivePowerVariableLimitsConstraint,
