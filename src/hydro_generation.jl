@@ -492,6 +492,94 @@ function PSI.get_min_max_limits(
     return PSY.get_active_power_limits_pump(x)
 end
 
+######################## Energy Limits Constraints #############################
+
+function _add_output_limit_constraints!(
+    container::PSI.OptimizationContainer,
+    ::Type{PSI.OutputActivePowerVariableLimitsConstraint},
+    devices::IS.FlattenIteratorWrapper{V},
+    model::PSI.DeviceModel{V, W},
+    network_model::PSI.NetworkModel{X},
+) where {
+    V <: PSY.HydroPumpedStorage,
+    W <: AbstractHydroReservoirFormulation,
+    X <: PM.AbstractPowerModel,
+}
+    if !PSI.has_service_model(model)
+        PSI.add_constraints!(
+            container,
+            PSI.OutputActivePowerVariableLimitsConstraint,
+            PSI.ActivePowerOutVariable,
+            devices,
+            model,
+            network_model,
+        )
+    else
+        if PSI.get_attribute(model, "reservation")
+            array_lb = PSI.get_expression(
+                container,
+                ReserveRangeExpressionLB(),
+                PSY.HydroPumpedStorage,
+            )
+            PSI._add_reserve_lower_bound_range_constraints_impl!(
+                container,
+                PSI.OutputActivePowerVariableLimitsConstraint,
+                array_lb,
+                devices,
+                model,
+            )
+            array_ub = PSI.get_expression(
+                container,
+                ReserveRangeExpressionUB(),
+                PSY.HydroPumpedStorage,
+            )
+            PSI._add_reserve_upper_bound_range_constraints_impl!(
+                container,
+                PSI.OutputActivePowerVariableLimitsConstraint,
+                array_ub,
+                devices,
+                model,
+            )
+        else
+            array_lb = PSI.get_expression(
+                container,
+                ReserveRangeExpressionLB(),
+                PSY.HydroPumpedStorage,
+            )
+            PSI._add_lower_bound_range_constraints_impl!(
+                container,
+                PSI.OutputActivePowerVariableLimitsConstraint,
+                array_lb,
+                devices,
+                model,
+            )
+            array_ub = PSI.get_expression(
+                container,
+                ReserveRangeExpressionUB(),
+                PSY.HydroPumpedStorage,
+            )
+            PSI._add_upper_bound_range_constraints_impl!(
+                container,
+                PSI.OutputActivePowerVariableLimitsConstraint,
+                array_ub,
+                devices,
+                model,
+            )
+        end
+    end
+end
+function _add_output_limits_with_reserves!(
+    container::PSI.OptimizationContainer,
+    ::Type{PSI.OutputActivePowerVariableLimitsConstraint},
+    devices::IS.FlattenIteratorWrapper{V},
+    model::PSI.DeviceModel{V, W},
+    network_model::PSI.NetworkModel{X},
+) where {
+    V <: PSY.HydroPumpedStorage,
+    W <: AbstractHydroReservoirFormulation,
+    X <: PM.AbstractPowerModel,
+} end
+
 ######################## Energy balance constraints ############################
 
 """
@@ -1081,4 +1169,94 @@ function PSI._get_initial_conditions_value(
     @debug "Device $(PSY.get_name(component)) initialized PSI.DeviceStatus as $var_type" _group =
         PSI.LOG_GROUP_BUILD_INITIAL_CONDITIONS
     return T(component, val)
+end
+
+function PSI.add_constraints!(
+    container::PSI.OptimizationContainer,
+    T::Type{<:ReserveRangeExpressionUB},
+    U::Type{<:PSI.ActivePowerReserveVariable},
+    devices::IS.FlattenIteratorWrapper{V},
+    model::PSI.DeviceModel{V, W},
+    ::PSI.NetworkModel{X},
+) where {V <: PSY.HydroGen, W <: PSI.AbstractDeviceFormulation, X <: PM.AbstractPowerModel}
+    PSI.add_range_constraints!(container, T, U, devices, model, X)
+    return
+end
+
+function PSI.add_to_expression!(
+    container::PSI.OptimizationContainer,
+    ::Type{T},
+    ::Type{U},
+    devices::Union{Vector{V}, IS.FlattenIteratorWrapper{V}},
+    model::PSI.DeviceModel{V, W},
+    network_model::PSI.NetworkModel{X},
+) where {
+    T <: Union{ReserveRangeExpressionLB, ReserveRangeExpressionUB},
+    U <: PSI.VariableType,
+    V <: PSY.Device,
+    W <: PSI.AbstractDeviceFormulation,
+    X <: PM.AbstractPowerModel,
+}
+    variable = PSI.get_variable(container, U(), V)
+    if !PSI.has_container_key(container, T, V)
+        PSI.add_expressions!(container, T, devices, model)
+    end
+    expression = PSI.get_expression(container, T(), V)
+    for d in devices, t in PSI.get_time_steps(container)
+        name = PSY.get_name(d)
+        PSI._add_to_jump_expression!(expression[name, t], variable[name, t], 1.0)
+    end
+    return
+end
+
+function PSI.add_to_expression!(
+    container::PSI.OptimizationContainer,
+    ::Type{T},
+    ::Type{U},
+    devices::Union{Vector{V}, IS.FlattenIteratorWrapper{V}},
+    model::PSI.ServiceModel{X, W},
+) where {
+    T <: ReserveRangeExpressionUB,
+    U <: PSI.VariableType,
+    V <: PSY.HydroGen,
+    X <: PSY.Reserve{PSY.ReserveUp},
+    W <: PSI.AbstractReservesFormulation,
+}
+    service_name = PSI.get_service_name(model)
+    variable = PSI.get_variable(container, U(), X, service_name)
+    if !PSI.has_container_key(container, T, V)
+        PSI.add_expressions!(container, T, devices, model)
+    end
+    expression = PSI.get_expression(container, T(), V)
+    for d in devices, t in PSI.get_time_steps(container)
+        name = PSY.get_name(d)
+        PSI._add_to_jump_expression!(expression[name, t], variable[name, t], 1.0)
+    end
+    return
+end
+
+function PSI.add_to_expression!(
+    container::PSI.OptimizationContainer,
+    ::Type{T},
+    ::Type{U},
+    devices::Union{Vector{V}, IS.FlattenIteratorWrapper{V}},
+    model::PSI.ServiceModel{X, W},
+) where {
+    T <: ReserveRangeExpressionLB,
+    U <: PSI.VariableType,
+    V <: PSY.HydroGen,
+    X <: PSY.Reserve{PSY.ReserveDown},
+    W <: PSI.AbstractReservesFormulation,
+}
+    service_name = PSI.get_service_name(model)
+    variable = PSI.get_variable(container, U(), X, service_name)
+    if !PSI.has_container_key(container, T, V)
+        PSI.add_expressions!(container, T, devices, model)
+    end
+    expression = PSI.get_expression(container, T(), V)
+    for d in devices, t in PSI.get_time_steps(container)
+        name = PSY.get_name(d)
+        PSI._add_to_jump_expression!(expression[name, t], variable[name, t], -1.0)
+    end
+    return
 end

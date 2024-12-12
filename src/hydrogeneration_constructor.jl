@@ -1332,9 +1332,26 @@ function PSI.construct_device!(
         model,
         network_model,
     )
-
-    PSI.add_expressions!(container, ReserveRangeExpressionLB, devices, model)
-    PSI.add_expressions!(container, ReserveRangeExpressionUB, devices, model)
+    if PSI.has_service_model(model)
+        PSI.add_to_expression!(
+            container,
+            ReserveRangeExpressionUB,
+            PSI.ActivePowerOutVariable,
+            devices,
+            model,
+            network_model,
+        )
+        PSI.add_to_expression!(
+            container,
+            ReserveRangeExpressionLB,
+            PSI.ActivePowerOutVariable,
+            devices,
+            model,
+            network_model,
+        )
+    end
+    # PSI.add_range_constraints!(container, ReserveRangeExpressionLB, devices, model)
+    # PSI.add_range_constraints!(container, ReserveRangeExpressionUB, devices, model)
 
     PSI.add_feedforward_arguments!(container, model, devices)
     return
@@ -1349,14 +1366,14 @@ function PSI.construct_device!(
 ) where {H <: PSY.HydroPumpedStorage, S <: PM.AbstractActivePowerModel}
     devices = PSI.get_available_components(model, sys)
 
-    PSI.add_constraints!(
+    _add_output_limit_constraints!(
         container,
         PSI.OutputActivePowerVariableLimitsConstraint,
-        PSI.ActivePowerOutVariable,
         devices,
         model,
         network_model,
     )
+
     PSI.add_constraints!(
         container,
         PSI.InputActivePowerVariableLimitsConstraint,

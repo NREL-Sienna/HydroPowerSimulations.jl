@@ -168,7 +168,7 @@ end
     set_device_model!(template, HydroDispatch, HydroCommitmentRunOfRiver)
 
     @testset "HydroRoR ED model $(net)" begin
-        ED = DecisionModel(UnitCommitmentProblem, template, sys; optimizer=GLPK_optimizer)
+        ED = DecisionModel(UnitCommitmentProblem, template, sys; optimizer=HiGHS_optimizer)
         @test build!(ED; output_dir=mktempdir(; cleanup=true)) == PSI.ModelBuildStatus.BUILT
         psi_checksolve_test(ED, [MOI.OPTIMAL, MOI.LOCALLY_SOLVED], 175521.0, 1000)
     end
@@ -232,7 +232,7 @@ end
                 UnitCommitmentProblem,
                 template,
                 sys;
-                optimizer=GLPK_optimizer,
+                optimizer=HiGHS_optimizer,
             )
             @test build!(ED; output_dir=mktempdir(; cleanup=true)) ==
                   PSI.ModelBuildStatus.BUILT
@@ -545,4 +545,22 @@ end
     @test build!(model; output_dir=mktempdir(; cleanup=true)) == PSI.ModelBuildStatus.BUILT
     # The value of this test needs to be revised
     # moi_tests(model, 240, 0, 48, 96, 72, false)
+end
+
+@testset "Test Reserves from HydroPumpedStorage" begin
+    template = ProblemTemplate(CopperPlatePowerModel)
+    set_device_model!(template, PowerLoad, StaticPowerLoad)
+    set_device_model!(template, HydroPumpedStorage, HydroDispatchPumpedStorage)
+    set_service_model!(
+        template,
+        ServiceModel(VariableReserve{ReserveUp}, RangeReserve, "Reserve7"),
+    )
+    set_service_model!(
+        template,
+        ServiceModel(VariableReserve{ReserveDown}, RangeReserve, "Reserve8"),
+    )
+
+    c_sys5_phes_ed = PSB.build_system(PSITestSystems, "c_sys5_phes_ed", add_reserves=true)
+    model = DecisionModel(template, c_sys5_phes_ed)
+    @test build!(model; output_dir=mktempdir(; cleanup=true)) == PSI.ModelBuildStatus.BUILT
 end
