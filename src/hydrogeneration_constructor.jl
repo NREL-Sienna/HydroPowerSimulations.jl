@@ -1120,7 +1120,7 @@ function PSI.construct_device!(
 end
 
 """
-Construct model for HydroGen with ReservoirStorage Dispatch Formulation
+Construct model for HydroGen with ReservoirStorage Commitment Formulation
 with only Active Power
 """
 function PSI.construct_device!(
@@ -1419,6 +1419,9 @@ function PSI.construct_device!(
     return
 end
 
+"""
+Construct model for HydroGen with HydroCommitmentRunOfRiver Formulation
+"""
 function PSI.construct_device!(
     container::PSI.OptimizationContainer,
     sys::PSY.System,
