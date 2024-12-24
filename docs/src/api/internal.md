@@ -3,4 +3,5 @@
 ```@autodocs
 Modules = [HydroPowerSimulations]
 Public = false
+Private = true
 ```
