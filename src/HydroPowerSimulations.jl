@@ -21,13 +21,19 @@ export HydroCommitmentRunOfRiver
 
 ######## Hydro Variables ########
 export HydroEnergyVariableUp
+export HydroEnergyVariableDown
 export WaterSpillageVariable
 export HydroEnergyShortageVariable
+export HydroEnergySurplusVariable
 
 ######## Hydro Aux Variables ########
 export HydroEnergyOutput
 
 ######## Hydro parameters #######
+export EnergyTargetTimeSeriesParameter
+export EnergyBudgetTimeSeriesParameter
+export InflowTimeSeriesParameter
+export OutflowTimeSeriesParameter
 export ReservoirTargetParameter
 export ReservoirLimitParameter
 
@@ -38,6 +44,10 @@ export InitialHydroEnergyLevelDown
 ######## Hydro feedforwards #######
 export ReservoirTargetFeedforward
 export ReservoirLimitFeedforward
+
+######## Hydro Expressions #######
+export ReserveRangeExpressionLB
+export ReserveRangeExpressionUB
 
 #################################################################################
 # Imports
