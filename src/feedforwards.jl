@@ -1,6 +1,6 @@
 """
     ReservoirTargetFeedforward(
-        component_type::Type{<:PSY.Component},
+        component_type::Type{<:PowerSystems.Component},
         source::Type{T},
         affected_values::Vector{DataType},
         target_period::Int,
@@ -13,7 +13,7 @@ variable associated with a penalty term.
 
 # Arguments:
 
-  - `component_type::Type{<:PSY.Component}` : Specify the type of component on which the Feedforward will be applied
+  - `component_type::Type{<:`[`PowerSystems.Component`](@extref)`}` : Specify the type of component on which the Feedforward will be applied
   - `source::Type{T}` : Specify the VariableType, ParameterType or AuxVariableType as the source of values for the Feedforward
   - `affected_values::Vector{DataType}` : Specify the variable on which the reservoir target will be applied using the source values
   - `target_period::Int` : Specify the time step at which the reservoir target will be applied.
@@ -74,10 +74,10 @@ Constructs a equality constraint to a fix a variable in one model using the vari
 `` x + slack >= param``
 
 # Arguments
-* container::PSI.OptimizationContainer : the optimization_container model built in PowerSimulations
-* model::PSI.DeviceModel : the device model
-* devices::IS.FlattenIteratorWrapper{T} : list of devices
-* ff::ReservoirTargetFeedforward : a instance of the FixValue Feedforward
+* `container::PSI.OptimizationContainer` : the optimization_container model built in PowerSimulations
+* `model::`[`PowerSimulations.DeviceModel`](@extref) : the device model
+* `devices::IS.FlattenIteratorWrapper{T}` : list of devices
+* `ff::`[`ReservoirTargetFeedforward`](@ref) : a instance of the ReservoirTarget Feedforward
 """
 function PSI.add_feedforward_constraints!(
     container::PSI.OptimizationContainer,
@@ -154,7 +154,7 @@ Adds a constraint to limit the sum of a variable over the number of periods to t
 
 # Arguments:
 
-  - `component_type::Type{<:PSY.Component}` : Specify the type of component on which the Feedforward will be applied
+  - `component_type::Type{<:`[`PowerSystems.Component`](@extref)`}` : Specify the type of component on which the Feedforward will be applied
   - `source::Type{T}` : Specify the VariableType, ParameterType or AuxVariableType as the source of values for the Feedforward
   - `affected_values::Vector{DataType}` : Specify the variable on which the reservoir limit will be applied using the source values
   - `number_of_periods::Int` : Specify the total number of periods that are added on which the limits are applied. For example, in a 24-step simulation if `number_of_periods = 24`, it will add only one constraint over the sum of 24 periods on which the reservoir limit will be applied. If `number_of_periods = 12`, it will create two constraints, one for the first 12 steps and one for the 13:24 steps. It is mandatory that `number_of_periods` can divide the total number of simulation steps.
@@ -194,10 +194,10 @@ PSI.get_optimization_container_key(ff) = ff.optimization_container_key
 get_number_of_periods(ff) = ff.number_of_periods
 
 @doc raw"""
-        add_feedforward_constraints(container::OptimizationContainer,
-                        cons_name::Symbol,
-                        param_reference,
-                        var_key::VariableKey)
+        add_feedforward_constraints(container::PSI.OptimizationContainer,
+                        model::PSI.DeviceModel,
+                        devices,
+                        ff::ReservoirLimitFeedforward)
 
 Constructs a parameterized integral limit constraint to implement feedforward from other models.
 The Parameters are initialized using the upper boundary values of the provided variables.
@@ -210,10 +210,10 @@ The Parameters are initialized using the upper boundary values of the provided v
 `` \sum_{t} x \leq param^{max}``
 
 # Arguments
-* container::OptimizationContainer : the optimization_container model built in PowerSimulations
-* model::DeviceModel : the device model
-* devices::IS.FlattenIteratorWrapper{T} : list of devices
-* ff::FixValueFeedforward : a instance of the FixValue Feedforward
+* `container::PowerSimulations.OptimizationContainer` : the optimization_container model built in PowerSimulations
+* `model::`[`PowerSimulations.DeviceModel`](@extref) : the device model
+* `devices::IS.FlattenIteratorWrapper{T}` : list of devices
+* `ff::`[`ReservoirLimitFeedforward`](@ref) : a instance of the Reservoir Limit Feedforward
 """
 function PSI.add_feedforward_constraints!(
     container::PSI.OptimizationContainer,

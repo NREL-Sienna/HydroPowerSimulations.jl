@@ -1,10 +1,10 @@
 """
-Expression for HydroPumpedStorage that keep track
+Expression for [`PowerSystems.HydroPumpedStorage`](@extref) that keep track
 of active power and reserves for Lower Bound limits
 """
 struct ReserveRangeExpressionLB <: PSI.RangeConstraintLBExpressions end
 """
-Expression for HydroPumpedStorage that keep track
+Expression for [`PowerSystems.HydroPumpedStorage`](@extref) that keep track
 of active power and reserves for Upper Bound limits
 """
 struct ReserveRangeExpressionUB <: PSI.RangeConstraintUBExpressions end
