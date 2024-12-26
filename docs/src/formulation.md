@@ -22,18 +22,18 @@ Hydro generation formulations define the optimization models that describe hydro
 
 ## `HydroDispatchRunOfRiver`
 
-```@docs
+```@docs; canonical=false
 HydroDispatchRunOfRiver
 ```
 
 **Variables:**
 
-  - `ActivePowerVariable`:
+  - [`PowerSimulations.ActivePowerVariable`](@extref):
     
       + Bounds: [0.0, ]
       + Symbol: ``p^\text{hy}``
 
-  - `ReactivePowerVariable`:
+  - [`PowerSimulations.ReactivePowerVariable`](@extref):
     
       + Bounds: [0.0, ]
       + Symbol: ``q^\text{hy}``
@@ -44,7 +44,7 @@ HydroDispatchRunOfRiver
     
       + Symbol: ``E^\text{hy,out}``
 
-The `HydroEnergyOutput` is computed as the energy used at each time step from the hydro, computed simply as ``E^\text{hy,out} \cdot \Delta T``, where ``\Delta T`` is the duration (in hours) of each time step.
+The [`HydroEnergyOutput`](@ref) is computed as the energy used at each time step from the hydro, computed simply as ``E^\text{hy,out} \cdot \Delta T``, where ``\Delta T`` is the duration (in hours) of each time step.
 
 **Static Parameters:**
 
@@ -63,7 +63,7 @@ Add a cost to the objective function depending on the defined cost structure of 
 
 **Expressions:**
 
-Adds ``p^\text{hy}`` to the `ActivePowerBalance` expression and ``q^\text{hy}`` to the `ReactivePowerBalance`, to be used in the supply-balance constraint depending on the network model used.
+Adds ``p^\text{hy}`` to the `PowerSimulations.ActivePowerBalance` expression and ``q^\text{hy}`` to the `PowerSimulations.ReactivePowerBalance`, to be used in the supply-balance constraint depending on the network model used.
 
 **Constraints:**
 
@@ -80,18 +80,18 @@ For each hydro unit creates the range constraints for its active and reactive po
 
 ## `HydroDispatchReservoirBudget`
 
-```@docs
+```@docs; canonical=false
 HydroDispatchReservoirBudget
 ```
 
 **Variables:**
 
-  - `ActivePowerVariable`:
+  - [`PowerSimulations.ActivePowerVariable`](@extref):
     
       + Bounds: [0.0, ]
       + Symbol: ``p^\text{hy}``
 
-  - `ReactivePowerVariable`:
+  - [`PowerSimulations.ReactivePowerVariable`](@extref):
     
       + Bounds: [0.0, ]
       + Symbol: ``q^\text{hy}``
@@ -102,7 +102,7 @@ HydroDispatchReservoirBudget
     
       + Symbol: ``E^\text{hy,out}``
 
-The `HydroEnergyOutput` is computed as the energy used at each time step from the hydro, computed simply as ``E^\text{hy,out} \cdot \Delta T``, where ``\Delta T`` is the duration (in hours) of each time step.
+The [`HydroEnergyOutput`](@ref) is computed as the energy used at each time step from the hydro, computed simply as ``E^\text{hy,out} \cdot \Delta T``, where ``\Delta T`` is the duration (in hours) of each time step.
 
 **Static Parameters:**
 
@@ -121,7 +121,7 @@ Add a cost to the objective function depending on the defined cost structure of 
 
 **Expressions:**
 
-Adds ``p^\text{hy}`` to the `ActivePowerBalance` expression and ``q^\text{hy}`` to the `ReactivePowerBalance`, to be used in the supply-balance constraint depending on the network model used.
+Adds ``p^\text{hy}`` to the `PowerSimulations.ActivePowerBalance` expression and ``q^\text{hy}`` to the `PowerSimulations.ReactivePowerBalance`, to be used in the supply-balance constraint depending on the network model used.
 
 **Constraints:**
 
@@ -139,22 +139,22 @@ For each hydro unit creates the range constraints for its active and reactive po
 
 ## `HydroDispatchReservoirStorage`
 
-```@docs
+```@docs; canonical=false
 HydroDispatchReservoirStorage
 ```
 
 **Variables:**
 
-  - `ActivePowerVariable`:
+  - [`PowerSimulations.ActivePowerVariable`](@extref):
     
       + Bounds: [0.0, ]
       + Symbol: ``p^\text{hy}``
 
-  - `ReactivePowerVariable`:
+  - [`PowerSimulations.ReactivePowerVariable`](@extref):
     
       + Bounds: [0.0, ]
       + Symbol: ``q^\text{hy}``
-  - `EnergyVariable`:
+  - [`PowerSimulations.EnergyVariable`](@extref):
     
       + Bounds: ``[0.0, E^\text{max}]``
       + Symbol: ``e``
@@ -177,7 +177,7 @@ HydroDispatchReservoirStorage
     
       + Symbol: ``E^\text{hy,out}``
 
-The `HydroEnergyOutput` is computed as the energy used at each time step from the hydro, computed simply as ``E^\text{hy,out} \cdot \Delta T``, where ``\Delta T`` is the duration (in hours) of each time step.
+The [`HydroEnergyOutput`](@ref) is computed as the energy used at each time step from the hydro, computed simply as ``E^\text{hy,out} \cdot \Delta T``, where ``\Delta T`` is the duration (in hours) of each time step.
 
 **Static Parameters:**
 
@@ -201,7 +201,7 @@ Add a cost to the objective function depending on the defined cost structure of 
 
 **Expressions:**
 
-Adds ``p^\text{hy}`` to the `ActivePowerBalance` expression and ``q^\text{hy}`` to the `ReactivePowerBalance`, to be used in the supply-balance constraint depending on the network model used.
+Adds ``p^\text{hy}`` to the `PowerSimulations.ActivePowerBalance` expression and ``q^\text{hy}`` to the `PowerSimulations.ReactivePowerBalance`, to be used in the supply-balance constraint depending on the network model used.
 
 **Constraints:**
 
@@ -220,20 +220,20 @@ For each hydro unit creates the range constraints for its active and reactive po
 
 ## HydroDispatchPumpedStorage
 
-This formulation is not available with reactive power. This formulation must be used with `PowerSystems.HydroPumpedStorage` component.
+This formulation is not available with reactive power. This formulation must be used with [`PowerSystems.HydroPumpedStorage`](@extref) component.
 
-```@docs
+```@docs; canonical=false
 HydroDispatchPumpedStorage
 ```
 
 **Variables:**
 
-  - `ActivePowerOutVariable`:
+  - [`PowerSimulations.ActivePowerOutVariable`](@extref):
     
       + Bounds: [0.0, ]
       + Symbol: ``p^\text{hy,out}``
 
-  - `ActivePowerInVariable`:
+  - [`PowerSimulations.ActivePowerInVariable`](@extref):
     
       + Bounds: [0.0, ]
       + Symbol: ``p^\text{hy,in}``
@@ -252,7 +252,7 @@ HydroDispatchPumpedStorage
 
 If the attribute `reservation` is set to true, the following variable is created:
 
-  - `ReservationVariable`:
+  - [`PowerSimulations.ReservationVariable`](@extref):
     
       + Bounds: ``\{0,1\}``
       + Symbol: ``ss^\text{hy}``
@@ -271,7 +271,7 @@ If `reservation` is set to false (default), then the hydro pumped storage is all
 
 **Initial Conditions:**
 
-The `InitialHydroEnergyLevelUp`: ``e_0^\text{up}`` is used as the initial condition for the energy level of the upper reservoir, while `InitialHydroEnergyLevelDown`: ``e_0^\text{dn}`` is used as the initial condition for the energy level of the lower reservoir.
+The [`InitialHydroEnergyLevelUp`](@ref): ``e_0^\text{up}`` is used as the initial condition for the energy level of the upper reservoir, while [`InitialHydroEnergyLevelDown`](@ref): ``e_0^\text{dn}`` is used as the initial condition for the energy level of the lower reservoir.
 
 **Time Series Parameters:**
 
@@ -283,7 +283,7 @@ Add a cost to the objective function depending on the defined cost structure of 
 
 **Expressions:**
 
-Adds ``(p^\text{hy,out} - p^\text{hy,in})`` to the `ActivePowerBalance` to be used in the supply-balance constraint depending on the network model used.
+Adds ``(p^\text{hy,out} - p^\text{hy,in})`` to the `PowerSimulations.ActivePowerBalance` to be used in the supply-balance constraint depending on the network model used.
 
 **Constraints:**
 
@@ -318,22 +318,22 @@ e_{t}^\text{dn} = e_{t-1}^\text{dn} + \left (p_t^\text{hy,out} + s_t - \frac{p_t
 
 ## `HydroCommitmentRunOfRiver`
 
-```@docs
+```@docs; canonical=false
 HydroCommitmentRunOfRiver
 ```
 
 **Variables:**
 
-  - `ActivePowerVariable`:
+  - [`PowerSimulations.ActivePowerVariable`](@extref):
     
       + Bounds: [0.0, ]
       + Symbol: ``p^\text{hy}``
 
-  - `ReactivePowerVariable`:
+  - [`PowerSimulations.ReactivePowerVariable`](@extref):
     
       + Bounds: [0.0, ]
       + Symbol: ``q^\text{hy}``
-  - `OnVariable`:
+  - [`PowerSimulations.OnVariable`](@extref):
     
       + Bounds: ``\{0, 1\}``
       + Symbol: ``u^\text{hy}``
@@ -344,7 +344,7 @@ HydroCommitmentRunOfRiver
     
       + Symbol: ``E^\text{hy,out}``
 
-The `HydroEnergyOutput` is computed as the energy used at each time step from the hydro, computed simply as ``E^\text{hy,out} \cdot \Delta T``, where ``\Delta T`` is the duration (in hours) of each time step.
+The [`HydroEnergyOutput`](@ref) is computed as the energy used at each time step from the hydro, computed simply as ``E^\text{hy,out} \cdot \Delta T``, where ``\Delta T`` is the duration (in hours) of each time step.
 
 **Static Parameters:**
 
@@ -363,7 +363,7 @@ Add a cost to the objective function depending on the defined cost structure of 
 
 **Expressions:**
 
-Adds ``p^\text{hy}`` to the `ActivePowerBalance` expression and ``q^\text{hy}`` to the `ReactivePowerBalance`, to be used in the supply-balance constraint depending on the network model used.
+Adds ``p^\text{hy}`` to the `PowerSimulations.ActivePowerBalance` expression and ``q^\text{hy}`` to the `PowerSimulations.ReactivePowerBalance`, to be used in the supply-balance constraint depending on the network model used.
 
 **Constraints:**
 
@@ -380,22 +380,22 @@ For each hydro unit creates the range constraints for its active and reactive po
 
 ## `HydroCommitmentReservoirBudget`
 
-```@docs
+```@docs; canonical=false
 HydroCommitmentReservoirBudget
 ```
 
 **Variables:**
 
-  - `ActivePowerVariable`:
+  - [`PowerSimulations.ActivePowerVariable`](@extref):
     
       + Bounds: [0.0, ]
       + Symbol: ``p^\text{hy}``
 
-  - `ReactivePowerVariable`:
+  - [`PowerSimulations.ReactivePowerVariable`](@extref):
     
       + Bounds: [0.0, ]
       + Symbol: ``q^\text{hy}``
-  - `OnVariable`:
+  - [`PowerSimulations.OnVariable`](@extref):
     
       + Bounds: ``\{0, 1\}``
       + Symbol: ``u^\text{hy}``
@@ -406,7 +406,7 @@ HydroCommitmentReservoirBudget
     
       + Symbol: ``E^\text{hy,out}``
 
-The `HydroEnergyOutput` is computed as the energy used at each time step from the hydro, computed simply as ``E^\text{hy,out} \cdot \Delta T``, where ``\Delta T`` is the duration (in hours) of each time step.
+The [`HydroEnergyOutput`](@ref) is computed as the energy used at each time step from the hydro, computed simply as ``E^\text{hy,out} \cdot \Delta T``, where ``\Delta T`` is the duration (in hours) of each time step.
 
 **Static Parameters:**
 
@@ -425,7 +425,7 @@ Add a cost to the objective function depending on the defined cost structure of 
 
 **Expressions:**
 
-Adds ``p^\text{hy}`` to the `ActivePowerBalance` expression and ``q^\text{hy}`` to the `ReactivePowerBalance`, to be used in the supply-balance constraint depending on the network model used.
+Adds ``p^\text{hy}`` to the `PowerSimulations.ActivePowerBalance` expression and ``q^\text{hy}`` to the `PowerSimulations.ReactivePowerBalance`, to be used in the supply-balance constraint depending on the network model used.
 
 **Constraints:**
 
@@ -443,26 +443,26 @@ For each hydro unit creates the range constraints for its active and reactive po
 
 ## `HydroDispatchReservoirStorage`
 
-```@docs
+```@docs; canonical=false
 HydroCommitmentReservoirStorage
 ```
 
 **Variables:**
 
-  - `ActivePowerVariable`:
+  - [`PowerSimulations.ActivePowerVariable`](@extref):
     
       + Bounds: [0.0, ]
       + Symbol: ``p^\text{hy}``
 
-  - `ReactivePowerVariable`:
+  - [`PowerSimulations.ReactivePowerVariable`](@extref):
     
       + Bounds: [0.0, ]
       + Symbol: ``q^\text{hy}``
-  - `OnVariable`:
+  - [`PowerSimulations.OnVariable`](@extref):
     
       + Bounds: ``\{0, 1\}``
       + Symbol: ``u^\text{hy}``
-  - `EnergyVariable`:
+  - [`PowerSimulations.EnergyVariable`](@extref):
     
       + Bounds: ``[0.0, E^\text{max}]``
       + Symbol: ``e``
@@ -485,7 +485,7 @@ HydroCommitmentReservoirStorage
     
       + Symbol: ``E^\text{hy,out}``
 
-The `HydroEnergyOutput` is computed as the energy used at each time step from the hydro, computed simply as ``E^\text{hy,out} \cdot \Delta T``, where ``\Delta T`` is the duration (in hours) of each time step.
+The [`HydroEnergyOutput`](@ref) is computed as the energy used at each time step from the hydro, computed simply as ``E^\text{hy,out} \cdot \Delta T``, where ``\Delta T`` is the duration (in hours) of each time step.
 
 **Static Parameters:**
 
@@ -509,7 +509,7 @@ Add a cost to the objective function depending on the defined cost structure of 
 
 **Expressions:**
 
-Adds ``p^\text{hy}`` to the `ActivePowerBalance` expression and ``q^\text{hy}`` to the `ReactivePowerBalance`, to be used in the supply-balance constraint depending on the network model used.
+Adds ``p^\text{hy}`` to the `PowerSimulations.ActivePowerBalance` expression and ``q^\text{hy}`` to the `PowerSimulations.ReactivePowerBalance`, to be used in the supply-balance constraint depending on the network model used.
 
 **Constraints:**
 
