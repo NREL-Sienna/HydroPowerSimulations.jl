@@ -6,7 +6,7 @@ CurrentModule = HydroPowerSimulations
 
 ## Overview
 
-`HydroPowerSimulations.jl` is a [`Julia`](http://www.julialang.org) package that extends [`PowerSimulations.jl`](https://github.com/NREL-Sienna/PowerSimulations.jl) for modeling of hydro generation technology in production cost modeling simulations.
+`HydroPowerSimulations.jl` is a [`Julia`](http://www.julialang.org) package that extends [`PowerSimulations.jl`](https://github.com/NREL-Sienna/PowerSimulations.jl) for modeling of hydro generation technology in operational simulations.
 
 * * *
 
