@@ -41,6 +41,12 @@ export ReservoirLimitParameter
 export InitialHydroEnergyLevelUp
 export InitialHydroEnergyLevelDown
 
+######## Hydro Constraints #######
+export EnergyTargetConstraint
+export EnergyCapacityDownConstraint
+export EnergyCapacityUpConstraint
+export EnergyBudgetConstraint
+
 ######## Hydro feedforwards #######
 export ReservoirTargetFeedforward
 export ReservoirLimitFeedforward
