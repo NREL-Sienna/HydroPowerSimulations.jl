@@ -5,7 +5,7 @@
 [![Documentation Build](https://github.com/NREL-Sienna/HydroPowerSimulations.jl/actions/workflows/docs.yml/badge.svg)](https://nrel-sienna.github.io/HydroPowerSimulations.jl/dev/)
 [<img src="https://img.shields.io/badge/slack-@Sienna/HydroPowerSimulations-sienna.svg?logo=slack">](https://join.slack.com/t/nrel-sienna/shared_invite/zt-glam9vdu-o8A9TwZTZqqNTKHa7q3BpQ)
 
-`HydroPowerSimulations.jl` is an extension package of [`PowerSimulations.jl`](https://github.com/NREL-Sienna/PowerSimulations.jl) for modeling of hydro generation technology.
+`HydroPowerSimulations.jl` is an extension package of [`PowerSimulations.jl`](https://nrel-sienna.github.io/PowerSimulations.jl/stable/) for modeling of hydro generation technology.
 
 For information on using the package, see the [stable documentation](https://nrel-sienna.github.io/HydroPowerSimulations.jl/stable/). Use the [in-development documentation](https://nrel-sienna.github.io/HydroPowerSimulations.jl/dev/) for the version of the documentation which contains the unreleased features.
 
