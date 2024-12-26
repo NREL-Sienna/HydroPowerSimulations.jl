@@ -1,5 +1,11 @@
 using Documenter, HydroPowerSimulations
 import DataStructures: OrderedDict
+using DocumenterInterLinks
+
+links = InterLinks(
+    "PowerSystems" => "https://nrel-sienna.github.io/PowerSystems.jl/stable/",
+    "PowerSimulations" => "https://nrel-sienna.github.io/PowerSimulations.jl/stable/",
+)
 
 pages = OrderedDict(
     "Welcome Page" => "index.md",
@@ -18,6 +24,7 @@ makedocs(
     ),
     sitename="HydroPowerSimulations.jl",
     pages=Any[p for p in pages],
+    plugins=[links],
 )
 
 deploydocs(
