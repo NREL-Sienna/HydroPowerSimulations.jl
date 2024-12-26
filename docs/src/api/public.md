@@ -5,6 +5,17 @@ Pages = ["public.md"]
 Depth = 2
 ```
 
+## Formulations
+
+```@autodocs
+Modules = [HydroPowerSimulations]
+Pages   = ["formulations.jl",
+           ]
+Order = [:type, :function]
+Public = true
+Private = false
+```
+
 ## Variables
 
 ```@autodocs
