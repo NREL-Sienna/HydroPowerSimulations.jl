@@ -1,5 +1,5 @@
 @testset "Single-stage Hydro Pumped Simulation" begin
-    output_dir = mktempdir(; cleanup=true)
+    output_dir = mktempdir(; cleanup = true)
     sys_ed = PSB.build_system(PSITestSystems, "c_sys5_phes_ed")
 
     template_ed = ProblemTemplate(CopperPlatePowerModel)
@@ -9,15 +9,15 @@
 
     model = DecisionModel(
         template_ed,
-        sys_ed,
-        name="ED",
-        optimizer=HiGHS_optimizer,
-        optimizer_solve_log_print=true,
-        store_variable_names=true,
+        sys_ed;
+        name = "ED",
+        optimizer = HiGHS_optimizer,
+        optimizer_solve_log_print = true,
+        store_variable_names = true,
     )
 
-    @test build!(model, output_dir=output_dir) == PSI.ModelBuildStatus.BUILT
-    @test solve!(model; optimizer=HiGHS_optimizer, output_dir=output_dir) ==
+    @test build!(model; output_dir = output_dir) == PSI.ModelBuildStatus.BUILT
+    @test solve!(model; optimizer = HiGHS_optimizer, output_dir = output_dir) ==
           IS.Simulation.RunStatus.SUCCESSFULLY_FINALIZED
 
     results = OptimizationProblemResults(model)
@@ -27,7 +27,7 @@
     # the last simulation step.
     reservoir_up_level = "HydroEnergyVariableUp__HydroPumpedStorage"
     last_value = last(variables[reservoir_up_level])["HydroPumpedStorage"]
-    @test isapprox(last_value, 0, atol=1e-5)
+    @test isapprox(last_value, 0, atol = 1e-5)
 end
 
 @testset "Multi-Stage Hydro Simulation Build" begin
@@ -58,62 +58,62 @@ end
         DecisionModel(
             template,
             sys_md;
-            name="MD",
-            initialize_model=false,
-            system_to_file=false,
-            optimizer=HiGHS_optimizer,
+            name = "MD",
+            initialize_model = false,
+            system_to_file = false,
+            optimizer = HiGHS_optimizer,
         ),
         DecisionModel(
             template_uc,
             sys_uc;
-            name="UC",
-            initialize_model=false,
-            system_to_file=false,
-            optimizer=HiGHS_optimizer,
+            name = "UC",
+            initialize_model = false,
+            system_to_file = false,
+            optimizer = HiGHS_optimizer,
         ),
         DecisionModel(
             template_ed,
             sys_ed;
-            name="ED",
-            initialize_model=false,
-            system_to_file=false,
-            optimizer=HiGHS_optimizer,
+            name = "ED",
+            initialize_model = false,
+            system_to_file = false,
+            optimizer = HiGHS_optimizer,
         ),
     ])
 
     feedforwards = Dict(
         "UC" => [
             ReservoirLimitFeedforward(;
-                source=PSI.ActivePowerVariable,
-                affected_values=[PSI.ActivePowerVariable],
-                component_type=HydroEnergyReservoir,
-                number_of_periods=24,
+                source = PSI.ActivePowerVariable,
+                affected_values = [PSI.ActivePowerVariable],
+                component_type = HydroEnergyReservoir,
+                number_of_periods = 24,
             ),
         ],
         "ED" => [
             ReservoirLimitFeedforward(;
-                source=PSI.ActivePowerVariable,
-                affected_values=[PSI.ActivePowerVariable],
-                component_type=HydroEnergyReservoir,
-                number_of_periods=12,
+                source = PSI.ActivePowerVariable,
+                affected_values = [PSI.ActivePowerVariable],
+                component_type = HydroEnergyReservoir,
+                number_of_periods = 12,
             ),
         ],
     )
 
     test_sequence = SimulationSequence(;
-        models=models,
-        ini_cond_chronology=InterProblemChronology(),
-        feedforwards=feedforwards,
+        models = models,
+        ini_cond_chronology = InterProblemChronology(),
+        feedforwards = feedforwards,
     )
 
     sim = Simulation(;
-        name="test_md",
-        steps=2,
-        models=models,
-        sequence=test_sequence,
-        simulation_folder=mktempdir(; cleanup=true),
+        name = "test_md",
+        steps = 2,
+        models = models,
+        sequence = test_sequence,
+        simulation_folder = mktempdir(; cleanup = true),
     )
-    @test build!(sim; serialize=false) == PSI.SimulationBuildStatus.BUILT
+    @test build!(sim; serialize = false) == PSI.SimulationBuildStatus.BUILT
 end
 
 function test_2_stage_decision_models_with_feedforwards(in_memory)
@@ -130,49 +130,59 @@ function test_2_stage_decision_models_with_feedforwards(in_memory)
         template_ed,
         PSI.NetworkModel(
             CopperPlatePowerModel;
-            duals=[CopperPlateBalanceConstraint],
-            use_slacks=true,
+            duals = [CopperPlateBalanceConstraint],
+            use_slacks = true,
         ),
     )
     c_sys5_hy_uc = PSB.build_system(PSITestSystems, "c_sys5_hy_uc")
     c_sys5_hy_ed = PSB.build_system(PSITestSystems, "c_sys5_hy_ed")
     models = SimulationModels(;
-        decision_models=[
-            DecisionModel(template_uc, c_sys5_hy_uc; name="UC", optimizer=HiGHS_optimizer),
-            DecisionModel(template_ed, c_sys5_hy_ed; name="ED", optimizer=ipopt_optimizer),
+        decision_models = [
+            DecisionModel(
+                template_uc,
+                c_sys5_hy_uc;
+                name = "UC",
+                optimizer = HiGHS_optimizer,
+            ),
+            DecisionModel(
+                template_ed,
+                c_sys5_hy_ed;
+                name = "ED",
+                optimizer = ipopt_optimizer,
+            ),
         ],
     )
 
     sequence = SimulationSequence(;
-        models=models,
-        feedforwards=Dict(
+        models = models,
+        feedforwards = Dict(
             "ED" => [
                 SemiContinuousFeedforward(;
-                    component_type=ThermalStandard,
-                    source=PSI.OnVariable,
-                    affected_values=[PSI.ActivePowerVariable],
+                    component_type = ThermalStandard,
+                    source = PSI.OnVariable,
+                    affected_values = [PSI.ActivePowerVariable],
                 ),
                 ReservoirLimitFeedforward(;
-                    component_type=HydroEnergyReservoir,
-                    source=PSI.ActivePowerVariable,
-                    affected_values=[PSI.ActivePowerVariable],
-                    number_of_periods=12,
+                    component_type = HydroEnergyReservoir,
+                    source = PSI.ActivePowerVariable,
+                    affected_values = [PSI.ActivePowerVariable],
+                    number_of_periods = 12,
                 ),
             ],
         ),
-        ini_cond_chronology=InterProblemChronology(),
+        ini_cond_chronology = InterProblemChronology(),
     )
     sim = Simulation(;
-        name="no_cache",
-        steps=2,
-        models=models,
-        sequence=sequence,
-        simulation_folder=mktempdir(; cleanup=true),
+        name = "no_cache",
+        steps = 2,
+        models = models,
+        sequence = sequence,
+        simulation_folder = mktempdir(; cleanup = true),
     )
 
-    build_out = build!(sim; console_level=Logging.Error)
+    build_out = build!(sim; console_level = Logging.Error)
     @test build_out == PSI.SimulationBuildStatus.BUILT
-    execute_out = execute!(sim; in_memory=in_memory)
+    execute_out = execute!(sim; in_memory = in_memory)
     @test execute_out == PSI.RunStatus.SUCCESSFULLY_FINALIZED
 end
 
@@ -183,8 +193,8 @@ end
 end
 
 @testset "HydroPumpedStorage simulation with Reserves" begin
-    output_dir = mktempdir(; cleanup=true)
-    sys = PSB.build_system(PSITestSystems, "c_sys5_phes_ed"; add_reserves=true)
+    output_dir = mktempdir(; cleanup = true)
+    sys = PSB.build_system(PSITestSystems, "c_sys5_phes_ed"; add_reserves = true)
     res5 = only(get_components(VariableReserve{ReserveUp}, sys))
     set_requirement!(res5, 0.1)
 
@@ -197,7 +207,7 @@ end
         DeviceModel(
             HydroPumpedStorage,
             HydroDispatchPumpedStorage;
-            attributes=Dict{String, Any}("reservation" => false),
+            attributes = Dict{String, Any}("reservation" => false),
         ),
     )
     set_device_model!(template, ThermalStandard, ThermalBasicUnitCommitment)
@@ -206,14 +216,14 @@ end
 
     model = DecisionModel(
         template,
-        sys,
-        name="ED",
-        optimizer=HiGHS_optimizer,
-        optimizer_solve_log_print=true,
-        store_variable_names=true,
+        sys;
+        name = "ED",
+        optimizer = HiGHS_optimizer,
+        optimizer_solve_log_print = true,
+        store_variable_names = true,
     )
-    @test build!(model, output_dir=output_dir) == PSI.ModelBuildStatus.BUILT
-    @test solve!(model; optimizer=HiGHS_optimizer, output_dir=output_dir) ==
+    @test build!(model; output_dir = output_dir) == PSI.ModelBuildStatus.BUILT
+    @test solve!(model; optimizer = HiGHS_optimizer, output_dir = output_dir) ==
           IS.Simulation.RunStatus.SUCCESSFULLY_FINALIZED
 
     set_device_model!(
@@ -221,19 +231,19 @@ end
         DeviceModel(
             HydroPumpedStorage,
             HydroDispatchPumpedStorage;
-            attributes=Dict{String, Any}("reservation" => true),
+            attributes = Dict{String, Any}("reservation" => true),
         ),
     )
 
     model = DecisionModel(
         template,
-        sys,
-        name="ED",
-        optimizer=HiGHS_optimizer,
-        optimizer_solve_log_print=true,
-        store_variable_names=true,
+        sys;
+        name = "ED",
+        optimizer = HiGHS_optimizer,
+        optimizer_solve_log_print = true,
+        store_variable_names = true,
     )
-    @test build!(model, output_dir=output_dir) == PSI.ModelBuildStatus.BUILT
-    @test solve!(model; optimizer=HiGHS_optimizer, output_dir=output_dir) ==
+    @test build!(model; output_dir = output_dir) == PSI.ModelBuildStatus.BUILT
+    @test solve!(model; optimizer = HiGHS_optimizer, output_dir = output_dir) ==
           IS.Simulation.RunStatus.SUCCESSFULLY_FINALIZED
 end

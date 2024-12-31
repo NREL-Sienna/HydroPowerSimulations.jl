@@ -51,8 +51,8 @@ set_device_model!(template, HydroDispatch, HydroDispatchRunOfRiver)
 With the template properly set-up, we construct, build and solve the optimization problem:
 
 ```@repl op_problem
-model = DecisionModel(template, sys; optimizer=HiGHS.Optimizer)
-build!(model, output_dir=mktempdir())
+model = DecisionModel(template, sys; optimizer = HiGHS.Optimizer)
+build!(model; output_dir = mktempdir())
 solve!(model)
 ```
 

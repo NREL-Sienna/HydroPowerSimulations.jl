@@ -370,7 +370,7 @@ function PSI.get_min_max_limits(
     ::Type{<:PSI.ActivePowerVariableLimitsConstraint},
     ::Type{<:HydroDispatchRunOfRiver},
 )
-    return (min=0.0, max=PSY.get_max_active_power(x))
+    return (min = 0.0, max = PSY.get_max_active_power(x))
 end
 
 """
@@ -871,7 +871,8 @@ function PSI.add_constraints!(
         param = PSI.get_parameter_column_values(param_container, name)
         constraint[name] = JuMP.@constraint(
             container.JuMPmodel,
-            sum([variable_out[name, t] for t in time_steps]) <= sum([multiplier[name, t] * param[t] for t in time_steps])
+            sum([variable_out[name, t] for t in time_steps]) <=
+            sum([multiplier[name, t] * param[t] for t in time_steps])
         )
     end
     return
@@ -934,8 +935,8 @@ function PSI.update_decision_state!(
         state_data_index = 1
         state_data.timestamps[:] .= range(
             simulation_time;
-            step=state_resolution,
-            length=PSI.get_num_rows(state_data),
+            step = state_resolution,
+            length = PSI.get_num_rows(state_data),
         )
     else
         state_data_index = PSI.find_timestamp_index(state_timestamps, simulation_time)

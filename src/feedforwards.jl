@@ -30,7 +30,7 @@ struct ReservoirTargetFeedforward <: PSI.AbstractAffectFeedforward
         affected_values::Vector{DataType},
         target_period::Int,
         penalty_cost::Float64,
-        meta=ISOPT.CONTAINER_KEY_EMPTY_META,
+        meta = ISOPT.CONTAINER_KEY_EMPTY_META,
     ) where {T}
         values_vector = Vector{PSI.VariableKey}(undef, length(affected_values))
         for (ix, v) in enumerate(affected_values)
@@ -104,7 +104,7 @@ function PSI.add_feedforward_constraints!(
             PSI.FeedforwardEnergyTargetConstraint(),
             T,
             set_name;
-            meta="$(var_type)target",
+            meta = "$(var_type)target",
         )
 
         for d in devices
@@ -168,7 +168,7 @@ struct ReservoirLimitFeedforward <: PSI.AbstractAffectFeedforward
         source::Type{T},
         affected_values::Vector{DataType},
         number_of_periods::Int,
-        meta=ISOPT.CONTAINER_KEY_EMPTY_META,
+        meta = ISOPT.CONTAINER_KEY_EMPTY_META,
     ) where {T}
         values_vector = Vector{PSI.VariableKey}(undef, length(affected_values))
         for (ix, v) in enumerate(affected_values)
@@ -245,7 +245,7 @@ function PSI.add_feedforward_constraints!(
             T,
             set_name,
             1:no_trenches;
-            meta="$(var_type)integral",
+            meta = "$(var_type)integral",
         )
 
         for name in set_name, i in 1:no_trenches
@@ -291,7 +291,7 @@ function PSI.update_parameter_values!(
     max_state_index = PSI.get_num_rows(state_data)
 
     state_data_index = PSI.find_timestamp_index(state_timestamps, current_time)
-    sim_timestamps = range(current_time; step=resolution, length=time[end])
+    sim_timestamps = range(current_time; step = resolution, length = time[end])
     old_parameter_values = PSI.jump_value.(parameter_array)
     # The current method uses older parameter values because when passing the energy output from one stage
     # to the next, the aux variable values gets over-written by the lower level model after its solve.
