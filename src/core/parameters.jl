@@ -1,10 +1,10 @@
 """
-Parameter to define energy storage target level time series
+Parameter to define energy storage target level time series for hydro generators
 """
 struct EnergyTargetTimeSeriesParameter <: PSI.TimeSeriesParameter end
 
 """
-Parameter to define energy budget time series
+Parameter to define energy budget time series for hydro generators
 """
 struct EnergyBudgetTimeSeriesParameter <: PSI.TimeSeriesParameter end
 
@@ -19,11 +19,11 @@ Parameter to define energy outflow from storage or reservoir time series
 struct OutflowTimeSeriesParameter <: PSI.TimeSeriesParameter end
 
 """
-Parameter to define energy target
+Parameter to define energy target for feedforward
 """
 struct ReservoirTargetParameter <: PSI.VariableValueParameter end
 """
-Parameter to define energy limit
+Parameter to define energy limit for feedforward
 """
 struct ReservoirLimitParameter <: PSI.VariableValueParameter end
 

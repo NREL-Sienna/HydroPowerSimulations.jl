@@ -1,5 +1,5 @@
 """
-Construct model for HydroGen with FixedOutput Formulation
+Construct model for [`PowerSystems.HydroGen``](@extref) with [`PowerSimulations.FixedOutput`](@extref) Formulation
 """
 function PSI.construct_device!(
     container::PSI.OptimizationContainer,
@@ -69,7 +69,7 @@ function PSI.construct_device!(
 end
 
 """
-Construct model for HydroGen with RunOfRiver Dispatch Formulation
+Construct model for [`PowerSystems.HydroGen`](@extref) with [`HydroDispatchRunOfRiver`](@ref) Formulation
 """
 function PSI.construct_device!(
     container::PSI.OptimizationContainer,
@@ -176,7 +176,7 @@ function PSI.construct_device!(
 end
 
 """
-Construct model for HydroGen with RunOfRiver Dispatch Formulation
+Construct model for [`PowerSystems.HydroGen`](@extref) with [`HydroDispatchRunOfRiver`](@ref) Formulation
 with only Active Power.
 """
 function PSI.construct_device!(
@@ -266,7 +266,7 @@ function PSI.construct_device!(
 end
 
 """
-Construct model for HydroGen with ReservoirBudget Dispatch Formulation
+Construct model for [`PowerSystems.HydroGen`](@extref) with ReservoirBudget Dispatch Formulation
 """
 function PSI.construct_device!(
     container::PSI.OptimizationContainer,
@@ -382,7 +382,7 @@ function PSI.construct_device!(
 end
 
 """
-Construct model for HydroGen with ReservoirBudget Dispatch Formulation
+Construct model for [`PowerSystems.HydroGen`](@extref) with [`HydroDispatchReservoirBudget`](@ref) Formulation
 with only Active Power.
 """
 function PSI.construct_device!(
@@ -477,7 +477,7 @@ function PSI.construct_device!(
 end
 
 """
-Construct model for HydroGen with ReservoirStorage Dispatch Formulation
+Construct model for [`PowerSystems.HydroGen`](@extref) with [`HydroDispatchReservoirStorage`](@ref) Formulation
 """
 function PSI.construct_device!(
     container::PSI.OptimizationContainer,
@@ -630,7 +630,7 @@ function PSI.construct_device!(
 end
 
 """
-Construct model for HydroGen with ReservoirStorage Dispatch Formulation
+Construct model for [`PowerSystems.HydroGen`](@extref) with [`HydroDispatchReservoirStorage`](@ref) Formulation
 with only Active Power
 """
 function PSI.construct_device!(
@@ -764,7 +764,7 @@ function PSI.construct_device!(
 end
 
 """
-Construct model for HydroGen with ReservoirBudget Commitment Formulation
+Construct model for [`PowerSystems.HydroGen`](@extref) with [`HydroCommitmentReservoirBudget`](@ref) Formulation
 """
 function PSI.construct_device!(
     container::PSI.OptimizationContainer,
@@ -866,7 +866,7 @@ function PSI.construct_device!(
 end
 
 """
-Construct model for HydroGen with ReservoirBudget Commitment Formulation
+Construct model for [`PowerSystems.HydroGen`](@extref) with [`HydroCommitmentReservoirBudget`](@ref) Formulation
 with only Active Power.
 """
 function PSI.construct_device!(
@@ -960,7 +960,7 @@ function PSI.construct_device!(
 end
 
 """
-Construct model for HydroGen with ReservoirStorage Commitment Formulation
+Construct model for [`PowerSystems.HydroGen`](@extref) with [`HydroCommitmentReservoirStorage`](@ref) Formulation
 """
 function PSI.construct_device!(
     container::PSI.OptimizationContainer,
@@ -1120,7 +1120,7 @@ function PSI.construct_device!(
 end
 
 """
-Construct model for HydroGen with ReservoirStorage Dispatch Formulation
+Construct model for [`PowerSystems.HydroGen`](@extref) with [`HydroCommitmentReservoirStorage`](@ref) Formulation
 with only Active Power
 """
 function PSI.construct_device!(
@@ -1259,7 +1259,7 @@ function PSI.construct_device!(
 end
 
 """
-Construct model for HydroPumpedStorage with PumpedStorage Dispatch Formulation
+Construct model for [`PowerSystems.HydroPumpedStorage`](@extref) with [`HydroDispatchPumpedStorage`](@ref) Formulation
 with only Active Power
 """
 function PSI.construct_device!(
@@ -1419,6 +1419,9 @@ function PSI.construct_device!(
     return
 end
 
+"""
+Construct model for [`PowerSystems.HydroGen`](@extref) with [`HydroCommitmentRunOfRiver`](@ref) Formulation
+"""
 function PSI.construct_device!(
     container::PSI.OptimizationContainer,
     sys::PSY.System,
@@ -1475,7 +1478,7 @@ function PSI.construct_device!(
 end
 
 """
-Construct model for HydroGen with RunOfRiver Commitment Formulation
+Construct model for [`PowerSystems.HydroGen`](@extref) with [`HydroCommitmentRunOfRiver`](@ref) Formulation
 with only Active Power.
 """
 function PSI.construct_device!(

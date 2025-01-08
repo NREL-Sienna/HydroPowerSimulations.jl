@@ -32,7 +32,7 @@ end
     device_model = PSI.DeviceModel(
         HydroPumpedStorage,
         HydroDispatchPumpedStorage;
-        attributes=Dict{String, Any}("reservation" => false),
+        attributes = Dict{String, Any}("reservation" => false),
     )
     c_sys5_phes_ed = PSB.build_system(PSITestSystems, "c_sys5_phes_ed")
 
@@ -146,9 +146,9 @@ end
                 EconomicDispatchProblem,
                 template,
                 sys;
-                optimizer=ipopt_optimizer,
+                optimizer = ipopt_optimizer,
             )
-            @test build!(ED; output_dir=mktempdir(; cleanup=true)) ==
+            @test build!(ED; output_dir = mktempdir(; cleanup = true)) ==
                   PSI.ModelBuildStatus.BUILT
             psi_checksolve_test(
                 ED,
@@ -168,8 +168,10 @@ end
     set_device_model!(template, HydroDispatch, HydroCommitmentRunOfRiver)
 
     @testset "HydroRoR ED model $(net)" begin
-        ED = DecisionModel(UnitCommitmentProblem, template, sys; optimizer=HiGHS_optimizer)
-        @test build!(ED; output_dir=mktempdir(; cleanup=true)) == PSI.ModelBuildStatus.BUILT
+        ED =
+            DecisionModel(UnitCommitmentProblem, template, sys; optimizer = HiGHS_optimizer)
+        @test build!(ED; output_dir = mktempdir(; cleanup = true)) ==
+              PSI.ModelBuildStatus.BUILT
         psi_checksolve_test(ED, [MOI.OPTIMAL, MOI.LOCALLY_SOLVED], 175521.0, 1000)
     end
 end
@@ -197,9 +199,9 @@ end
                 EconomicDispatchProblem,
                 template,
                 sys;
-                optimizer=ipopt_optimizer,
+                optimizer = ipopt_optimizer,
             )
-            @test build!(ED; output_dir=mktempdir(; cleanup=true)) ==
+            @test build!(ED; output_dir = mktempdir(; cleanup = true)) ==
                   PSI.ModelBuildStatus.BUILT
             psi_checksolve_test(
                 ED,
@@ -232,9 +234,9 @@ end
                 UnitCommitmentProblem,
                 template,
                 sys;
-                optimizer=HiGHS_optimizer,
+                optimizer = HiGHS_optimizer,
             )
-            @test build!(ED; output_dir=mktempdir(; cleanup=true)) ==
+            @test build!(ED; output_dir = mktempdir(; cleanup = true)) ==
                   PSI.ModelBuildStatus.BUILT
             psi_checksolve_test(
                 ED,
@@ -256,9 +258,10 @@ end
         EconomicDispatchProblem,
         template,
         c_sys5_hyd;
-        optimizer=HiGHS_optimizer,
+        optimizer = HiGHS_optimizer,
     )
-    @test build!(model; output_dir=mktempdir(; cleanup=true)) == PSI.ModelBuildStatus.BUILT
+    @test build!(model; output_dir = mktempdir(; cleanup = true)) ==
+          PSI.ModelBuildStatus.BUILT
     moi_tests(model, 15, 0, 3, 3, 9, false)
     # The value of this test needs to be revised
     # psi_checksolve_test(model, [MOI.OPTIMAL], 5621.0, 10.0)
@@ -274,9 +277,10 @@ end
         EconomicDispatchProblem,
         template,
         c_sys5_hyd;
-        optimizer=HiGHS_optimizer,
+        optimizer = HiGHS_optimizer,
     )
-    @test build!(model; output_dir=mktempdir(; cleanup=true)) == PSI.ModelBuildStatus.BUILT
+    @test build!(model; output_dir = mktempdir(; cleanup = true)) ==
+          PSI.ModelBuildStatus.BUILT
     moi_tests(model, 15, 0, 3, 3, 9, false)
     # The value of this test needs to be revised
     # psi_checksolve_test(model, [MOI.OPTIMAL], 21.0)
@@ -292,9 +296,10 @@ end
         EconomicDispatchProblem,
         template,
         c_sys5_hyd;
-        optimizer=HiGHS_optimizer,
+        optimizer = HiGHS_optimizer,
     )
-    @test build!(model; output_dir=mktempdir(; cleanup=true)) == PSI.ModelBuildStatus.BUILT
+    @test build!(model; output_dir = mktempdir(; cleanup = true)) ==
+          PSI.ModelBuildStatus.BUILT
     moi_tests(model, 15, 0, 3, 3, 9, false)
     # The value of this test needs to be revised
     # psi_checksolve_test(model, [MOI.OPTIMAL], -5429.0, 10.0)
@@ -310,9 +315,10 @@ end
         EconomicDispatchProblem,
         template,
         c_sys5_hyd;
-        optimizer=HiGHS_optimizer,
+        optimizer = HiGHS_optimizer,
     )
-    @test build!(model; output_dir=mktempdir(; cleanup=true)) == PSI.ModelBuildStatus.BUILT
+    @test build!(model; output_dir = mktempdir(; cleanup = true)) ==
+          PSI.ModelBuildStatus.BUILT
     moi_tests(model, 15, 0, 3, 3, 9, false)
     psi_checksolve_test(model, [MOI.OPTIMAL], 21.0, 10.0)
 end
@@ -327,9 +333,10 @@ end
         EconomicDispatchProblem,
         template,
         c_sys5_hyd;
-        optimizer=HiGHS_optimizer,
+        optimizer = HiGHS_optimizer,
     )
-    @test build!(model; output_dir=mktempdir(; cleanup=true)) == PSI.ModelBuildStatus.BUILT
+    @test build!(model; output_dir = mktempdir(; cleanup = true)) ==
+          PSI.ModelBuildStatus.BUILT
     moi_tests(model, 15, 0, 3, 3, 9, false)
     # The value of this test needs to be revised
     # psi_checksolve_test(model, [MOI.OPTIMAL], -17179.0)
@@ -340,43 +347,43 @@ end
 @testset "Test SemiContinuousFeedforward to HydroDispatch with HydroDispatchRunOfRiver model" begin
     device_model = PSI.DeviceModel(HydroDispatch, HydroDispatchRunOfRiver)
     ff_sc = SemiContinuousFeedforward(;
-        component_type=HydroDispatch,
-        source=PSI.OnVariable,
-        affected_values=[PSI.ActivePowerVariable],
+        component_type = HydroDispatch,
+        source = PSI.OnVariable,
+        affected_values = [PSI.ActivePowerVariable],
     )
 
     PSI.attach_feedforward!(device_model, ff_sc)
     c_sys5_hy = PSB.build_system(PSITestSystems, "c_sys5_hy")
     model = DecisionModel(MockOperationProblem, DCPPowerModel, c_sys5_hy)
-    mock_construct_device!(model, device_model; built_for_recurrent_solves=true)
+    mock_construct_device!(model, device_model; built_for_recurrent_solves = true)
     moi_tests(model, 72, 0, 48, 24, 0, false)
 end
 
 @testset "Test UpperBoundFeedforward to HydroDispatch with HydroCommitmentRunOfRiver model" begin
     device_model = PSI.DeviceModel(HydroDispatch, HydroCommitmentRunOfRiver)
     ff_ub = UpperBoundFeedforward(;
-        component_type=HydroDispatch,
-        source=PSI.ActivePowerVariable,
-        affected_values=[PSI.ActivePowerVariable],
+        component_type = HydroDispatch,
+        source = PSI.ActivePowerVariable,
+        affected_values = [PSI.ActivePowerVariable],
     )
     PSI.attach_feedforward!(device_model, ff_ub)
     c_sys5_hy = PSB.build_system(PSITestSystems, "c_sys5_hy")
     model = DecisionModel(MockOperationProblem, DCPPowerModel, c_sys5_hy)
-    mock_construct_device!(model, device_model; built_for_recurrent_solves=true)
+    mock_construct_device!(model, device_model; built_for_recurrent_solves = true)
     moi_tests(model, 96, 0, 72, 24, 0, true)
 end
 
 @testset "Test LowerBoundFeedforward to HydroDispatch with HydroCommitmentRunOfRiver model" begin
     device_model = PSI.DeviceModel(HydroDispatch, HydroCommitmentRunOfRiver)
     ff_ub = LowerBoundFeedforward(;
-        component_type=HydroDispatch,
-        source=PSI.ActivePowerVariable,
-        affected_values=[PSI.ActivePowerVariable],
+        component_type = HydroDispatch,
+        source = PSI.ActivePowerVariable,
+        affected_values = [PSI.ActivePowerVariable],
     )
     PSI.attach_feedforward!(device_model, ff_ub)
     c_sys5_hy = PSB.build_system(PSITestSystems, "c_sys5_hy")
     model = DecisionModel(MockOperationProblem, DCPPowerModel, c_sys5_hy)
-    mock_construct_device!(model, device_model; built_for_recurrent_solves=true)
+    mock_construct_device!(model, device_model; built_for_recurrent_solves = true)
     moi_tests(model, 96, 0, 48, 48, 0, true)
 end
 
@@ -384,15 +391,15 @@ end
     device_model = PSI.DeviceModel(HydroDispatch, HydroDispatchRunOfRiver)
 
     ff_ub = UpperBoundFeedforward(;
-        component_type=HydroDispatch,
-        source=PSI.ActivePowerVariable,
-        affected_values=[PSI.ActivePowerVariable],
+        component_type = HydroDispatch,
+        source = PSI.ActivePowerVariable,
+        affected_values = [PSI.ActivePowerVariable],
     )
 
     PSI.attach_feedforward!(device_model, ff_ub)
     c_sys5_hy = PSB.build_system(PSITestSystems, "c_sys5_hy")
     model = DecisionModel(MockOperationProblem, DCPPowerModel, c_sys5_hy)
-    mock_construct_device!(model, device_model; built_for_recurrent_solves=true)
+    mock_construct_device!(model, device_model; built_for_recurrent_solves = true)
     moi_tests(model, 72, 0, 72, 24, 0, false)
 end
 
@@ -400,91 +407,91 @@ end
     device_model = PSI.DeviceModel(HydroDispatch, HydroDispatchRunOfRiver)
 
     ff_ub = LowerBoundFeedforward(;
-        component_type=HydroDispatch,
-        source=PSI.ActivePowerVariable,
-        affected_values=[PSI.ActivePowerVariable],
+        component_type = HydroDispatch,
+        source = PSI.ActivePowerVariable,
+        affected_values = [PSI.ActivePowerVariable],
     )
 
     PSI.attach_feedforward!(device_model, ff_ub)
     c_sys5_hy = PSB.build_system(PSITestSystems, "c_sys5_hy")
     model = DecisionModel(MockOperationProblem, DCPPowerModel, c_sys5_hy)
-    mock_construct_device!(model, device_model; built_for_recurrent_solves=true)
+    mock_construct_device!(model, device_model; built_for_recurrent_solves = true)
     moi_tests(model, 72, 0, 48, 48, 0, false)
 end
 
 @testset "Test ReservoirLimitFeedforward to HydroEnergyReservoir with HydroDispatchReservoirBudget model" begin
     device_model = PSI.DeviceModel(HydroEnergyReservoir, HydroDispatchReservoirBudget)
     ff_il = ReservoirLimitFeedforward(;
-        component_type=HydroEnergyReservoir,
-        source=PSI.ActivePowerVariable,
-        affected_values=[PSI.ActivePowerVariable],
-        number_of_periods=12,
+        component_type = HydroEnergyReservoir,
+        source = PSI.ActivePowerVariable,
+        affected_values = [PSI.ActivePowerVariable],
+        number_of_periods = 12,
     )
 
     PSI.attach_feedforward!(device_model, ff_il)
     c_sys5_hy = PSB.build_system(PSITestSystems, "c_sys5_hyd")
     model = DecisionModel(MockOperationProblem, DCPPowerModel, c_sys5_hy)
-    mock_construct_device!(model, device_model; built_for_recurrent_solves=true)
+    mock_construct_device!(model, device_model; built_for_recurrent_solves = true)
     moi_tests(model, 72, 0, 27, 24, 0, false)
 end
 
 @testset "Test ReservoirLimitFeedforward to HydroEnergyReservoir with HydroDispatchReservoirStorage model" begin
     device_model = PSI.DeviceModel(HydroEnergyReservoir, HydroDispatchReservoirStorage)
     ff_il = ReservoirLimitFeedforward(;
-        component_type=HydroEnergyReservoir,
-        source=PSI.ActivePowerVariable,
-        affected_values=[PSI.ActivePowerVariable],
-        number_of_periods=12,
+        component_type = HydroEnergyReservoir,
+        source = PSI.ActivePowerVariable,
+        affected_values = [PSI.ActivePowerVariable],
+        number_of_periods = 12,
     )
 
     PSI.attach_feedforward!(device_model, ff_il)
     c_sys5_hy = PSB.build_system(PSITestSystems, "c_sys5_hyd_ems")
     model = DecisionModel(MockOperationProblem, DCPPowerModel, c_sys5_hy)
-    mock_construct_device!(model, device_model; built_for_recurrent_solves=true)
+    mock_construct_device!(model, device_model; built_for_recurrent_solves = true)
     moi_tests(model, 193, 0, 26, 24, 48, false)
 end
 
 @testset "Test LowerBoundFeedforward to HydroEnergyReservoir with HydroDispatchReservoirStorage model" begin
     device_model = PSI.DeviceModel(HydroEnergyReservoir, HydroDispatchReservoirStorage)
     ff_il = LowerBoundFeedforward(;
-        component_type=HydroEnergyReservoir,
-        source=PSI.ActivePowerVariable,
-        affected_values=[PSI.ActivePowerVariable],
+        component_type = HydroEnergyReservoir,
+        source = PSI.ActivePowerVariable,
+        affected_values = [PSI.ActivePowerVariable],
     )
 
     PSI.attach_feedforward!(device_model, ff_il)
     c_sys5_hy = PSB.build_system(PSITestSystems, "c_sys5_hyd_ems")
     model = DecisionModel(MockOperationProblem, DCPPowerModel, c_sys5_hy)
-    mock_construct_device!(model, device_model; built_for_recurrent_solves=true)
+    mock_construct_device!(model, device_model; built_for_recurrent_solves = true)
     moi_tests(model, 193, 0, 24, 48, 48, false)
 end
 
 @testset "Test ReservoirLimitFeedforward to HydroEnergyReservoir with HydroCommitmentReservoirStorage model" begin
     device_model = PSI.DeviceModel(HydroEnergyReservoir, HydroCommitmentReservoirStorage)
     ff_il = ReservoirLimitFeedforward(;
-        component_type=HydroEnergyReservoir,
-        source=PSI.ActivePowerVariable,
-        affected_values=[PSI.ActivePowerVariable],
-        number_of_periods=12,
+        component_type = HydroEnergyReservoir,
+        source = PSI.ActivePowerVariable,
+        affected_values = [PSI.ActivePowerVariable],
+        number_of_periods = 12,
     )
     PSI.attach_feedforward!(device_model, ff_il)
     c_sys5_hy = PSB.build_system(PSITestSystems, "c_sys5_hyd_ems")
     model = DecisionModel(MockOperationProblem, DCPPowerModel, c_sys5_hy)
-    mock_construct_device!(model, device_model; built_for_recurrent_solves=true)
+    mock_construct_device!(model, device_model; built_for_recurrent_solves = true)
     moi_tests(model, 217, 0, 26, 24, 48, true)
 end
 
 @testset "Test SemiContinuousFeedforward to HydroEnergyReservoir with HydroDispatchReservoirStorage model" begin
     device_model = PSI.DeviceModel(HydroEnergyReservoir, HydroDispatchReservoirStorage)
     ff_sc = SemiContinuousFeedforward(;
-        component_type=HydroEnergyReservoir,
-        source=PSI.OnVariable,
-        affected_values=[PSI.ActivePowerVariable],
+        component_type = HydroEnergyReservoir,
+        source = PSI.OnVariable,
+        affected_values = [PSI.ActivePowerVariable],
     )
     PSI.attach_feedforward!(device_model, ff_sc)
     c_sys5_hy = PSB.build_system(PSITestSystems, "c_sys5_hyd_ems")
     model = DecisionModel(MockOperationProblem, DCPPowerModel, c_sys5_hy)
-    mock_construct_device!(model, device_model; built_for_recurrent_solves=true)
+    mock_construct_device!(model, device_model; built_for_recurrent_solves = true)
     moi_tests(model, 193, 0, 24, 24, 48, false)
 end
 
@@ -492,16 +499,16 @@ end
     device_model = PSI.DeviceModel(HydroPumpedStorage, HydroDispatchPumpedStorage)
 
     ff_il = ReservoirLimitFeedforward(;
-        component_type=HydroPumpedStorage,
-        source=PSI.ActivePowerOutVariable,
-        affected_values=[PSI.ActivePowerOutVariable],
-        number_of_periods=12,
+        component_type = HydroPumpedStorage,
+        source = PSI.ActivePowerOutVariable,
+        affected_values = [PSI.ActivePowerOutVariable],
+        number_of_periods = 12,
     )
 
     PSI.attach_feedforward!(device_model, ff_il)
     c_sys5_hy = PSB.build_system(PSITestSystems, "c_sys5_phes_ed")
     model = DecisionModel(MockOperationProblem, DCPPowerModel, c_sys5_hy)
-    mock_construct_device!(model, device_model; built_for_recurrent_solves=true)
+    mock_construct_device!(model, device_model; built_for_recurrent_solves = true)
     moi_tests(model, 110, 0, 25, 24, 24, true)
 end
 
@@ -509,17 +516,17 @@ end
     device_model = PSI.DeviceModel(HydroPumpedStorage, HydroDispatchPumpedStorage)
 
     ff_up = ReservoirTargetFeedforward(;
-        component_type=HydroPumpedStorage,
-        source=HydroEnergyVariableUp,
-        affected_values=[HydroEnergyVariableUp],
-        target_period=12,
-        penalty_cost=1e4,
+        component_type = HydroPumpedStorage,
+        source = HydroEnergyVariableUp,
+        affected_values = [HydroEnergyVariableUp],
+        target_period = 12,
+        penalty_cost = 1e4,
     )
 
     PSI.attach_feedforward!(device_model, ff_up)
     c_sys5_hy = PSB.build_system(PSITestSystems, "c_sys5_phes_ed")
     model = DecisionModel(MockOperationProblem, DCPPowerModel, c_sys5_hy)
-    mock_construct_device!(model, device_model; built_for_recurrent_solves=true)
+    mock_construct_device!(model, device_model; built_for_recurrent_solves = true)
     moi_tests(model, 122, 0, 24, 25, 24, true)
 end
 
@@ -540,9 +547,10 @@ end
         ServiceModel(ReserveDemandCurve{ReserveUp}, StepwiseCostReserve, "ORDC1"),
     )
 
-    c_sys5_hyd = PSB.build_system(PSITestSystems, "c_sys5_hyd"; add_reserves=true)
+    c_sys5_hyd = PSB.build_system(PSITestSystems, "c_sys5_hyd"; add_reserves = true)
     model = DecisionModel(template, c_sys5_hyd)
-    @test build!(model; output_dir=mktempdir(; cleanup=true)) == PSI.ModelBuildStatus.BUILT
+    @test build!(model; output_dir = mktempdir(; cleanup = true)) ==
+          PSI.ModelBuildStatus.BUILT
     # The value of this test needs to be revised
     # moi_tests(model, 240, 0, 48, 96, 72, false)
 end
@@ -560,7 +568,8 @@ end
         ServiceModel(VariableReserve{ReserveDown}, RangeReserve, "Reserve8"),
     )
 
-    c_sys5_phes_ed = PSB.build_system(PSITestSystems, "c_sys5_phes_ed", add_reserves=true)
+    c_sys5_phes_ed = PSB.build_system(PSITestSystems, "c_sys5_phes_ed"; add_reserves = true)
     model = DecisionModel(template, c_sys5_phes_ed)
-    @test build!(model; output_dir=mktempdir(; cleanup=true)) == PSI.ModelBuildStatus.BUILT
+    @test build!(model; output_dir = mktempdir(; cleanup = true)) ==
+          PSI.ModelBuildStatus.BUILT
 end

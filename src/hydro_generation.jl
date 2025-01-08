@@ -292,7 +292,7 @@ function PSI.add_constraints!(
 end
 
 """
-Add semicontinuous range constraints for Hydro Unit Commitment formulation
+Add semicontinuous range constraints for [`HydroCommitmentRunOfRiver`](@ref) formulation
 """
 function PSI.add_constraints!(
     container::PSI.OptimizationContainer,
@@ -370,7 +370,7 @@ function PSI.get_min_max_limits(
     ::Type{<:PSI.ActivePowerVariableLimitsConstraint},
     ::Type{<:HydroDispatchRunOfRiver},
 )
-    return (min=0.0, max=PSY.get_max_active_power(x))
+    return (min = 0.0, max = PSY.get_max_active_power(x))
 end
 
 """
@@ -385,7 +385,7 @@ function PSI.get_min_max_limits(
 end
 
 """
-Add power variable limits constraints for hydro unit commitment formulation
+Add power variable limits constraints for abstract hydro unit commitment formulations
 """
 function PSI.add_constraints!(
     container::PSI.OptimizationContainer,
@@ -400,7 +400,7 @@ function PSI.add_constraints!(
 end
 
 """
-Add power variable limits constraints for hydro dispatch formulation
+Add power variable limits constraints for abstract hydro dispatch formulations
 """
 function PSI.add_constraints!(
     container::PSI.OptimizationContainer,
@@ -421,7 +421,7 @@ function PSI.add_constraints!(
 end
 
 """
-Add input power variable limits constraints for hydro dispatch formulation
+Add input power variable limits constraints for abstract hydro dispatch formulations
 """
 function PSI.add_constraints!(
     container::PSI.OptimizationContainer,
@@ -446,7 +446,7 @@ function PSI.add_constraints!(
 end
 
 """
-Add output power variable limits constraints for hydro dispatch formulation
+Add output power variable limits constraints for abstract hydro dispatch formulations
 """
 function PSI.add_constraints!(
     container::PSI.OptimizationContainer,
@@ -471,7 +471,7 @@ function PSI.add_constraints!(
 end
 
 """
-Min and max output active power variable limits for hydro dispatch pumped storage
+Min and max output active power variable limits for [`HydroDispatchPumpedStorage`](@ref)
 """
 function PSI.get_min_max_limits(
     x::PSY.HydroGen,
@@ -482,7 +482,7 @@ function PSI.get_min_max_limits(
 end
 
 """
-Min and max input active power variable limits for hydro dispatch pumped storage
+Min and max input active power variable limits for [`HydroDispatchPumpedStorage`](@ref)
 """
 function PSI.get_min_max_limits(
     x::PSY.HydroGen,
@@ -584,7 +584,7 @@ function _add_output_limits_with_reserves!(
 
 """
 This function defines the constraints for the water level (or state of charge)
-for the Hydro Reservoir.
+for the [`PowerSystems.HydroEnergyReservoir`](@extref).
 """
 function PSI.add_constraints!(
     container::PSI.OptimizationContainer,
@@ -643,7 +643,7 @@ end
 
 """
 This function defines the constraints for the water level (or state of charge)
-for the HydroPumpedStorage.
+for the [`PowerSystems.HydroPumpedStorage`](@extref).
 """
 function PSI.add_constraints!(
     container::PSI.OptimizationContainer,
@@ -712,7 +712,7 @@ function PSI.add_constraints!(
 end
 
 """
-Add energy capacity down constraints for hydro pumped storage
+Add energy capacity down constraints for [`PowerSystems.HydroPumpedStorage`](@extref)
 """
 function PSI.add_constraints!(
     container::PSI.OptimizationContainer,
@@ -779,7 +779,7 @@ function PSI.add_constraints!(
 end
 
 """
-Add energy target constraints for hydro gen
+Add energy target constraints for [`PowerSystems.HydroGen`](@extref)
 """
 function PSI.add_constraints!(
     container::PSI.OptimizationContainer,
@@ -871,7 +871,8 @@ function PSI.add_constraints!(
         param = PSI.get_parameter_column_values(param_container, name)
         constraint[name] = JuMP.@constraint(
             container.JuMPmodel,
-            sum([variable_out[name, t] for t in time_steps]) <= sum([multiplier[name, t] * param[t] for t in time_steps])
+            sum([variable_out[name, t] for t in time_steps]) <=
+            sum([multiplier[name, t] * param[t] for t in time_steps])
         )
     end
     return
@@ -934,8 +935,8 @@ function PSI.update_decision_state!(
         state_data_index = 1
         state_data.timestamps[:] .= range(
             simulation_time;
-            step=state_resolution,
-            length=PSI.get_num_rows(state_data),
+            step = state_resolution,
+            length = PSI.get_num_rows(state_data),
         )
     else
         state_data_index = PSI.find_timestamp_index(state_timestamps, simulation_time)
