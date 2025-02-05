@@ -190,7 +190,8 @@ struct ReservoirLimitFeedforward <: PSI.AbstractAffectFeedforward
 end
 
 PSI.get_default_parameter_type(::ReservoirLimitFeedforward, _) = ReservoirLimitParameter
-PSI.get_optimization_container_key(ff::ReservoirLimitFeedforward) = ff.optimization_container_key
+PSI.get_optimization_container_key(ff::ReservoirLimitFeedforward) =
+    ff.optimization_container_key
 get_number_of_periods(ff::ReservoirLimitFeedforward) = ff.number_of_periods
 
 @doc raw"""
