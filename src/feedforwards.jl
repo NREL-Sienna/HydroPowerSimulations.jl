@@ -177,7 +177,7 @@ struct ReservoirLimitFeedforward <: PSI.AbstractAffectFeedforward
                     PSI.get_optimization_container_key(v(), component_type, meta)
             else
                 error(
-                    "EnergyLimitFeedforward is only compatible with VariableType or ParamterType affected values",
+                    "ReservoirLimitFeedforward is only compatible with VariableType or ParamterType affected values",
                 )
             end
         end
@@ -190,8 +190,9 @@ struct ReservoirLimitFeedforward <: PSI.AbstractAffectFeedforward
 end
 
 PSI.get_default_parameter_type(::ReservoirLimitFeedforward, _) = ReservoirLimitParameter
-PSI.get_optimization_container_key(ff) = ff.optimization_container_key
-get_number_of_periods(ff) = ff.number_of_periods
+PSI.get_optimization_container_key(ff::ReservoirLimitFeedforward) =
+    ff.optimization_container_key
+get_number_of_periods(ff::ReservoirLimitFeedforward) = ff.number_of_periods
 
 @doc raw"""
         add_feedforward_constraints(container::PSI.OptimizationContainer,
