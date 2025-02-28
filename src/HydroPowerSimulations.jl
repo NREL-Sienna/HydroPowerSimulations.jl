@@ -36,6 +36,7 @@ export InflowTimeSeriesParameter
 export OutflowTimeSeriesParameter
 export ReservoirTargetParameter
 export ReservoirLimitParameter
+export HydroUsageLimitParameter
 
 ######## Hydro Initial Conditions #######
 export InitialHydroEnergyLevelUp
@@ -50,6 +51,7 @@ export EnergyBudgetConstraint
 ######## Hydro feedforwards #######
 export ReservoirTargetFeedforward
 export ReservoirLimitFeedforward
+export HydroUsageLimitFeedforward
 
 ######## Hydro Expressions #######
 export ReserveRangeExpressionLB
