@@ -94,6 +94,7 @@ PSI.get_multiplier_value(::PSI.TimeSeriesParameter, d::PSY.HydroGen, ::PSI.Fixed
 
 PSI.get_parameter_multiplier(::PSI.VariableValueParameter, d::PSY.HydroGen, ::AbstractHydroFormulation) = 1.0
 PSI.get_initial_parameter_value(::PSI.VariableValueParameter, d::PSY.HydroGen, ::AbstractHydroFormulation) = 1.0
+PSI.get_initial_parameter_value(::HydroUsageLimitParameter, d::PSY.HydroGen, ::AbstractHydroFormulation) = 1e6 #unbounded
 PSI.get_expression_multiplier(::PSI.OnStatusParameter, ::PSI.ActivePowerRangeExpressionUB, d::PSY.HydroGen, ::AbstractHydroFormulation) = PSY.get_active_power_limits(d).max
 PSI.get_expression_multiplier(::PSI.OnStatusParameter, ::PSI.ActivePowerRangeExpressionLB, d::PSY.HydroGen, ::AbstractHydroFormulation) = PSY.get_active_power_limits(d).min
 
@@ -890,9 +891,35 @@ function PSI.calculate_aux_variable_value!(
     p_variable_results = PSI.get_variable(container, PSI.ActivePowerVariable(), T)
     aux_variable_container = PSI.get_aux_variable(container, HydroEnergyOutput(), T)
     devices_names = axes(aux_variable_container, 1)
-    for name in devices_names, t in time_steps
-        aux_variable_container[name, t] =
-            PSI.jump_value(p_variable_results[name, t]) * fraction_of_hour
+    for name in devices_names
+        d = PSY.get_component(T, system, name)
+        for t in time_steps
+            if PSI.has_container_key(container, HydroServedReserveUpExpression, typeof(d))
+                served_regup = PSI.jump_value(
+                    PSI.get_expression(container, HydroServedReserveUpExpression(), T)[
+                        name,
+                        t,
+                    ],
+                )
+            else
+                served_regup = 0.0
+            end
+            if PSI.has_container_key(container, HydroServedReserveUpExpression, typeof(d))
+                served_regdn = PSI.jump_value(
+                    PSI.get_expression(container, HydroServedReserveDownExpression(), T)[
+                        name,
+                        t,
+                    ],
+                )
+            else
+                served_regdn = 0.0
+            end
+            aux_variable_container[name, t] =
+                (
+                    PSI.jump_value(p_variable_results[name, t]) +
+                    served_regup - served_regdn
+                ) * fraction_of_hour
+        end
     end
 
     return
@@ -909,9 +936,35 @@ function PSI.calculate_aux_variable_value!(
     p_variable_results = PSI.get_variable(container, PSI.ActivePowerOutVariable(), T)
     aux_variable_container = PSI.get_aux_variable(container, HydroEnergyOutput(), T)
     devices_names = axes(aux_variable_container, 1)
-    for name in devices_names, t in time_steps
-        aux_variable_container[name, t] =
-            PSI.jump_value(p_variable_results[name, t]) * fraction_of_hour
+    for name in devices_names
+        d = PSY.get_component(T, system, name)
+        for t in time_steps
+            if PSI.has_container_key(container, HydroServedReserveUpExpression, typeof(d))
+                served_regup = PSI.jump_value(
+                    PSI.get_expression(container, HydroServedReserveUpExpression(), T)[
+                        name,
+                        t,
+                    ],
+                )
+            else
+                served_regup = 0.0
+            end
+            if PSI.has_container_key(container, HydroServedReserveUpExpression, typeof(d))
+                served_regdn = PSI.jump_value(
+                    PSI.get_expression(container, HydroServedReserveDownExpression(), T)[
+                        name,
+                        t,
+                    ],
+                )
+            else
+                served_regdn = 0.0
+            end
+            aux_variable_container[name, t] =
+                (
+                    PSI.jump_value(p_variable_results[name, t]) +
+                    served_regup - served_regdn
+                ) * fraction_of_hour
+        end
     end
 
     return
@@ -1244,6 +1297,185 @@ function PSI.add_to_expression!(
     model::PSI.ServiceModel{X, W},
 ) where {
     T <: ReserveRangeExpressionLB,
+    U <: PSI.VariableType,
+    V <: PSY.HydroGen,
+    X <: PSY.Reserve{PSY.ReserveDown},
+    W <: PSI.AbstractReservesFormulation,
+}
+    service_name = PSI.get_service_name(model)
+    variable = PSI.get_variable(container, U(), X, service_name)
+    if !PSI.has_container_key(container, T, V)
+        PSI.add_expressions!(container, T, devices, model)
+    end
+    expression = PSI.get_expression(container, T(), V)
+    for d in devices, t in PSI.get_time_steps(container)
+        name = PSY.get_name(d)
+        PSI._add_to_jump_expression!(expression[name, t], variable[name, t], -1.0)
+    end
+    return
+end
+
+function PSI.add_to_expression!(
+    container::PSI.OptimizationContainer,
+    ::Type{T},
+    ::Type{U},
+    devices::Union{Vector{V}, IS.FlattenIteratorWrapper{V}},
+    model::PSI.DeviceModel{V, W},
+    network_model::PSI.NetworkModel{X},
+) where {
+    T <: HydroServedReserveUpExpression,
+    U <: PSI.ActivePowerReserveVariable,
+    V <: PSY.HydroGen,
+    W <: PSI.AbstractDeviceFormulation,
+    X <: PM.AbstractPowerModel,
+}
+    expression = PSI.get_expression(container, T(), V)
+    for d in devices
+        name = PSY.get_name(d)
+        service_models = PSI.get_services(model)
+        for service_model in service_models
+            service_name = PSI.get_service_name(service_model)
+            services = PSY.get_services(d)
+            service_ix = findfirst(x -> PSY.get_name(x) == service_name, services)
+            service = services[service_ix]
+            if isa(service, PSY.Reserve{PSY.ReserveUp})
+                deployed_fraction = PSY.get_deployed_fraction(service)
+                variable = PSI.get_variable(
+                    container,
+                    U(),
+                    typeof(service),
+                    service_name,
+                )
+                for t in PSI.get_time_steps(container)
+                    PSI._add_to_jump_expression!(
+                        expression[name, t],
+                        variable[name, t],
+                        deployed_fraction,
+                    )
+                end
+            end
+        end
+    end
+end
+
+function PSI.add_to_expression!(
+    container::PSI.OptimizationContainer,
+    ::Type{T},
+    ::Type{U},
+    devices::Union{Vector{V}, IS.FlattenIteratorWrapper{V}},
+    model::PSI.DeviceModel{V, W},
+    network_model::PSI.NetworkModel{X},
+) where {
+    T <: HydroServedReserveDownExpression,
+    U <: PSI.ActivePowerReserveVariable,
+    V <: PSY.HydroGen,
+    W <: PSI.AbstractDeviceFormulation,
+    X <: PM.AbstractPowerModel,
+}
+    expression = PSI.get_expression(container, T(), V)
+    for d in devices
+        name = PSY.get_name(d)
+        service_models = PSI.get_services(model)
+        for service_model in service_models
+            service_name = PSI.get_service_name(service_model)
+            # Find service with the same name of the service_model, that should exist in the device
+            services = PSY.get_services(d)
+            service_ix = findfirst(x -> PSY.get_name(x) == service_name, services)
+            service = services[service_ix]
+            if isa(service, PSY.Reserve{PSY.ReserveDown})
+                deployed_fraction = PSY.get_deployed_fraction(service)
+                variable = PSI.get_variable(
+                    container,
+                    U(),
+                    typeof(service),
+                    service_name,
+                )
+                for t in PSI.get_time_steps(container)
+                    PSI._add_to_jump_expression!(
+                        expression[name, t],
+                        variable[name, t],
+                        deployed_fraction,
+                    )
+                end
+            end
+        end
+    end
+end
+
+###################################################################
+##################### Hydro Usage Parameters ######################
+###################################################################
+
+function PSI._add_parameters!(
+    container::PSI.OptimizationContainer,
+    ::Type{T},
+    devices::V,
+    model::PSI.DeviceModel{D, W},
+) where {
+    T <: HydroUsageLimitParameter,
+    V <: Union{Vector{D}, IS.FlattenIteratorWrapper{D}},
+    W <: AbstractHydroFormulation,
+} where {D <: PSY.HydroGen}
+    #@debug "adding" T D U _group = LOG_GROUP_OPTIMIZATION_CONTAINER
+    names = [PSY.get_name(device) for device in devices]
+    time_steps = PSI.get_time_steps(container)
+    resolution = PSI.get_resolution(container)
+    fraction_of_hour = Dates.value(Dates.Minute(resolution)) / PSI.MINUTES_IN_HOUR
+    HOURS_IN_DAY = 24
+    mult = fraction_of_hour * length(time_steps) / HOURS_IN_DAY
+    key = PSI.AuxVarKey{HydroEnergyOutput, D}("")
+    parameter_container =
+        PSI.add_param_container!(container, T(), D, key, names, [time_steps[end]])
+    jump_model = PSI.get_jump_model(container)
+
+    for d in devices
+        name = PSY.get_name(d)
+        PSI.set_multiplier!(parameter_container, 1.0, name, time_steps[end])
+        PSI.set_parameter!(
+            parameter_container,
+            jump_model,
+            mult * PSI.get_initial_parameter_value(T(), d, W()),
+            name,
+            time_steps[end],
+        )
+    end
+    return
+end
+
+function PSI.add_to_expression!(
+    container::PSI.OptimizationContainer,
+    ::Type{T},
+    ::Type{U},
+    devices::Union{Vector{V}, IS.FlattenIteratorWrapper{V}},
+    model::PSI.ServiceModel{X, W},
+) where {
+    T <: HydroServedReserveUpExpression,
+    U <: PSI.VariableType,
+    V <: PSY.HydroGen,
+    X <: PSY.Reserve{PSY.ReserveUp},
+    W <: PSI.AbstractReservesFormulation,
+}
+    service_name = PSI.get_service_name(model)
+    variable = PSI.get_variable(container, U(), X, service_name)
+    if !PSI.has_container_key(container, T, V)
+        PSI.add_expressions!(container, T, devices, model)
+    end
+    expression = PSI.get_expression(container, T(), V)
+    for d in devices, t in PSI.get_time_steps(container)
+        name = PSY.get_name(d)
+        PSI._add_to_jump_expression!(expression[name, t], variable[name, t], 1.0)
+    end
+    return
+end
+
+function PSI.add_to_expression!(
+    container::PSI.OptimizationContainer,
+    ::Type{T},
+    ::Type{U},
+    devices::Union{Vector{V}, IS.FlattenIteratorWrapper{V}},
+    model::PSI.ServiceModel{X, W},
+) where {
+    T <: HydroServedReserveDownExpression,
     U <: PSI.VariableType,
     V <: PSY.HydroGen,
     X <: PSY.Reserve{PSY.ReserveDown},

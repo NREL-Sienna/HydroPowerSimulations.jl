@@ -349,3 +349,176 @@ function PSI.update_parameter_values!(
     )
     return
 end
+
+"""
+    HydroUsageLimitFeedforward(
+        component_type::Type{<:PowerSystems.Component},
+        source::Type{T},
+        affected_values::Vector{DataType},
+        meta = CONTAINER_KEY_EMPTY_META
+    ) where {T}
+
+Adds a constraint to enforce a maximum usage of hydro energy based on the source value.
+It is recommended to use the Auxiliary Variable HydroEnergyOutput as Source, affecting the HydroUsageLimitParameter.
+
+# Arguments:
+
+  - `component_type::Type{<:`[`PowerSystems.Component`](@extref)`}` : Specify the type of component on which the Feedforward will be applied
+  - `source::Type{T}` : Specify the VariableType, ParameterType or AuxVariableType as the source of values for the Feedforward
+  - `affected_values::Vector{DataType}` : Specify the variable on which the hydro limit will be applied using the source values
+"""
+struct HydroUsageLimitFeedforward <: PSI.AbstractAffectFeedforward
+    optimization_container_key::PSI.OptimizationContainerKey
+    affected_values::Vector{<:PSI.OptimizationContainerKey}
+    function HydroUsageLimitFeedforward(;
+        component_type::Type{<:PSY.Component},
+        source::Type{T},
+        affected_values::Vector{DataType},
+        meta = ISOPT.CONTAINER_KEY_EMPTY_META,
+    ) where {T}
+        values_vector = Vector{PSI.ParameterKey}(undef, length(affected_values))
+        for (ix, v) in enumerate(affected_values)
+            if v <: PSI.ParameterType
+                values_vector[ix] =
+                    PSI.get_optimization_container_key(v(), component_type, meta)
+            else
+                error(
+                    "HydroUsageLimitFeedforward is only compatible with VariableType or ParameterType affected values",
+                )
+            end
+        end
+        new(
+            PSI.get_optimization_container_key(T(), component_type, meta),
+            values_vector,
+        )
+    end
+end
+
+PSI.get_default_parameter_type(::HydroUsageLimitFeedforward, _) =
+    HydroUsageLimitParameter
+PSI.get_optimization_container_key(ff::HydroUsageLimitFeedforward) =
+    ff.optimization_container_key
+
+function PSI.add_feedforward_arguments!(
+    container::PSI.OptimizationContainer,
+    model::PSI.DeviceModel,
+    devices::Union{Vector{D}, IS.FlattenIteratorWrapper{D}},
+) where {D <: PSY.HydroGen}
+    for ff in PSI.get_feedforwards(model)
+        PSI._add_feedforward_arguments!(container, model, devices, ff)
+    end
+    return
+end
+
+function PSI._add_feedforward_arguments!(
+    container::PSI.OptimizationContainer,
+    device_model::PSI.DeviceModel,
+    devices::Union{Vector{D}, IS.FlattenIteratorWrapper{D}},
+    ff::U,
+) where {
+    D <: PSY.HydroGen,
+    U <: HydroUsageLimitFeedforward,
+}
+    parameter_type = PSI.get_default_parameter_type(ff, D)
+    PSI._add_parameters!(container, parameter_type, devices, device_model)
+    return
+end
+
+function PSI.add_feedforward_constraints!(
+    container::PSI.OptimizationContainer,
+    model::PSI.DeviceModel,
+    devices::Vector{V},
+) where {V <: PSY.HydroGen}
+    for ff in PSI.get_feedforwards(model)
+        PSI.add_feedforward_constraints!(container, model, devices, ff)
+    end
+    return
+end
+
+function PSI.add_feedforward_constraints!(
+    container::PSI.OptimizationContainer,
+    device_model::PSI.DeviceModel,
+    devices::Union{Vector{D}, IS.FlattenIteratorWrapper{D}},
+    ::HydroUsageLimitFeedforward,
+) where {D <: PSY.HydroGen}
+    time_steps = PSI.get_time_steps(container)
+    resolution = PSI.get_resolution(container)
+    fraction_of_hour = Dates.value(Dates.Minute(resolution)) / PSI.MINUTES_IN_HOUR
+    names = [PSY.get_name(d) for d in devices]
+    power_var = PSI.get_variable(container, PSI.ActivePowerVariable(), D)
+    T = FeedForwardHydroUsageLimitConstraint
+    con_reservoir_ff = PSI.add_constraints_container!(container, T(), D, names)
+    for device in devices
+        ci_name = PSY.get_name(device)
+        if PSI.built_for_recurrent_solves(container)
+            param_value =
+                PSI.get_parameter_array(container, HydroUsageLimitParameter(), D)[
+                    ci_name,
+                    time_steps[end],
+                ]
+            if PSI.has_service_model(device_model)
+                served_reg_dn =
+                    PSI.get_expression(container, HydroServedReserveDownExpression(), D)
+                served_reg_up =
+                    PSI.get_expression(container, HydroServedReserveUpExpression(), D)
+                con_reservoir_ff[ci_name] = JuMP.@constraint(
+                    PSI.get_jump_model(container),
+                    fraction_of_hour * sum(
+                        power_var[ci_name, :] + served_reg_up[ci_name, :] -
+                        served_reg_dn[ci_name, :],
+                    ) <= param_value
+                )
+            else
+                con_reservoir_ff[ci_name] = JuMP.@constraint(
+                    PSI.get_jump_model(container),
+                    fraction_of_hour * sum(power_var[ci_name, :]) <= param_value
+                )
+            end
+        end
+    end
+    return
+end
+
+function PSI.update_container_parameter_values!(
+    optimization_container::PSI.OptimizationContainer,
+    model::PSI.DecisionModel,
+    key::PSI.ParameterKey{T, U},
+    input::PSI.DatasetContainer{PSI.InMemoryDataset},
+) where {
+    T <: HydroUsageLimitParameter,
+    U <: PSY.HydroGen,
+}
+    # Note: Do not instantiate a new key here because it might not match the param keys in the container
+    # if the keys have strings in the meta fields
+    parameter_array = PSI.get_parameter_array(optimization_container, key)
+    parameter_attributes = PSI.get_parameter_attributes(optimization_container, key)
+    current_time = PSI.get_current_time(model)
+    state_values =
+        PSI.get_dataset_values(input, PSI.get_attribute_key(parameter_attributes))
+    component_names = axes(parameter_array)[1]
+    model_resolution = PSI.get_resolution(optimization_container)
+    state_data = PSI.get_dataset(input, PSI.get_attribute_key(parameter_attributes))
+    state_timestamps = state_data.timestamps
+    end_of_horizon_time =
+        current_time +
+        (PSI.get_time_steps(optimization_container)[end] - 1) * model_resolution
+    state_data_index_start = PSI.find_timestamp_index(state_timestamps, current_time)
+    state_data_index_end = PSI.find_timestamp_index(state_timestamps, end_of_horizon_time)
+    for name in component_names
+        param_value =
+            max.(state_values[name, state_data_index_start:state_data_index_end], 1e-6)
+        PSI.fix_parameter_value(
+            parameter_array[name, state_data_index_end],
+            sum(param_value),
+        )
+    end
+
+    IS.@record :execution PSI.ParameterUpdateEvent(
+        T,
+        U,
+        parameter_attributes,
+        PSI.get_current_timestamp(model),
+        PSI.get_name(model),
+    )
+    return
+end

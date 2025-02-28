@@ -50,3 +50,16 @@ The specified constraint is formulated as:
 """
 struct EnergyBudgetConstraint <: PSI.ConstraintType end
 struct EnergyCapacityConstraint <: PSI.ConstraintType end
+
+"""
+Struct to create the constraint that limits the hydro usage for hydro formulations.
+
+For more information check [HydroPowerSimulations Formulations](@ref HydroPowerSimulations-Formulations).
+
+The specified constraint is formulated as:
+
+```math
+\\sum_{t=1}^T E^\\text{hy}_t \\le  \\text{HydroUsageLimitParameter}_T,
+```
+"""
+struct FeedForwardHydroUsageLimitConstraint <: PSI.ConstraintType end

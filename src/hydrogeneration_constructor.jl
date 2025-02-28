@@ -108,6 +108,11 @@ function PSI.construct_device!(
 
     PSI.add_expressions!(container, PSI.ProductionCostExpression, devices, model)
 
+    if PSI.has_service_model(model)
+        PSI.add_expressions!(container, HydroServedReserveUpExpression, devices, model)
+        PSI.add_expressions!(container, HydroServedReserveDownExpression, devices, model)
+    end
+
     PSI.add_to_expression!(
         container,
         PSI.ActivePowerRangeExpressionLB,
@@ -141,6 +146,25 @@ function PSI.construct_device!(
     S <: PM.AbstractPowerModel,
 }
     devices = PSI.get_available_components(model, sys)
+
+    if PSI.has_service_model(model)
+        PSI.add_to_expression!(
+            container,
+            HydroServedReserveUpExpression,
+            PSI.ActivePowerReserveVariable,
+            devices,
+            model,
+            network_model,
+        )
+        PSI.add_to_expression!(
+            container,
+            HydroServedReserveDownExpression,
+            PSI.ActivePowerReserveVariable,
+            devices,
+            model,
+            network_model,
+        )
+    end
 
     PSI.add_constraints!(
         container,
@@ -222,6 +246,10 @@ function PSI.construct_device!(
     )
 
     PSI.add_expressions!(container, PSI.ProductionCostExpression, devices, model)
+    if PSI.has_service_model(model)
+        PSI.add_expressions!(container, HydroServedReserveUpExpression, devices, model)
+        PSI.add_expressions!(container, HydroServedReserveDownExpression, devices, model)
+    end
 
     PSI.add_feedforward_arguments!(container, model, devices)
     return
@@ -239,6 +267,25 @@ function PSI.construct_device!(
     S <: PM.AbstractActivePowerModel,
 }
     devices = PSI.get_available_components(model, sys)
+
+    if PSI.has_service_model(model)
+        PSI.add_to_expression!(
+            container,
+            HydroServedReserveUpExpression,
+            PSI.ActivePowerReserveVariable,
+            devices,
+            model,
+            network_model,
+        )
+        PSI.add_to_expression!(
+            container,
+            HydroServedReserveDownExpression,
+            PSI.ActivePowerReserveVariable,
+            devices,
+            model,
+            network_model,
+        )
+    end
 
     PSI.add_constraints!(
         container,
@@ -298,6 +345,10 @@ function PSI.construct_device!(
     PSI.add_parameters!(container, EnergyBudgetTimeSeriesParameter, devices, model)
 
     PSI.add_expressions!(container, PSI.ProductionCostExpression, devices, model)
+    if PSI.has_service_model(model)
+        PSI.add_expressions!(container, HydroServedReserveUpExpression, devices, model)
+        PSI.add_expressions!(container, HydroServedReserveDownExpression, devices, model)
+    end
 
     PSI.add_to_expression!(
         container,
@@ -343,6 +394,25 @@ function PSI.construct_device!(
     network_model::PSI.NetworkModel{S},
 ) where {H <: PSY.HydroEnergyReservoir, S <: PM.AbstractPowerModel}
     devices = PSI.get_available_components(model, sys)
+
+    if PSI.has_service_model(model)
+        PSI.add_to_expression!(
+            container,
+            HydroServedReserveUpExpression,
+            PSI.ActivePowerReserveVariable,
+            devices,
+            model,
+            network_model,
+        )
+        PSI.add_to_expression!(
+            container,
+            HydroServedReserveDownExpression,
+            PSI.ActivePowerReserveVariable,
+            devices,
+            model,
+            network_model,
+        )
+    end
 
     PSI.add_constraints!(
         container,
@@ -409,6 +479,10 @@ function PSI.construct_device!(
     PSI.add_parameters!(container, EnergyBudgetTimeSeriesParameter, devices, model)
 
     PSI.add_expressions!(container, PSI.ProductionCostExpression, devices, model)
+    if PSI.has_service_model(model)
+        PSI.add_expressions!(container, HydroServedReserveUpExpression, devices, model)
+        PSI.add_expressions!(container, HydroServedReserveDownExpression, devices, model)
+    end
 
     PSI.add_to_expression!(
         container,
@@ -447,6 +521,25 @@ function PSI.construct_device!(
     network_model::PSI.NetworkModel{S},
 ) where {H <: PSY.HydroEnergyReservoir, S <: PM.AbstractActivePowerModel}
     devices = PSI.get_available_components(model, sys)
+
+    if PSI.has_service_model(model)
+        PSI.add_to_expression!(
+            container,
+            HydroServedReserveUpExpression,
+            PSI.ActivePowerReserveVariable,
+            devices,
+            model,
+            network_model,
+        )
+        PSI.add_to_expression!(
+            container,
+            HydroServedReserveDownExpression,
+            PSI.ActivePowerReserveVariable,
+            devices,
+            model,
+            network_model,
+        )
+    end
 
     PSI.add_constraints!(
         container,
@@ -534,6 +627,10 @@ function PSI.construct_device!(
     PSI.add_parameters!(container, InflowTimeSeriesParameter, devices, model)
 
     PSI.add_expressions!(container, PSI.ProductionCostExpression, devices, model)
+    if PSI.has_service_model(model)
+        PSI.add_expressions!(container, HydroServedReserveUpExpression, devices, model)
+        PSI.add_expressions!(container, HydroServedReserveDownExpression, devices, model)
+    end
 
     PSI.add_to_expression!(
         container,
@@ -579,6 +676,25 @@ function PSI.construct_device!(
     network_model::PSI.NetworkModel{S},
 ) where {H <: PSY.HydroEnergyReservoir, S <: PM.AbstractPowerModel}
     devices = PSI.get_available_components(model, sys)
+
+    if PSI.has_service_model(model)
+        PSI.add_to_expression!(
+            container,
+            HydroServedReserveUpExpression,
+            PSI.ActivePowerReserveVariable,
+            devices,
+            model,
+            network_model,
+        )
+        PSI.add_to_expression!(
+            container,
+            HydroServedReserveDownExpression,
+            PSI.ActivePowerReserveVariable,
+            devices,
+            model,
+            network_model,
+        )
+    end
 
     PSI.add_constraints!(
         container,
@@ -691,6 +807,10 @@ function PSI.construct_device!(
     PSI.add_parameters!(container, InflowTimeSeriesParameter, devices, model)
 
     PSI.add_expressions!(container, PSI.ProductionCostExpression, devices, model)
+    if PSI.has_service_model(model)
+        PSI.add_expressions!(container, HydroServedReserveUpExpression, devices, model)
+        PSI.add_expressions!(container, HydroServedReserveDownExpression, devices, model)
+    end
 
     PSI.add_to_expression!(
         container,
@@ -722,6 +842,25 @@ function PSI.construct_device!(
     network_model::PSI.NetworkModel{S},
 ) where {H <: PSY.HydroEnergyReservoir, S <: PM.AbstractActivePowerModel}
     devices = PSI.get_available_components(model, sys)
+
+    if PSI.has_service_model(model)
+        PSI.add_to_expression!(
+            container,
+            HydroServedReserveUpExpression,
+            PSI.ActivePowerReserveVariable,
+            devices,
+            model,
+            network_model,
+        )
+        PSI.add_to_expression!(
+            container,
+            HydroServedReserveDownExpression,
+            PSI.ActivePowerReserveVariable,
+            devices,
+            model,
+            network_model,
+        )
+    end
 
     PSI.add_constraints!(
         container,
@@ -799,6 +938,10 @@ function PSI.construct_device!(
     PSI.add_parameters!(container, EnergyBudgetTimeSeriesParameter, devices, model)
 
     PSI.add_expressions!(container, PSI.ProductionCostExpression, devices, model)
+    if PSI.has_service_model(model)
+        PSI.add_expressions!(container, HydroServedReserveUpExpression, devices, model)
+        PSI.add_expressions!(container, HydroServedReserveDownExpression, devices, model)
+    end
 
     PSI.add_to_expression!(
         container,
@@ -828,6 +971,25 @@ function PSI.construct_device!(
     network_model::PSI.NetworkModel{S},
 ) where {H <: PSY.HydroGen, D <: HydroCommitmentReservoirBudget, S <: PM.AbstractPowerModel}
     devices = PSI.get_available_components(model, sys)
+
+    if PSI.has_service_model(model)
+        PSI.add_to_expression!(
+            container,
+            HydroServedReserveUpExpression,
+            PSI.ActivePowerReserveVariable,
+            devices,
+            model,
+            network_model,
+        )
+        PSI.add_to_expression!(
+            container,
+            HydroServedReserveDownExpression,
+            PSI.ActivePowerReserveVariable,
+            devices,
+            model,
+            network_model,
+        )
+    end
 
     PSI.add_constraints!(
         container,
@@ -897,6 +1059,10 @@ function PSI.construct_device!(
     PSI.add_parameters!(container, EnergyBudgetTimeSeriesParameter, devices, model)
 
     PSI.add_expressions!(container, PSI.ProductionCostExpression, devices, model)
+    if PSI.has_service_model(model)
+        PSI.add_expressions!(container, HydroServedReserveUpExpression, devices, model)
+        PSI.add_expressions!(container, HydroServedReserveDownExpression, devices, model)
+    end
     PSI.add_to_expression!(
         container,
         PSI.ActivePowerRangeExpressionLB,
@@ -930,6 +1096,25 @@ function PSI.construct_device!(
     S <: PM.AbstractActivePowerModel,
 }
     devices = PSI.get_available_components(model, sys)
+
+    if PSI.has_service_model(model)
+        PSI.add_to_expression!(
+            container,
+            HydroServedReserveUpExpression,
+            PSI.ActivePowerReserveVariable,
+            devices,
+            model,
+            network_model,
+        )
+        PSI.add_to_expression!(
+            container,
+            HydroServedReserveDownExpression,
+            PSI.ActivePowerReserveVariable,
+            devices,
+            model,
+            network_model,
+        )
+    end
 
     PSI.add_constraints!(
         container,
@@ -1040,6 +1225,10 @@ function PSI.construct_device!(
     PSI.add_parameters!(container, InflowTimeSeriesParameter, devices, model)
 
     PSI.add_expressions!(container, PSI.ProductionCostExpression, devices, model)
+    if PSI.has_service_model(model)
+        PSI.add_expressions!(container, HydroServedReserveUpExpression, devices, model)
+        PSI.add_expressions!(container, HydroServedReserveDownExpression, devices, model)
+    end
 
     PSI.add_to_expression!(
         container,
@@ -1069,6 +1258,25 @@ function PSI.construct_device!(
     network_model::PSI.NetworkModel{S},
 ) where {H <: PSY.HydroEnergyReservoir, S <: PM.AbstractPowerModel}
     devices = PSI.get_available_components(model, sys)
+
+    if PSI.has_service_model(model)
+        PSI.add_to_expression!(
+            container,
+            HydroServedReserveUpExpression,
+            PSI.ActivePowerReserveVariable,
+            devices,
+            model,
+            network_model,
+        )
+        PSI.add_to_expression!(
+            container,
+            HydroServedReserveDownExpression,
+            PSI.ActivePowerReserveVariable,
+            devices,
+            model,
+            network_model,
+        )
+    end
 
     PSI.add_constraints!(
         container,
@@ -1132,6 +1340,25 @@ function PSI.construct_device!(
 ) where {H <: PSY.HydroEnergyReservoir, S <: PM.AbstractActivePowerModel}
     devices = PSI.get_available_components(model, sys)
 
+    if PSI.has_service_model(model)
+        PSI.add_to_expression!(
+            container,
+            HydroServedReserveUpExpression,
+            PSI.ActivePowerReserveVariable,
+            devices,
+            model,
+            network_model,
+        )
+        PSI.add_to_expression!(
+            container,
+            HydroServedReserveDownExpression,
+            PSI.ActivePowerReserveVariable,
+            devices,
+            model,
+            network_model,
+        )
+    end
+
     PSI.add_variables!(
         container,
         PSI.ActivePowerVariable,
@@ -1187,6 +1414,10 @@ function PSI.construct_device!(
     PSI.add_parameters!(container, InflowTimeSeriesParameter, devices, model)
 
     PSI.add_expressions!(container, PSI.ProductionCostExpression, devices, model)
+    if PSI.has_service_model(model)
+        PSI.add_expressions!(container, HydroServedReserveUpExpression, devices, model)
+        PSI.add_expressions!(container, HydroServedReserveDownExpression, devices, model)
+    end
 
     PSI.add_to_expression!(
         container,
@@ -1216,6 +1447,25 @@ function PSI.construct_device!(
     network_model::PSI.NetworkModel{S},
 ) where {H <: PSY.HydroEnergyReservoir, S <: PM.AbstractActivePowerModel}
     devices = PSI.get_available_components(model, sys)
+
+    if PSI.has_service_model(model)
+        PSI.add_to_expression!(
+            container,
+            HydroServedReserveUpExpression,
+            PSI.ActivePowerReserveVariable,
+            devices,
+            model,
+            network_model,
+        )
+        PSI.add_to_expression!(
+            container,
+            HydroServedReserveDownExpression,
+            PSI.ActivePowerReserveVariable,
+            devices,
+            model,
+            network_model,
+        )
+    end
 
     PSI.add_constraints!(
         container,
@@ -1315,6 +1565,10 @@ function PSI.construct_device!(
     PSI.add_parameters!(container, OutflowTimeSeriesParameter, devices, model)
 
     PSI.add_expressions!(container, PSI.ProductionCostExpression, devices, model)
+    if PSI.has_service_model(model)
+        PSI.add_expressions!(container, HydroServedReserveUpExpression, devices, model)
+        PSI.add_expressions!(container, HydroServedReserveDownExpression, devices, model)
+    end
 
     PSI.add_to_expression!(
         container,
@@ -1365,6 +1619,25 @@ function PSI.construct_device!(
     network_model::PSI.NetworkModel{S},
 ) where {H <: PSY.HydroPumpedStorage, S <: PM.AbstractActivePowerModel}
     devices = PSI.get_available_components(model, sys)
+
+    if PSI.has_service_model(model)
+        PSI.add_to_expression!(
+            container,
+            HydroServedReserveUpExpression,
+            PSI.ActivePowerReserveVariable,
+            devices,
+            model,
+            network_model,
+        )
+        PSI.add_to_expression!(
+            container,
+            HydroServedReserveDownExpression,
+            PSI.ActivePowerReserveVariable,
+            devices,
+            model,
+            network_model,
+        )
+    end
 
     _add_output_limit_constraints!(
         container,
@@ -1456,6 +1729,10 @@ function PSI.construct_device!(
     PSI.add_parameters!(container, PSI.ActivePowerTimeSeriesParameter, devices, model)
 
     PSI.add_expressions!(container, PSI.ProductionCostExpression, devices, model)
+    if PSI.has_service_model(model)
+        PSI.add_expressions!(container, HydroServedReserveUpExpression, devices, model)
+        PSI.add_expressions!(container, HydroServedReserveDownExpression, devices, model)
+    end
 
     PSI.add_to_expression!(
         container,
@@ -1509,6 +1786,10 @@ function PSI.construct_device!(
     PSI.add_parameters!(container, PSI.ActivePowerTimeSeriesParameter, devices, model)
 
     PSI.add_expressions!(container, PSI.ProductionCostExpression, devices, model)
+    if PSI.has_service_model(model)
+        PSI.add_expressions!(container, HydroServedReserveUpExpression, devices, model)
+        PSI.add_expressions!(container, HydroServedReserveDownExpression, devices, model)
+    end
 
     PSI.add_to_expression!(
         container,
@@ -1542,6 +1823,25 @@ function PSI.construct_device!(
     S <: PM.AbstractActivePowerModel,
 }
     devices = PSI.get_available_components(model, sys)
+
+    if PSI.has_service_model(model)
+        PSI.add_to_expression!(
+            container,
+            HydroServedReserveUpExpression,
+            PSI.ActivePowerReserveVariable,
+            devices,
+            model,
+            network_model,
+        )
+        PSI.add_to_expression!(
+            container,
+            HydroServedReserveDownExpression,
+            PSI.ActivePowerReserveVariable,
+            devices,
+            model,
+            network_model,
+        )
+    end
 
     PSI.add_constraints!(
         container,
