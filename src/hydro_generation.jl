@@ -1063,7 +1063,10 @@ function PSI.update_initial_conditions!(
     store::PSI.EmulationModelStore,
     ::Dates.Millisecond,
 ) where {
-    T <: PSI.InitialCondition{InitialHydroEnergyLevelUp, S},
+    T <: Union{
+        PSI.InitialCondition{InitialHydroEnergyLevelUp, S},
+        PSI.InitialCondition{InitialHydroEnergyLevelUp, Nothing},
+    },
 } where {S <: Union{Float64, JuMP.VariableRef}}
     for ic in ics
         var_val = PSI.get_variable_value(
@@ -1084,7 +1087,10 @@ function PSI.update_initial_conditions!(
     store::PSI.EmulationModelStore,
     ::Dates.Millisecond,
 ) where {
-    T <: PSI.InitialCondition{InitialHydroEnergyLevelDown, S},
+    T <: Union{
+        PSI.InitialCondition{InitialHydroEnergyLevelDown, S},
+        PSI.InitialCondition{InitialHydroEnergyLevelDown, Nothing},
+    },
 } where {S <: Union{Float64, JuMP.VariableRef}}
     for ic in ics
         var_val = PSI.get_variable_value(
@@ -1105,7 +1111,10 @@ function PSI.update_initial_conditions!(
     state::PSI.SimulationState,
     ::Dates.Millisecond,
 ) where {
-    T <: PSI.InitialCondition{InitialHydroEnergyLevelUp, S},
+    T <: Union{
+        PSI.InitialCondition{InitialHydroEnergyLevelUp, S},
+        PSI.InitialCondition{InitialHydroEnergyLevelUp, Nothing},
+    },
 } where {S <: Union{Float64, JuMP.VariableRef}}
     for ic in ics
         var_val = PSI.get_system_state_value(
@@ -1123,7 +1132,10 @@ function PSI.update_initial_conditions!(
     state::PSI.SimulationState,
     ::Dates.Millisecond,
 ) where {
-    T <: PSI.InitialCondition{InitialHydroEnergyLevelDown, S},
+    T <: Union{
+        PSI.InitialCondition{InitialHydroEnergyLevelDown, S},
+        PSI.InitialCondition{InitialHydroEnergyLevelDown, Nothing},
+    },
 } where {S <: Union{Float64, JuMP.VariableRef}}
     for ic in ics
         var_val = PSI.get_system_state_value(
