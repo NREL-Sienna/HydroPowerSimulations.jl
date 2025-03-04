@@ -1064,10 +1064,11 @@ function PSI.update_initial_conditions!(
     ::Dates.Millisecond,
 ) where {
     T <: Union{
-        PSI.InitialCondition{InitialHydroEnergyLevelUp, S},
+        PSI.InitialCondition{InitialHydroEnergyLevelUp, Float64},
+        PSI.InitialCondition{InitialHydroEnergyLevelUp, JuMP.VariableRef},
         PSI.InitialCondition{InitialHydroEnergyLevelUp, Nothing},
     },
-} where {S <: Union{Float64, JuMP.VariableRef}}
+}
     for ic in ics
         var_val = PSI.get_variable_value(
             store,
@@ -1088,10 +1089,11 @@ function PSI.update_initial_conditions!(
     ::Dates.Millisecond,
 ) where {
     T <: Union{
-        PSI.InitialCondition{InitialHydroEnergyLevelDown, S},
+        PSI.InitialCondition{InitialHydroEnergyLevelDown, Float64},
+        PSI.InitialCondition{InitialHydroEnergyLevelDown, JuMP.VariableRef},
         PSI.InitialCondition{InitialHydroEnergyLevelDown, Nothing},
     },
-} where {S <: Union{Float64, JuMP.VariableRef}}
+}
     for ic in ics
         var_val = PSI.get_variable_value(
             store,
@@ -1112,10 +1114,11 @@ function PSI.update_initial_conditions!(
     ::Dates.Millisecond,
 ) where {
     T <: Union{
-        PSI.InitialCondition{InitialHydroEnergyLevelUp, S},
+        PSI.InitialCondition{InitialHydroEnergyLevelUp, Float64},
+        PSI.InitialCondition{InitialHydroEnergyLevelUp, JuMP.VariableRef},
         PSI.InitialCondition{InitialHydroEnergyLevelUp, Nothing},
     },
-} where {S <: Union{Float64, JuMP.VariableRef}}
+}
     for ic in ics
         var_val = PSI.get_system_state_value(
             state,
@@ -1133,10 +1136,11 @@ function PSI.update_initial_conditions!(
     ::Dates.Millisecond,
 ) where {
     T <: Union{
-        PSI.InitialCondition{InitialHydroEnergyLevelDown, S},
+        PSI.InitialCondition{InitialHydroEnergyLevelDown, Float64},
+        PSI.InitialCondition{InitialHydroEnergyLevelDown, JuMP.VariableRef},
         PSI.InitialCondition{InitialHydroEnergyLevelDown, Nothing},
     },
-} where {S <: Union{Float64, JuMP.VariableRef}}
+}
     for ic in ics
         var_val = PSI.get_system_state_value(
             state,
