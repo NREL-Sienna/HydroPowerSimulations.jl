@@ -27,6 +27,11 @@ Parameter to define energy limit for feedforward
 """
 struct ReservoirLimitParameter <: PSI.VariableValueParameter end
 
+"""
+Parameter to define energy usage limit for feedforward
+"""
+struct HydroUsageLimitParameter <: PSI.VariableValueParameter end
+
 convert_result_to_natural_units(::Type{ReservoirLimitParameter}) = true
 convert_result_to_natural_units(::Type{ReservoirTargetParameter}) = true
 
