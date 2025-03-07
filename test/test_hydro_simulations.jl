@@ -300,6 +300,6 @@ end
             initial_time=DateTime("2024-01-01T00:00:00"),
              simulation_folder = mktempdir(; cleanup = true)
         )
-    @test build!(sim)
-    @test execute!(sim)
+    @test build!(sim) == IS.Simulation.SimulationBuildStatus.BUILT
+    @test execute!(sim) == IS.Simulation.RunStatus.SUCCESSFULLY_FINALIZED
 end
