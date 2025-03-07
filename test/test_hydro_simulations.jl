@@ -271,35 +271,35 @@ end
     set_service_model!(template, ServiceModel(VariableReserve{ReserveUp}, RangeReserve))
     set_service_model!(template, ServiceModel(VariableReserve{ReserveDown}, RangeReserve))
 
-    models = SimulationModels(
-            decision_models=[
-                DecisionModel(
-                    template,
-                    sys,
-                    name="UC",
-                    optimizer=HiGHS_optimizer,
-                    initialize_model=true,
-                    optimizer_solve_log_print=true,
-                    direct_mode_optimizer=true,
-                    check_numerical_bounds=false,
-                    calculate_conflict=true,
-                    rebuild_model=true
-                ),
-            ],
-        )
-    sequence =  SimulationSequence(
-            models=models,
-            ini_cond_chronology=InterProblemChronology(),
-        )
+    models = SimulationModels(;
+        decision_models = [
+            DecisionModel(
+                template,
+                sys;
+                name = "UC",
+                optimizer = HiGHS_optimizer,
+                initialize_model = true,
+                optimizer_solve_log_print = true,
+                direct_mode_optimizer = true,
+                check_numerical_bounds = false,
+                calculate_conflict = true,
+                rebuild_model = true,
+            ),
+        ],
+    )
+    sequence = SimulationSequence(;
+        models = models,
+        ini_cond_chronology = InterProblemChronology(),
+    )
 
-    sim = Simulation(
-            name= "test",
-            steps=2,
-            models=models,
-            sequence=sequence,
-            initial_time=DateTime("2024-01-01T00:00:00"),
-             simulation_folder = mktempdir(; cleanup = true)
-        )
+    sim = Simulation(;
+        name = "test",
+        steps = 2,
+        models = models,
+        sequence = sequence,
+        initial_time = DateTime("2024-01-01T00:00:00"),
+        simulation_folder = mktempdir(; cleanup = true),
+    )
     @test build!(sim) == IS.Simulation.SimulationBuildStatus.BUILT
     @test execute!(sim) == IS.Simulation.RunStatus.SUCCESSFULLY_FINALIZED
 end
