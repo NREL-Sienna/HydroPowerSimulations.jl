@@ -880,14 +880,15 @@ function PSI.add_constraints!(
     # TODO: remove constants
     K1 = 0.0003
     K2 = 9
-
+    # TODO: add initial storage 
+    initial_storage = 10^3
     for d in devices
         name = PSY.get_name(d)
         constraint[name, 1] = JuMP.@constraint(
                 container.JuMPmodel,
                 hydro_power[name, t] ==
                 fraction_of_hour * (
-                turbined_out_flow_var[name, 1] * (0.5 * K1 * (energy_var[name, 1])+K2) 
+                turbined_out_flow_var[name, 1] * (0.5 * K1 * (energy_var[name, 1]+ initial_storage) + K2) 
                 )
             )
         for t in time_steps[2:end]
@@ -943,24 +944,32 @@ function PSI.add_constraints!(
     param_container = PSI.get_parameter(container, InflowTimeSeriesParameter(), V)
     multiplier = PSI.get_multiplier_array(param_container)
 
+    #TODO: add initial storage and final storage
+    initial_storage = 10^3
+    final_storage = 10^3
+    t_first = first(time_steps)
+    t_final = last(time_steps)
+
     for ic in initial_conditions
         device = PSI.get_component(ic)
         name = PSY.get_name(device)
 
-        ## TODO: Find initial conditon
-        # constraint[name, 1] = JuMP.@constraint(
-        #     container.JuMPmodel,
-        #     energy_var[name, 1] ==
-        #     PSI.get_value(ic) +
-        #     (
-        #         powerin_var[name, 1] -
-        #         (spillage_var[name, 1] + powerout_var[name, 1]) / efficiency
-        #     ) * fraction_of_hour +
-        #     PSI.get_parameter_column_refs(param_container, name)[1] * multiplier[name, 1]
-        #     # Be consistent on this parameter definition
-        # )
+        constraint[name, t_first] = JuMP.@constraint(
+            container.JuMPmodel,
+            energy_var[name, t_first] ==
+            initial_storage +
+            fraction_of_hour * (
+            PSI.get_parameter_column_refs(param_container, name)[t_first] * multiplier[name, t_first] - 
+            turbined_out_flow_var[name, t_first] - spillage_var[name, t_first]
+            )
+        )
 
-        for t in time_steps[2:end]
+        constraint[name, t_final] = JuMP.@constraint(
+            container.JuMPmodel,
+            energy_var[name, t_final] == final_storage
+        )
+
+        for t in time_steps[t_first+1:t_final-1]
             constraint[name, t] = JuMP.@constraint(
                 container.JuMPmodel,
                 energy_var[name, t] ==
