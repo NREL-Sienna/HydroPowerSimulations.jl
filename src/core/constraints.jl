@@ -73,7 +73,7 @@ For more information check [HydroPowerSimulations Formulations](@ref HydroPowerS
 The specified constraint is formulated as:
 
 ```math
-\\ p_{t} = \Delta t (f^{Tu}_{t-1}(0.5 K_1 (v_{t} + v_{t-1}) + K_2))
+\\ p_{t} = \\Delta t (f^{Tu}_{t-1}(0.5 K_1 (v_{t} + v_{t-1}) + K_2))
 ```
 """
 struct HydroPowerConstraint <: PSI.ConstraintType end
@@ -85,7 +85,7 @@ For more information check [HydroPowerSimulations Formulations](@ref HydroPowerS
 The specified constraint is formulated as:
 
 ```math
-\\ v_{t} = v_{t-1} + \Delta t (f^{UR}_{t-1} - f^{Sp}_{t-1} - f^{Tu}_{t-1})
+\\ v_{t} = v_{t-1} + \\Delta t (f^{UR}_{t-1} - f^{Sp}_{t-1} - f^{Tu}_{t-1})
 ```
 """
 struct StorageVolumeConstraint <: PSI.ConstraintType end
