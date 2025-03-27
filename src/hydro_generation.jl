@@ -879,6 +879,291 @@ function PSI.add_constraints!(
     return
 end
 
+
+##################################### Hydro Turbine Constraints ###############
+
+#TurbinePowerOutputConstraint
+"""
+Bilinear representation of active power output from a HydroTurbine as a function of head and turbined flow rate.
+"""
+function PSI.add_constraints!(
+    container::PSI.OptimizationContainer,
+    ::Type{TurbinePowerOutputConstraint},
+    devices::IS.FlattenIteratorWrapper{V},
+    model::PSI.DeviceModel{V, W},
+    ::PSI.NetworkModel{X},
+) where {
+    V <: PSY.HydroTurbine,
+    W <: HydroTurbineFlowrate,
+    X <: PM.AbstractActivePowerModel,
+}
+    time_steps = PSI.get_time_steps(container)
+    set_name = [PSY.get_name(d) for d in devices]
+    constraint =
+        PSI.add_constraints_container!(container, TurbinePowerOutputConstraint(), V, set_name, time_steps)
+
+    parent_reservoir = PSY.get_reservoirs(V)
+    reservoir_name = PSY.get_name(parent_reservoir)
+
+    variable_power = PSI.get_variable(container, PSI.ActivePowerVariable(), V)
+    variable_flow = PSI.get_variable(container, HydroTurbineFlowrateVariable(), V)
+    reservoir_head = PSI.get_variable(container, ReservoirHeadVariable(), parent_reservoir)
+
+    for d in devices
+        name = PSY.get_name(d)
+        efficiency = PSY.get_efficiency(d)
+        water_constant = efficiency * GRAVITATIONAL_CONSTANT * WATER_DENSITY / 2
+        # get initial reservoir head
+        initial_head = # use mapping functions once we have them to convert initial volume to initial head.
+        for t in time_steps[1]
+        constraint[name, t] = JuMP.@constraint(
+                container.JuMPmodel,
+                variable_power[name, 1] == water_constant * variable_flow[name, 1] * (initial_head + reservoir_head[reservoir_name, 1])
+            )
+        end
+        for t in time_steps[2:end]
+            constraint[name, t] = JuMP.@constraint(
+                container.JuMPmodel,
+                variable_power[name, t] == water_constant * variable_flow[name, t] * (reservoir_head[reservoir_name, t-1] + reservoir_head[reservoir_name, t])
+            )
+        end
+    end
+    return
+end
+
+#TurbineFlowLimitConstraint
+"""
+Constraint to keep turbined outflow within bounds
+"""
+function PSI.add_constraints!(
+    container::PSI.OptimizationContainer,
+    ::Type{TurbineFlowLimitConstraint},
+    devices::IS.FlattenIteratorWrapper{V},
+    model::PSI.DeviceModel{V, W},
+    ::PSI.NetworkModel{X},
+) where {
+    V <: PSY.HydroTurbine,
+    W <: HydroTurbineFlowrate,
+    X <: PM.AbstractActivePowerModel,
+}
+    time_steps = PSI.get_time_steps(container)
+    set_name = [PSY.get_name(d) for d in devices]
+    constraint =
+        PSI.add_constraints_container!(container, TurbineFlowLimitConstraint(), V, set_name, time_steps)
+
+    variable_volume = PSI.get_variable(container, HydroReservoirVolumeVariable(), V)
+
+    for d in devices
+        name = PSY.get_name(d)
+        for t in time_steps
+        constraint[name, t] = JuMP.@constraint(
+                container.JuMPmodel,
+                get_outflow_limits(d).min <= variable_volume[name,t] <= get_outflow_limits(d).max
+            )
+        end
+    end
+    return
+end
+
+
+##################################### Hydro Reservoir Constraints ###############
+
+#ReservoirTurbinedOutflowConstraint
+"""
+Constraint to track sum of turbined outflow from the reservoir
+"""
+function PSI.add_constraints!(
+    container::PSI.OptimizationContainer,
+    ::Type{ReservoirTurbinedOutflowConstraint},
+    devices::IS.FlattenIteratorWrapper{V},
+    model::PSI.DeviceModel{V, W},
+    ::PSI.NetworkModel{X},
+) where {
+    V <: PSY.HydroReservoir,
+    W <: HydroVolumeReservoir,
+    X <: PM.AbstractActivePowerModel,
+}
+    time_steps = PSI.get_time_steps(container)
+    set_name = [PSY.get_name(d) for d in devices]
+    constraint =
+        PSI.add_constraints_container!(container, ReservoirTurbinedOutflowConstraint(), V, set_name, time_steps)
+
+    variable_res_outflow = PSI.get_variable(container, ReservoirTurbinedOutflowVariable(), V)
+    children_turbines = PSY.get_
+    
+
+    for d in devices
+        name = PSY.get_name(d)
+        for t in time_steps
+        constraint[name, t] = JuMP.@constraint(
+                container.JuMPmodel,
+                ReservoirTurbinedOutflowVariable
+            )
+        end
+    end
+    return
+end
+
+#ReservoirVolumeLimitConstraint
+"""
+Constraint to keep reservoir stored volume within bounds.
+"""
+function PSI.add_constraints!(
+    container::PSI.OptimizationContainer,
+    ::Type{ReservoirVolumeLimitConstraint},
+    devices::IS.FlattenIteratorWrapper{V},
+    model::PSI.DeviceModel{V, W},
+    ::PSI.NetworkModel{X},
+) where {
+    V <: PSY.HydroReservoir,
+    W <: HydroVolumeReservoir,
+    X <: PM.AbstractActivePowerModel,
+}
+    time_steps = PSI.get_time_steps(container)
+    set_name = [PSY.get_name(d) for d in devices]
+    constraint =
+        PSI.add_constraints_container!(container, ReservoirVolumeLimitConstraint(), V, set_name, time_steps)
+
+    variable_volume = PSI.get_variable(container, HydroReservoirVolumeVariable(), V)
+    
+
+    for d in devices
+        name = PSY.get_name(d)
+        for t in time_steps
+        constraint[name, t] = JuMP.@constraint(
+                container.JuMPmodel,
+                get_storage_volume_limits(d).min <= variable_volume[name,t] <= get_storage_volume_limits(d).max
+            )
+        end
+    end
+    return
+end
+
+#ReservoirInventoryConstraint
+"""
+Constraint to track volume inventory
+"""
+function PSI.add_constraints!(
+    container::PSI.OptimizationContainer,
+    ::Type{ReservoirInventoryConstraint},
+    devices::IS.FlattenIteratorWrapper{V},
+    model::PSI.DeviceModel{V, W},
+    ::PSI.NetworkModel{X},
+) where {
+    V <: PSY.HydroReservoir,
+    W <: HydroVolumeReservoir,
+    X <: PM.AbstractActivePowerModel,
+}
+    time_steps = PSI.get_time_steps(container)
+    set_name = [PSY.get_name(d) for d in devices]
+    constraint =
+        PSI.add_constraints_container!(container, ReservoirInventoryConstraint(), V, set_name, time_steps)
+
+    variable_volume = PSI.get_variable(container, HydroReservoirVolumeVariable(), V)
+    variable_controlled_in = PSI.get_variable(container, ReservoirTurbinedOutflowVariable(), V)
+    variable_turbined_out = PSI.get_variable(container, ReservoirTurbinedOutflowVariable(), V)
+    variable_spillage_out = PSI.get_variable(container, HydroReservoirSpillageVariable(), V)
+    
+
+    for d in devices
+        name = PSY.get_name(d)
+        initial_volume = PSY.get_initial_storage(d)
+        lateral_inflow = PSY.get_inflow(d)
+        uncontrolled_outflow = PSY.get_ouflow(d)
+
+        for t in time_steps[1]
+            constraint[name, t] = JuMP.@constraint(
+                    container.JuMPmodel,
+                    variable_volume[name,t] == initial_volume + 
+                    DELTA_T * (lateral_inflow[t] + variable_controlled_in[name,t] - variable_turbined_out[name,t] - variable_spillage_out[name,t] - uncontrolled_outflow[t])
+                )
+        end
+        for t in time_steps[2:end]
+        constraint[name, t] = JuMP.@constraint(
+                container.JuMPmodel,
+                variable_volume[name,t] == variable_volume[name,t-1]+ 
+                DELTA_T * (lateral_inflow[t] + variable_controlled_in[name,t] - variable_turbined_out[name,t] - variable_spillage_out[name,t] - uncontrolled_outflow[t])
+                )
+        end
+    end
+    return
+end
+
+#ReservoirFinalInventoryConstraint
+"""
+Constraint to ensure final volume meets target
+"""
+function PSI.add_constraints!(
+    container::PSI.OptimizationContainer,
+    ::Type{ReservoirFinalInventoryConstraint},
+    devices::IS.FlattenIteratorWrapper{V},
+    model::PSI.DeviceModel{V, W},
+    ::PSI.NetworkModel{X},
+) where {
+    V <: PSY.HydroReservoir,
+    W <: HydroVolumeReservoir,
+    X <: PM.AbstractActivePowerModel,
+}
+    time_steps = PSI.get_time_steps(container)
+    set_name = [PSY.get_name(d) for d in devices]
+    constraint =
+        PSI.add_constraints_container!(container, ReservoirFinalInventoryConstraint(), V, set_name, time_steps)
+
+    variable_volume = PSI.get_variable(container, HydroReservoirVolumeVariable(), V)    
+
+    for d in devices
+        name = PSY.get_name(d)
+        final_volume = PSY.get_volume_target(d)
+
+        for t in time_steps[end:end]
+            constraint[name, t] = JuMP.@constraint(
+                    container.JuMPmodel,
+                    variable_volume[name,t] >= final_volume
+                )
+        end
+    end
+    return
+end
+
+#ReservoirVolumeToHeadConstraint NOT DONE
+"""
+Constraint to convert volume to head based on line segments stored in Reservoir struct
+"""
+function PSI.add_constraints!(
+    container::PSI.OptimizationContainer,
+    ::Type{ReservoirVolumeToHeadConstraint},
+    devices::IS.FlattenIteratorWrapper{V},
+    model::PSI.DeviceModel{V, W},
+    ::PSI.NetworkModel{X},
+) where {
+    V <: PSY.HydroReservoir,
+    W <: HydroVolumeReservoir,
+    X <: PM.AbstractActivePowerModel,
+}
+    time_steps = PSI.get_time_steps(container)
+    set_name = [PSY.get_name(d) for d in devices]
+    constraint =
+        PSI.add_constraints_container!(container, ReservoirVolumeToHeadConstraint(), V, set_name, time_steps)
+
+    variable_volume = PSI.get_variable(container, HydroReservoirVolumeVariable(), V)
+    variable_head = PSI.get_variable(container, ReservoirHeadVariable(), V)
+    v2h_binaries =     
+
+    for d in devices
+        name = PSY.get_name(d)
+
+        for t in time_steps[end:end]
+            constraint[name, t] = JuMP.@constraint(
+                    container.JuMPmodel,
+                    head[name,t] == sum
+                )
+        end
+    end
+    return
+end
+
+###############################################################################
+
 ##################################### Auxillary Variables ############################
 function PSI.calculate_aux_variable_value!(
     container::PSI.OptimizationContainer,

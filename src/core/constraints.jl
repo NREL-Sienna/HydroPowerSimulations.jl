@@ -63,3 +63,41 @@ The specified constraint is formulated as:
 ```
 """
 struct FeedForwardHydroUsageLimitConstraint <: PSI.ConstraintType end
+
+### 
+"""
+Models turbine outflow limits
+"""
+struct TurbineFlowLimitConstraint <: PSI.ConstraintType end
+
+"""
+Models turbine power output as a function of head
+"""
+struct TurbinePowerOutputConstraint <: PSI.ConstraintType end
+
+"""
+Models reservoir stored volume limits
+"""
+struct ReservoirVolumeLimitConstraint <: PSI.ConstraintType end
+
+"""
+Models time-coupling of stored volume
+"""
+struct ReservoirInventoryConstraint <: PSI.ConstraintType end
+
+"""
+Represents final volume storage constraint
+"""
+struct ReservoirFinalInventoryConstraint <: PSI.ConstraintType end
+
+"""
+Converts per-turbine turbined outflow to total reservoir turbined outflow
+"""
+struct ReservoirTurbinedOutflowConstraint <: PSI.ConstraintType end
+
+"""
+Converts stored volume to head
+"""
+struct ReservoirVolumeToHeadConstraint <: PSI.ConstraintType end
+
+###

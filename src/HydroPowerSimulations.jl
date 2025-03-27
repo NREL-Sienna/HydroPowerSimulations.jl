@@ -81,6 +81,7 @@ const PM = PowerSimulations.PM
 #################################################################################
 # Includes
 # Core includes
+include("core/definitions.jl")
 include("core/formulations.jl")
 include("core/variables.jl")
 include("core/constraints.jl")
