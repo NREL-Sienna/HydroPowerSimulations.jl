@@ -989,11 +989,11 @@ function PSI.add_constraints!(
         PSI.add_constraints_container!(container, ReservoirTurbinedOutflowConstraint(), V, set_name, time_steps)
 
     variable_res_outflow = PSI.get_variable(container, ReservoirTurbinedOutflowVariable(), V)
-    children_turbines = PSY.get_
-    
 
     for d in devices
         name = PSY.get_name(d)
+        children_turbines = get_contributing_devices(sys, d)
+        # TODO: is sys defined anywhere here?
         for t in time_steps
         constraint[name, t] = JuMP.@constraint(
                 container.JuMPmodel,
