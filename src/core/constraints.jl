@@ -89,3 +89,16 @@ The specified constraint is formulated as:
 ```
 """
 struct StorageVolumeConstraint <: PSI.ConstraintType end
+
+"""
+Struct to create the constraint for hydro reservoir total outflow
+
+For more information check [HydroPowerSimulations Formulations](@ref HydroPowerSimulations-Formulations).
+
+The specified constraint is formulated as:
+
+```math
+\\ f^{Out}_{t-1} = f^{Tu}_{t-1} + f^{Sp}_{t-1}
+```
+"""
+struct TotalOutFlowConstraint <: PSI.ConstraintType end

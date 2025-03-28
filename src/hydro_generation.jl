@@ -882,22 +882,26 @@ function PSI.add_constraints!(
     K2 = 9
     # TODO: add initial storage 
     initial_storage = 10^3
+
+    t_first = first(time_steps)
+    t_final = last(time_steps)
+
     for d in devices
         name = PSY.get_name(d)
-        constraint[name, 1] = JuMP.@constraint(
+        constraint[name, t_first] = JuMP.@constraint(
                 container.JuMPmodel,
                 hydro_power[name, t] ==
                 fraction_of_hour * (
                 turbined_out_flow_var[name, 1] * (0.5 * K1 * (energy_var[name, 1]+ initial_storage) + K2) 
                 )
             )
-        for t in time_steps[2:end]
-            constraint[name, t] = JuMP.@constraint(
-                container.JuMPmodel,
-                hydro_power[name, t] ==
-                fraction_of_hour * (
-                turbined_out_flow_var[name, t] * (0.5 * K1 * (energy_var[name, t] + energy_var[name, t-1])+K2) 
-                )
+        for t in time_steps[t_first+1:t_final-1]
+                constraint[name, t] = JuMP.@constraint(
+                    container.JuMPmodel,
+                    hydro_power[name, t] ==
+                    fraction_of_hour * (
+                    turbined_out_flow_var[name, t] * (0.5 * K1 * (energy_var[name, t] + energy_var[name, t-1]) + K2) 
+                    )
             )
         end
     end
@@ -926,7 +930,6 @@ function PSI.add_constraints!(
     initial_conditions =
         PSI.get_initial_condition(container, InitialHydroEnergyLevelUp(), V)
 
-    
     # powerin_var = PSI.get_variable(container, PSI.ActivePowerInVariable(), V)
     # powerout_var = PSI.get_variable(container, PSI.ActivePowerOutVariable(), V)
 
@@ -984,9 +987,52 @@ function PSI.add_constraints!(
     return
 end
 
+"""
+This function defines the constraints for the total flow 
+for the [`PowerSystems.HydroEnergyBlockOptimization`](@extref).
+"""
+function PSI.add_constraints!(
+    container::PSI.OptimizationContainer,
+    ::Type{TotalOutFlowConstraint},
+    devices::IS.FlattenIteratorWrapper{V},
+    model::PSI.DeviceModel{V, W},
+    ::PSI.NetworkModel{X},
+) where {
+    V <: PSY.HydroEnergyBlockOptimization,
+    W <: AbstractHydroReservoirFormulation,
+    X <: PM.AbstractActivePowerModel,
+}
+    time_steps = PSI.get_time_steps(container)
+    resolution = PSI.get_resolution(container)
+    fraction_of_hour = Dates.value(Dates.Minute(resolution)) / PSI.MINUTES_IN_HOUR
+    names = [PSY.get_name(x) for x in devices]
+    initial_conditions =
+        PSI.get_initial_condition(container, InitialHydroEnergyLevelUp(), V)
 
+    turbined_out_flow_var = PSI.get_variable(container, HydroTurbinedOutflowVariable(), V)
+    spillage_var = PSI.get_variable(container, WaterSpillageVariable(), V)
+    total_outflow_var = PSI.get_variable(container, HydroTotalOutflowVariable(), V)
 
+    constraint = PSI.add_constraints_container!(
+        container,
+        TotalOutFlowConstraint(),
+        V,
+        names,
+        time_steps,
+    )
 
+    for d in devices
+        name = PSY.get_name(d)
+
+        for t in time_steps
+                constraint[name, t] = JuMP.@constraint(
+                    container.JuMPmodel,
+                    total_outflow_var[name, t] == turbined_out_flow_var[name, t] + spillage_var[name, t]
+                )
+        end
+    end
+    return
+end
 ##################################### Water/Energy Budget Constraint ############################
 """
 This function define the budget constraint for the
