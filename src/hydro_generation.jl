@@ -842,7 +842,7 @@ end
 ##################################### Energy Block Optimization ############################
 """
 This function defines the constraint for the hydro power generation 
-for the [`PowerSystems.HydroEnergyBlockOptimization`](@extref).
+for the [`HydroEnergyBlockOptimization`](@extref).
 """
 function PSI.add_constraints!(
     container::PSI.OptimizationContainer,
@@ -851,7 +851,7 @@ function PSI.add_constraints!(
     model::PSI.DeviceModel{V, W},
     ::PSI.NetworkModel{X},
 ) where {
-    V <: PSY.HydroEnergyBlockOptimization,
+    V <: HydroEnergyBlockOptimization,
     W <: AbstractHydroReservoirFormulation,
     X <: PM.AbstractActivePowerModel,
 }
@@ -910,7 +910,7 @@ end
 
 """
 This function defines the constraints for the water level (or state of charge)
-for the [`PowerSystems.HydroEnergyBlockOptimization`](@extref).
+for the [`HydroEnergyBlockOptimization`](@extref).
 """
 function PSI.add_constraints!(
     container::PSI.OptimizationContainer,
@@ -919,7 +919,7 @@ function PSI.add_constraints!(
     model::PSI.DeviceModel{V, W},
     ::PSI.NetworkModel{X},
 ) where {
-    V <: PSY.HydroEnergyBlockOptimization,
+    V <: HydroEnergyBlockOptimization,
     W <: AbstractHydroReservoirFormulation,
     X <: PM.AbstractActivePowerModel,
 }
@@ -989,7 +989,7 @@ end
 
 """
 This function defines the constraints for the total flow 
-for the [`PowerSystems.HydroEnergyBlockOptimization`](@extref).
+for the [`HydroEnergyBlockOptimization`](@extref).
 """
 function PSI.add_constraints!(
     container::PSI.OptimizationContainer,
@@ -998,7 +998,7 @@ function PSI.add_constraints!(
     model::PSI.DeviceModel{V, W},
     ::PSI.NetworkModel{X},
 ) where {
-    V <: PSY.HydroEnergyBlockOptimization,
+    V <: HydroEnergyBlockOptimization,
     W <: AbstractHydroReservoirFormulation,
     X <: PM.AbstractActivePowerModel,
 }
