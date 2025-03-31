@@ -914,7 +914,8 @@ function PSI.add_constraints!(
         efficiency = PSY.get_efficiency(d)
         water_constant = efficiency * GRAVITATIONAL_CONSTANT * WATER_DENSITY / 2
         # get initial reservoir head
-        initial_head = # use mapping functions once we have them to convert initial volume to initial head.
+        initial_head = 
+        #TODO: use mapping functions once we have them to convert initial volume to initial head.
         for t in time_steps[1]
         constraint[name, t] = JuMP.@constraint(
                 container.JuMPmodel,
@@ -975,6 +976,7 @@ Constraint to track sum of turbined outflow from the reservoir
 function PSI.add_constraints!(
     container::PSI.OptimizationContainer,
     ::Type{ReservoirTurbinedOutflowConstraint},
+    sys::PSY.System,
     devices::IS.FlattenIteratorWrapper{V},
     model::PSI.DeviceModel{V, W},
     ::PSI.NetworkModel{X},
@@ -988,16 +990,18 @@ function PSI.add_constraints!(
     constraint =
         PSI.add_constraints_container!(container, ReservoirTurbinedOutflowConstraint(), V, set_name, time_steps)
 
-    variable_res_outflow = PSI.get_variable(container, ReservoirTurbinedOutflowVariable(), V)
+    variable_res_turb_outflow = PSI.get_variable(container, ReservoirTurbinedOutflowVariable(), V)
+    variable_turb_outflow = PSI.get_variable(container, HydroTurbineFlowrateVariable(), V)
 
     for d in devices
         name = PSY.get_name(d)
         children_turbines = get_contributing_devices(sys, d)
-        # TODO: is sys defined anywhere here?
+        turbine_names = [PSY.get_name(dd) for dd in children_turbines]
+        # TODO: check that it's okay I added sys as an argument here.
         for t in time_steps
         constraint[name, t] = JuMP.@constraint(
                 container.JuMPmodel,
-                ReservoirTurbinedOutflowVariable
+                variable_res_turb_outflow[name,t] == sum(variable_turb_outflow[turbine_name,t] for turbine_name in turbine_names)
             )
         end
     end
@@ -1119,6 +1123,7 @@ function PSI.add_constraints!(
             constraint[name, t] = JuMP.@constraint(
                     container.JuMPmodel,
                     variable_volume[name,t] >= final_volume
+                    #TODO: does not include upstream releases in rivers because of long timeframe for now
                 )
         end
     end
@@ -1126,6 +1131,7 @@ function PSI.add_constraints!(
 end
 
 #ReservoirVolumeToHeadConstraint NOT DONE
+# TODO: 
 """
 Constraint to convert volume to head based on line segments stored in Reservoir struct
 """
@@ -1142,22 +1148,52 @@ function PSI.add_constraints!(
 }
     time_steps = PSI.get_time_steps(container)
     set_name = [PSY.get_name(d) for d in devices]
-    constraint =
-        PSI.add_constraints_container!(container, ReservoirVolumeToHeadConstraint(), V, set_name, time_steps)
+    constraint_head =
+        PSI.add_constraints_container!(container, ReservoirVolumeToHeadConstraint(), V, set_name, time_steps; meta="head")
+    constraint_bin =
+        PSI.add_constraints_container!(container, ReservoirVolumeToHeadConstraint(), V, set_name, time_steps; meta="bin")
 
     variable_volume = PSI.get_variable(container, HydroReservoirVolumeVariable(), V)
-    variable_head = PSI.get_variable(container, ReservoirHeadVariable(), V)
-    v2h_binaries =     
+    variable_head = PSI.get_variable(container, ReservoirHeadVariable(), V)    
+    var_head_pwl = get_variable(container, ReservoirPiecewiseHeadVariable(), V) #TODO: this and head, or just keep head?
+    var_head_pwl_bin = get_variable(container, ReservoirPiecewiseBinaryHeadVariable(), V) #TODO:
 
     for d in devices
         name = PSY.get_name(d)
+        pwl_head_params = get_pwl_head_params(d)
+        range_segments = 1:(length(pwl_head_params) - 1)
+        for t in time_steps
+        
 
-        for t in time_steps[end:end]
-            constraint[name, t] = JuMP.@constraint(
+        ## Equality Constraints ##
+        constraint_head[name,t] = JuMP.@constraint(
+            container.JuMPmodel,
+            variable_head[name,t] == 
+            sum(
+                var_head_pwl_bin[name,ix,t] * pwl_head_params[ix]
+                for ix in range_segments) + 
+            sum(
+                var_head_pwl[name,ix,t]
+            )
+            sum()
+            )
+        
+        
+        ## Binary Bound ##
+        constraint_bin[name, t] = JuMP.@constraint(
+            get_jump_model(container),
+            sum(var_pwl_head_bin[name, ix, t] for ix in range_segments) == 1.0
+        )
+        ## Continuous Bound ##
+  
+            constraint_head[name, t] = JuMP.@constraint(
                     container.JuMPmodel,
                     head[name,t] == sum
                 )
         end
+        # most heads
+
+        # final head constraint
     end
     return
 end
