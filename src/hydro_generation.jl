@@ -267,6 +267,12 @@ function PSI.get_default_attributes(
 )
     return Dict{String, Any}("reservation" => true)
 end
+function PSI.get_default_attributes(
+    ::Type{PSY.HydroReservoir},
+    ::Type{HydroEnergyBlockOptimization},
+)
+    return Dict{String, Any}("reservation" => false)
+end
 
 """
 Time series constraints
