@@ -1871,7 +1871,7 @@ end
 ################################################################################################
 #### New Hydro Block Optimization Model ####
 """
-Construct model for [`PowerSystems.HydroGen`](@extref) with [`HydroEnergyBlockOptimization`](@ref) Formulation
+Construct model for [`PowerSystems.HydroReservoir`](@extref) with [`HydroEnergyBlockOptimization`](@ref) Formulation
 with only Active Power
 """
 function PSI.construct_device!(
@@ -1880,7 +1880,7 @@ function PSI.construct_device!(
     ::PSI.ArgumentConstructStage,
     model::PSI.DeviceModel{H, HydroEnergyBlockOptimization},
     network_model::PSI.NetworkModel{S},
-) where {H <: PSY.HydroEnergyReservoir, S <: PM.AbstractActivePowerModel}
+) where {H <: PSY.HydroReservoir, S <: PM.AbstractActivePowerModel}
     devices = PSI.get_available_components(model, sys)
 
     PSI.add_variables!(
@@ -1916,7 +1916,7 @@ function PSI.construct_device!(
         network_model,
     )
 
-    PSI.add_parameters!(container, InflowTimeSeriesParameter, devices, model)
+    # PSI.add_parameters!(container, InflowTimeSeriesParameter, devices, model)
 
     PSI.add_expressions!(container, PSI.ProductionCostExpression, devices, model)
 
@@ -1953,7 +1953,7 @@ function PSI.construct_device!(
     ::PSI.ModelConstructStage,
     model::PSI.DeviceModel{H, HydroEnergyBlockOptimization},
     network_model::PSI.NetworkModel{S},
-) where {H <: PSY.HydroEnergyReservoir, S <: PM.AbstractActivePowerModel}
+) where {H <: PSY.HydroReservoir, S <: PM.AbstractActivePowerModel}
     devices = PSI.get_available_components(model, sys)
 
     # if PSI.has_service_model(model)
@@ -1975,23 +1975,36 @@ function PSI.construct_device!(
     #     )
     # end
 
-    # PSI.add_constraints!(
-    #     container,
-    #     PSI.ActivePowerVariableLimitsConstraint,
-    #     PSI.ActivePowerRangeExpressionLB,
-    #     devices,
-    #     model,
-    #     network_model,
-    # )
-    # PSI.add_constraints!(
-    #     container,
-    #     PSI.ActivePowerVariableLimitsConstraint,
-    #     PSI.ActivePowerRangeExpressionUB,
-    #     devices,
-    #     model,
-    #     network_model,
-    # )
-
+    PSI.add_constraints!(
+        container,
+        PSI.ActivePowerVariableLimitsConstraint,
+        PSI.ActivePowerRangeExpressionLB,
+        devices,
+        model,
+        network_model,
+    )
+    PSI.add_constraints!(
+        container,
+        PSI.ActivePowerVariableLimitsConstraint,
+        PSI.ActivePowerRangeExpressionUB,
+        devices,
+        model,
+        network_model,
+    )
+    PSI.add_constraints!(
+        container,
+        HydroPowerConstraint,
+        devices,
+        model,
+        network_model,
+    )
+    PSI.add_constraints!(
+        container,
+        StorageVolumeConstraint,
+        devices,
+        model,
+        network_model,
+    )
     # PSI.add_initial_condition!(
     #     container,
     #     devices,
