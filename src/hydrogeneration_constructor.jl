@@ -1894,7 +1894,7 @@ function PSI.construct_device!(
         HydroTurbinedOutflowVariable,
         devices,
         HydroEnergyBlockOptimization(),
-    )    
+    )
     PSI.add_variables!(
         container,
         WaterSpillageVariable,
@@ -1906,7 +1906,7 @@ function PSI.construct_device!(
         HydroEnergyVariableUp,
         devices,
         HydroEnergyBlockOptimization(),
-    )    
+    )
     PSI.add_to_expression!(
         container,
         PSI.ActivePowerBalance,

@@ -224,6 +224,16 @@ function PSI.get_default_time_series_names(
     )
 end
 
+function PSI.get_default_time_series_names(
+    ::Type{PSY.HydroReservoir},
+    ::Type{<:HydroEnergyBlockOptimization},
+)
+    return Dict{Type{<:PSI.TimeSeriesParameter}, String}(
+        InflowTimeSeriesParameter => "inflow",
+        OutflowTimeSeriesParameter => "outflow",
+    )
+end
+
 function PSI.get_default_attributes(
     ::Type{T},
     ::Type{D},
@@ -841,7 +851,7 @@ end
 
 ##################################### Energy Block Optimization ############################
 """
-This function defines the constraint for the hydro power generation 
+This function defines the constraint for the hydro power generation
 for the [`HydroEnergyBlockOptimization`](@extref).
 """
 function PSI.add_constraints!(
@@ -880,7 +890,7 @@ function PSI.add_constraints!(
     # TODO: remove constants
     K1 = 0.0003
     K2 = 9
-    # TODO: add initial storage 
+    # TODO: add initial storage
     initial_storage = 10^3
 
     t_first = first(time_steps)
@@ -889,19 +899,21 @@ function PSI.add_constraints!(
     for d in devices
         name = PSY.get_name(d)
         constraint[name, t_first] = JuMP.@constraint(
+            container.JuMPmodel,
+            hydro_power[name, t] ==
+            fraction_of_hour * (
+                turbined_out_flow_var[name, 1] *
+                (0.5 * K1 * (energy_var[name, 1] + initial_storage) + K2)
+            )
+        )
+        for t in time_steps[(t_first + 1):(t_final - 1)]
+            constraint[name, t] = JuMP.@constraint(
                 container.JuMPmodel,
                 hydro_power[name, t] ==
                 fraction_of_hour * (
-                turbined_out_flow_var[name, 1] * (0.5 * K1 * (energy_var[name, 1]+ initial_storage) + K2) 
+                    turbined_out_flow_var[name, t] *
+                    (0.5 * K1 * (energy_var[name, t] + energy_var[name, t - 1]) + K2)
                 )
-            )
-        for t in time_steps[t_first+1:t_final-1]
-                constraint[name, t] = JuMP.@constraint(
-                    container.JuMPmodel,
-                    hydro_power[name, t] ==
-                    fraction_of_hour * (
-                    turbined_out_flow_var[name, t] * (0.5 * K1 * (energy_var[name, t] + energy_var[name, t-1]) + K2) 
-                    )
             )
         end
     end
@@ -962,8 +974,9 @@ function PSI.add_constraints!(
             energy_var[name, t_first] ==
             initial_storage +
             fraction_of_hour * (
-            PSI.get_parameter_column_refs(param_container, name)[t_first] * multiplier[name, t_first] - 
-            turbined_out_flow_var[name, t_first] - spillage_var[name, t_first]
+                PSI.get_parameter_column_refs(param_container, name)[t_first] *
+                multiplier[name, t_first] -
+                turbined_out_flow_var[name, t_first] - spillage_var[name, t_first]
             )
         )
 
@@ -972,14 +985,15 @@ function PSI.add_constraints!(
             energy_var[name, t_final] == final_storage
         )
 
-        for t in time_steps[t_first+1:t_final-1]
+        for t in time_steps[(t_first + 1):(t_final - 1)]
             constraint[name, t] = JuMP.@constraint(
                 container.JuMPmodel,
                 energy_var[name, t] ==
                 energy_var[name, t - 1] +
                 fraction_of_hour * (
-                PSI.get_parameter_column_refs(param_container, name)[t] * multiplier[name, t] - 
-                turbined_out_flow_var[name, t] - spillage_var[name, t]
+                    PSI.get_parameter_column_refs(param_container, name)[t] *
+                    multiplier[name, t] -
+                    turbined_out_flow_var[name, t] - spillage_var[name, t]
                 )
             )
         end
@@ -988,7 +1002,7 @@ function PSI.add_constraints!(
 end
 
 """
-This function defines the constraints for the total flow 
+This function defines the constraints for the total flow
 for the [`HydroEnergyBlockOptimization`](@extref).
 """
 function PSI.add_constraints!(
@@ -1025,10 +1039,11 @@ function PSI.add_constraints!(
         name = PSY.get_name(d)
 
         for t in time_steps
-                constraint[name, t] = JuMP.@constraint(
-                    container.JuMPmodel,
-                    total_outflow_var[name, t] == turbined_out_flow_var[name, t] + spillage_var[name, t]
-                )
+            constraint[name, t] = JuMP.@constraint(
+                container.JuMPmodel,
+                total_outflow_var[name, t] ==
+                turbined_out_flow_var[name, t] + spillage_var[name, t]
+            )
         end
     end
     return
