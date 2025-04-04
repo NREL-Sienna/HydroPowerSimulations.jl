@@ -83,6 +83,14 @@ PSI.get_variable_binary(::HydroEnergySurplusVariable, ::Type{<:PSY.HydroGen}, ::
 PSI.get_variable_upper_bound(::HydroEnergySurplusVariable, d::PSY.HydroGen, ::AbstractHydroReservoirFormulation) = 0.0
 PSI.get_variable_lower_bound(::HydroEnergySurplusVariable, d::PSY.HydroGen, ::AbstractHydroReservoirFormulation) = - PSY.get_storage_capacity(d)
 PSI.get_variable_lower_bound(::HydroEnergySurplusVariable, d::PSY.HydroPumpedStorage, ::AbstractHydroReservoirFormulation) = - PSY.get_storage_capacity(d).up
+
+############## HydroTurbineFlowRateVariable, HydroTurbine ####################
+PSI.get_variable_binary(::HydroTurbineFlowRateVariable, ::Type{PSY.HydroTurbine}, ::AbstractHydroFormulation) = false
+PSI.get_variable_upper_bound(::HydroTurbineFlowRateVariable, d::PSY.HydroTurbine, ::AbstractHydroReservoirFormulation) = isnothing(PSY.get_outflow_limits(d)) ? 0.0 : PSY.get_outflow_limits(d).min
+PSI.get_variable_lower_bound(::HydroTurbineFlowRateVariable, d::PSY.HydroTurbine, ::AbstractHydroReservoirFormulation) = isnothing(PSY.get_outflow_limits(d)) ? nothing : PSY.get_outflow_limits(d).max
+
+
+
 ########################### Parameter related set functions ################################
 PSI.get_multiplier_value(::EnergyBudgetTimeSeriesParameter, d::PSY.HydroGen, ::AbstractHydroFormulation) = PSY.get_max_active_power(d)
 PSI.get_multiplier_value(::EnergyBudgetTimeSeriesParameter, d::PSY.HydroEnergyReservoir, ::AbstractHydroFormulation) = PSY.get_storage_capacity(d)
