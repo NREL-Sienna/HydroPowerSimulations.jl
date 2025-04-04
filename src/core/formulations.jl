@@ -43,3 +43,18 @@ struct HydroCommitmentReservoirStorage <: AbstractHydroReservoirFormulation end
 Formulation type to add commitment and injection variables constrained by a maximum injection time series for [`PowerSystems.HydroGen`](@extref)
 """
 struct HydroCommitmentRunOfRiver <: AbstractHydroUnitCommitment end
+
+"""
+Formulation type to add commitment and injection variables constrained by a maximum injection time series for [`PowerSystems.HydroGen`](@extref)
+"""
+struct HydroReservoirRunOfRiver <: AbstractHydroUnitCommitment end
+
+"""
+Formulation type to add reservoir methods with hydro turbines for [`PowerSystems.HydroGen`](@extref)
+"""
+struct HydroLongTermReservoir <: AbstractHydroReservoirFormulation end
+
+"""
+Formulation type to add injection variables for a HydroTurbine connected to reservoirs using a bilinear model [`PowerSystems.HydroGen`](@extref)
+"""
+struct HydroTurbineBilinearDispatch <: AbstractHydroDispatchFormulation end
