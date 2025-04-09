@@ -84,14 +84,21 @@ PSI.get_variable_upper_bound(::HydroEnergySurplusVariable, d::PSY.HydroGen, ::Ab
 PSI.get_variable_lower_bound(::HydroEnergySurplusVariable, d::PSY.HydroGen, ::AbstractHydroReservoirFormulation) = - PSY.get_storage_capacity(d)
 PSI.get_variable_lower_bound(::HydroEnergySurplusVariable, d::PSY.HydroPumpedStorage, ::AbstractHydroReservoirFormulation) = - PSY.get_storage_capacity(d).up
 
-############## HydroReservoir ####################
-PSI.get_variable_binary(::HydroTurbinedOutflowVariable, ::Type{<:PSY.HydroReservoir}, ::AbstractHydroReservoirFormulation) = false
+############## HydroReservoir and HydroReser ####################
+PSI.get_variable_binary(::HydroTurbinedOutflowVariable, ::Type{<:PSY.HydroTurbine}, ::AbstractHydroReservoirFormulation) = false
 PSI.get_variable_binary(::WaterSpillageVariable, ::Type{<:PSY.HydroReservoir}, ::AbstractHydroReservoirFormulation) = false
 PSI.get_variable_binary(::HydroEnergyVariableUp, ::Type{<:PSY.HydroReservoir}, ::AbstractHydroReservoirFormulation) = false
 PSI.get_variable_binary(::PSI.ActivePowerVariable, ::Type{<:PSY.HydroReservoir}, ::AbstractHydroReservoirFormulation) = false
 PSI.get_variable_binary(::HydroTotalOutflowVariable, ::Type{<:PSY.HydroReservoir}, ::AbstractHydroReservoirFormulation) = false
 
 PSI.get_variable_binary(::PSI.ActivePowerVariable, ::Type{<:PSY.HydroTurbine}, ::AbstractHydroReservoirFormulation) = false
+PSI.get_variable_lower_bound(::HydroEnergyVariableUp, d::PSY.HydroReservoir, ::AbstractHydroReservoirFormulation) = PSY.get_storage_level_limits(d).min
+PSI.get_variable_upper_bound(::HydroEnergyVariableUp, d::PSY.HydroReservoir, ::AbstractHydroReservoirFormulation) = PSY.get_storage_level_limits(d).max
+PSI.get_variable_lower_bound(::WaterSpillageVariable, d::PSY.HydroReservoir, ::AbstractHydroReservoirFormulation) = isnothing(PSY.get_spillage_limits(d)) ? 0.0 : PSY.get_spillage_limits(d).min
+PSI.get_variable_upper_bound(::WaterSpillageVariable, d::PSY.HydroReservoir, ::AbstractHydroReservoirFormulation) = isnothing(PSY.get_spillage_limits(d)) ? nothing : PSY.get_spillage_limits(d).max
+
+PSI.get_variable_lower_bound(::HydroTurbinedOutflowVariable, d::PSY.HydroTurbine, ::AbstractHydroReservoirFormulation) = isnothing(PSY.get_outflow_limits(d)) ? 0.0 : PSY.get_outflow_limits(d).min
+PSI.get_variable_upper_bound(::HydroTurbinedOutflowVariable, d::PSY.HydroTurbine, ::AbstractHydroReservoirFormulation) = isnothing(PSY.get_outflow_limits(d)) ? nothing : PSY.get_outflow_limits(d).max
 
 ########################### Parameter related set functions ################################
 PSI.get_multiplier_value(::EnergyBudgetTimeSeriesParameter, d::PSY.HydroGen, ::AbstractHydroFormulation) = PSY.get_max_active_power(d)
@@ -101,8 +108,8 @@ PSI.get_multiplier_value(::InflowTimeSeriesParameter, d::PSY.HydroGen, ::Abstrac
 PSI.get_multiplier_value(::OutflowTimeSeriesParameter, d::PSY.HydroGen, ::AbstractHydroFormulation) = PSY.get_outflow(d) * PSY.get_conversion_factor(d)
 PSI.get_multiplier_value(::PSI.TimeSeriesParameter, d::PSY.HydroGen, ::AbstractHydroFormulation) = PSY.get_max_active_power(d)
 PSI.get_multiplier_value(::PSI.TimeSeriesParameter, d::PSY.HydroGen, ::PSI.FixedOutput) = PSY.get_max_active_power(d)
-PSI.get_multiplier_value(::InflowTimeSeriesParameter, d::PSY.HydroReservoir, ::AbstractHydroFormulation) = PSY.get_inflow(d) 
-PSI.get_multiplier_value(::OutflowTimeSeriesParameter, d::PSY.HydroReservoir, ::AbstractHydroFormulation) = PSY.get_outflow(d)
+PSI.get_multiplier_value(::InflowTimeSeriesParameter, d::PSY.HydroReservoir, ::AbstractHydroFormulation) = 1.0
+PSI.get_multiplier_value(::OutflowTimeSeriesParameter, d::PSY.HydroReservoir, ::AbstractHydroFormulation) = 1.0
 
 PSI.get_parameter_multiplier(::PSI.VariableValueParameter, d::PSY.HydroGen, ::AbstractHydroFormulation) = 1.0
 PSI.get_initial_parameter_value(::PSI.VariableValueParameter, d::PSY.HydroGen, ::AbstractHydroFormulation) = 1.0
@@ -892,9 +899,8 @@ function PSI.add_constraints!(
     names = [PSY.get_name(x) for x in devices]
 
     energy_var = PSI.get_variable(container, HydroEnergyVariableUp(), PSY.HydroReservoir)
-    turbined_out_flow_var = PSI.get_variable(container, HydroTurbinedOutflowVariable(), PSY.HydroReservoir)
+    turbined_out_flow_var = PSI.get_variable(container, HydroTurbinedOutflowVariable(), PSY.HydroTurbine)
 
-    hydro_power = PSI.get_variable(container, PSI.ActivePowerVariable(), PSY.HydroReservoir)
     hydro_power = PSI.get_variable(container, PSI.ActivePowerVariable(), PSY.HydroTurbine)
 
     constraint = PSI.add_constraints_container!(
@@ -906,6 +912,7 @@ function PSI.add_constraints!(
     )
 
     @show "HydroPowerConstraint"
+    base_power = PSI.get_base_power(container)
     # TODO: remove constants
     K1 = 0.0003
     K2 = 9
@@ -915,7 +922,7 @@ function PSI.add_constraints!(
 
     for d in devices
         name = PSY.get_name(d)
-        
+
         ##TODO: fix for mutiplple turbine-reservoir mapping
         reservoir = only(PSY.get_reservoirs(d))
         reservoir_name = PSY.get_name(reservoir)
@@ -925,16 +932,16 @@ function PSI.add_constraints!(
                 container.JuMPmodel,
                 hydro_power[name, t_first] ==
                 fraction_of_hour * (
-                turbined_out_flow_var[reservoir_name, t_first] * (0.5 * K1 * (energy_var[reservoir_name, t_first]+ initial_level) + K2) 
-                )
+                turbined_out_flow_var[name, t_first] * (0.5 * K1 * (energy_var[reservoir_name, t_first]+ initial_level) + K2) 
+                ) / base_power
             )
-        for t in time_steps[t_first+1:t_final-1]
+        for t in time_steps[t_first+1:t_final]
                 constraint[name, t] = JuMP.@constraint(
                     container.JuMPmodel,
                     hydro_power[name, t] ==
                     fraction_of_hour * (
-                    turbined_out_flow_var[reservoir_name, t] * (0.5 * K1 * (energy_var[reservoir_name, t] + energy_var[reservoir_name, t-1]) + K2) 
-                    )
+                    turbined_out_flow_var[name, t] * (0.5 * K1 * (energy_var[reservoir_name, t] + energy_var[reservoir_name, t-1]) + K2) 
+                    ) / base_power
             )
         end
     end
@@ -947,6 +954,7 @@ for the [`HydroEnergyBlockOptimization`](@extref).
 """
 function PSI.add_constraints!(
     container::PSI.OptimizationContainer,
+    sys::PSY.System,
     ::Type{StorageVolumeConstraint},
     devices::IS.FlattenIteratorWrapper{V},
     model::PSI.DeviceModel{V, W},
@@ -960,14 +968,9 @@ function PSI.add_constraints!(
     resolution = PSI.get_resolution(container)
     fraction_of_hour = Dates.value(Dates.Minute(resolution)) / PSI.MINUTES_IN_HOUR
     names = [PSY.get_name(x) for x in devices]
-    # initial_conditions =
-    #     PSI.get_initial_condition(container, InitialHydroEnergyLevelUp(), V)
-
-    # powerin_var = PSI.get_variable(container, PSI.ActivePowerInVariable(), V)
-    # powerout_var = PSI.get_variable(container, PSI.ActivePowerOutVariable(), V)
 
     energy_var = PSI.get_variable(container, HydroEnergyVariableUp(), V)
-    turbined_out_flow_var = PSI.get_variable(container, HydroTurbinedOutflowVariable(), V)
+    turbined_out_flow_var = PSI.get_variable(container, HydroTurbinedOutflowVariable(), PSY.HydroTurbine)
     spillage_var = PSI.get_variable(container, WaterSpillageVariable(), V)
 
     constraint = PSI.add_constraints_container!(
@@ -986,19 +989,23 @@ function PSI.add_constraints!(
     t_first = first(time_steps)
     t_final = last(time_steps)
 
+    #TODO: is this the right way of getting the turbines in the system
+
     for d in devices
         name = PSY.get_name(d)
-        #TODO: Is this the right approach to get initial and target levels?
         initial_level = PSY.get_initial_level(d)
         target_level = PSY.get_level_targets(d)
-
+        turbines = get_connected_devices(sys, d)
+        turbine_names = [PSY.get_name(turbine) for turbine in turbines]
+        @show turbine_names
+        
         constraint[name, t_first] = JuMP.@constraint(
             container.JuMPmodel,
             energy_var[name, t_first] ==
             initial_level +
             fraction_of_hour * (
             PSI.get_parameter_column_refs(param_container, name)[t_first] * multiplier[name, t_first] -
-            turbined_out_flow_var[name, t_first] - spillage_var[name, t_first]
+            sum(turbined_out_flow_var[turbine_name, t_first] for turbine_name in turbine_names) - spillage_var[name, t_first]
             )
         )
 
@@ -1007,14 +1014,14 @@ function PSI.add_constraints!(
             energy_var[name, t_final] >= target_level
         )
 
-        for t in time_steps[(t_first + 1):(t_final - 1)]
+        for t in time_steps[(t_first + 1):(t_final)]
             constraint[name, t] = JuMP.@constraint(
                 container.JuMPmodel,
                 energy_var[name, t] ==
                 energy_var[name, t - 1] +
                 fraction_of_hour * (
                 PSI.get_parameter_column_refs(param_container, name)[t] * multiplier[name, t] - 
-                turbined_out_flow_var[name, t] - spillage_var[name, t]
+                sum(turbined_out_flow_var[turbine_name, t_first] for turbine_name in turbine_names) - spillage_var[name, t]
                 )
             )
         end
@@ -1028,6 +1035,7 @@ for the [`HydroEnergyBlockOptimization`](@extref).
 """
 function PSI.add_constraints!(
     container::PSI.OptimizationContainer,
+    sys::PSY.System,
     ::Type{TotalOutFlowConstraint},
     devices::IS.FlattenIteratorWrapper{V},
     model::PSI.DeviceModel{V, W},
@@ -1044,7 +1052,7 @@ function PSI.add_constraints!(
 
     @show "TotalOutFlowConstraint"
 
-    turbined_out_flow_var = PSI.get_variable(container, HydroTurbinedOutflowVariable(), V)
+    turbined_out_flow_var = PSI.get_variable(container, HydroTurbinedOutflowVariable(), PSY.HydroTurbine)
     spillage_var = PSI.get_variable(container, WaterSpillageVariable(), V)
     total_outflow_var = PSI.get_variable(container, HydroTotalOutflowVariable(), V)
 
@@ -1055,15 +1063,18 @@ function PSI.add_constraints!(
         names,
         time_steps,
     )
-
-    for d in devices
+    
+    for d in devices        
         name = PSY.get_name(d)
+
+        turbines = get_connected_devices(sys, d)
+        turbine_names = [PSY.get_name(turbine) for turbine in turbines]
 
         for t in time_steps
             constraint[name, t] = JuMP.@constraint(
                 container.JuMPmodel,
                 total_outflow_var[name, t] ==
-                turbined_out_flow_var[name, t] + spillage_var[name, t]
+                sum(turbined_out_flow_var[turbine_name, t] for turbine_name in turbine_names) + spillage_var[name, t]
             )
         end
     end
