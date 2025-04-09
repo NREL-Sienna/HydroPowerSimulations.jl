@@ -59,7 +59,6 @@ function PSI.construct_device!(
 
     PSI.add_parameters!(container, PSI.ActivePowerTimeSeriesParameter, devices, model)
 
-
     # Expression
     PSI.add_to_expression!(
         container,
@@ -230,9 +229,9 @@ function PSI.construct_device!(
         model,
         network_model,
     )
-    
+
     PSI.add_parameters!(container, PSI.ActivePowerTimeSeriesParameter, devices, model)
-    
+
     PSI.add_to_expression!(
         container,
         PSI.ActivePowerRangeExpressionLB,
@@ -1932,7 +1931,7 @@ function PSI.construct_device!(
     devices = PSI.get_available_components(model, sys)
 
     @show "ModelConstructStage - HydroReservoir"
-   
+
     PSI.add_constraints!(
         container,
         sys,
@@ -1949,7 +1948,7 @@ function PSI.construct_device!(
         devices,
         model,
         network_model,
-    )    
+    )
 
     PSI.add_feedforward_constraints!(container, model, devices)
     # PSI.add_constraint_dual!(container, sys, model)
@@ -1991,7 +1990,7 @@ function PSI.construct_device!(
         model,
         network_model,
     )
-    
+
     PSI.add_to_expression!(
         container,
         PSI.ActivePowerRangeExpressionLB,
