@@ -1888,14 +1888,6 @@ function PSI.construct_device!(
 ) where {H <: PSY.HydroReservoir, S <: PM.AbstractPowerModel}
     devices = PSI.get_available_components(model, sys)
 
-    @show "ArgumentConstructStage - HydroReservoir"
-    PSI.add_variables!(
-        container,
-        PSI.ActivePowerVariable,
-        devices,
-        HydroEnergyBlockOptimization(),
-    )
-
     PSI.add_variables!(
         container,
         WaterSpillageVariable,
@@ -1930,11 +1922,8 @@ function PSI.construct_device!(
 ) where {H <: PSY.HydroReservoir, S <: PM.AbstractPowerModel}
     devices = PSI.get_available_components(model, sys)
 
-    @show "ModelConstructStage - HydroReservoir"
-
     PSI.add_constraints!(
         container,
-        sys,
         StorageVolumeConstraint,
         devices,
         model,
@@ -1951,7 +1940,6 @@ function PSI.construct_device!(
     )
 
     PSI.add_feedforward_constraints!(container, model, devices)
-    # PSI.add_constraint_dual!(container, sys, model)
 
     return
 end
