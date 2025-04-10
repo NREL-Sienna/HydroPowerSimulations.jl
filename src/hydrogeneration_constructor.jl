@@ -1956,7 +1956,7 @@ function PSI.construct_device!(
     network_model::PSI.NetworkModel{S},
 ) where {
     H <: PSY.HydroTurbine,
-    D <: AbstractHydroDispatchFormulation,
+    D <: HydroEnergyBlockOptimization,
     S <: PM.AbstractActivePowerModel,
 }
     devices = PSI.get_available_components(model, sys)
@@ -2014,7 +2014,7 @@ function PSI.construct_device!(
     network_model::PSI.NetworkModel{S},
 ) where {
     H <: PSY.HydroTurbine,
-    D <: AbstractHydroDispatchFormulation,
+    D <: HydroEnergyBlockOptimization,
     S <: PM.AbstractActivePowerModel,
 }
     devices = PSI.get_available_components(model, sys)
