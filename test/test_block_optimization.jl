@@ -30,5 +30,5 @@
           PSI.ModelBuildStatus.BUILT
 
     @test solve!(model; optimizer = Ipopt_optimizer, output_dir = output_dir) ==
-    IS.Simulation.RunStatus.SUCCESSFULLY_FINALIZED
-    end
+          IS.Simulation.RunStatus.SUCCESSFULLY_FINALIZED
+end
