@@ -1045,7 +1045,6 @@ function PSI.add_constraints!(
     time_steps = PSI.get_time_steps(container)
     names = [PSY.get_name(x) for x in devices]
 
-
     turbined_out_flow_var =
         PSI.get_variable(container, HydroTurbinedOutflowVariable(), PSY.HydroTurbine)
     spillage_var = PSI.get_variable(container, WaterSpillageVariable(), V)
