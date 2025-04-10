@@ -36,9 +36,9 @@ PSI.get_variable_upper_bound(::PSI.EnergyVariable, d::PSY.HydroGen, ::AbstractHy
 
 ########################### HydroEnergyVariableUp, HydroGen #################################
 PSI.get_variable_binary(::HydroEnergyVariableUp, ::Type{<:PSY.HydroGen}, ::AbstractHydroReservoirFormulation) = false
-PSI.get_variable_warm_start_value(::HydroEnergyVariableUp, d::PSY.HydroGen, ::AbstractHydroReservoirFormulation) = PSY.get_initial_storage(d)
+PSI.get_variable_warm_start_value(::HydroEnergyVariableUp, d::PSY.HydroGen, ::AbstractHydroReservoirFormulation) = PSY.get_initial_storage(d).up
 PSI.get_variable_lower_bound(::HydroEnergyVariableUp, d::PSY.HydroGen, ::AbstractHydroReservoirFormulation) = 0.0
-PSI.get_variable_upper_bound(::HydroEnergyVariableUp, d::PSY.HydroGen, ::AbstractHydroReservoirFormulation) = PSY.get_storage_capacity(d)
+PSI.get_variable_upper_bound(::HydroEnergyVariableUp, d::PSY.HydroGen, ::AbstractHydroReservoirFormulation) = PSY.get_storage_capacity(d).up
 
 ########################### HydroEnergyVariableDown, HydroGen #################################
 PSI.get_variable_binary(::HydroEnergyVariableDown, ::Type{<:PSY.HydroGen}, ::AbstractHydroReservoirFormulation) = false
