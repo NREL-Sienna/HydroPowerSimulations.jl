@@ -6,6 +6,7 @@ using PowerNetworkMatrices
 using HydroPowerSimulations
 using DataFrames
 using CSV
+using TimeSeries
 using Dates
 using InfrastructureSystems
 using Test
@@ -36,6 +37,7 @@ const PNM = PowerNetworkMatrices
 # Test Utils
 using JuMP
 using HiGHS
+using Ipopt
 
 HiGHS_optimizer = JuMP.optimizer_with_attributes(
     HiGHS.Optimizer,
@@ -43,6 +45,10 @@ HiGHS_optimizer = JuMP.optimizer_with_attributes(
     "log_to_console" => false,
     "mip_abs_gap" => 1e-1,
     "mip_rel_gap" => 1e-1,
+)
+
+Ipopt_optimizer = JuMP.optimizer_with_attributes(
+    Ipopt.Optimizer
 )
 
 ENV["RUNNING_PSI_TESTS"] = "true"
@@ -113,6 +119,8 @@ function run_tests()
         )
     end
     console_logger = ConsoleLogger(config.console_stream, config.console_level)
+
+    include("data_utils/reservoir_sys.jl")
 
     IS.open_file_logger(config.filename, config.file_level) do file_logger
         levels = (Logging.Info, Logging.Warn, Logging.Error)
