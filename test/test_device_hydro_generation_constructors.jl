@@ -574,7 +574,6 @@ end
           PSI.ModelBuildStatus.BUILT
 end
 
-
 #########################################
 ####### RESERVOIR TURBINE TESTS #########
 #########################################
@@ -584,7 +583,7 @@ end
 
     modeling_horizon = 52 * 24 * 1
     sys = get_test_reservoir_turbine_sys(modeling_horizon)
-    
+
     template_ed = ProblemTemplate(
         NetworkModel(
             CopperPlatePowerModel;
@@ -607,5 +606,5 @@ end
     )
 
     @test build!(model; output_dir = mktempdir(; cleanup = true)) ==
-    PSI.ModelBuildStatus.BUILT
+          PSI.ModelBuildStatus.BUILT
 end
