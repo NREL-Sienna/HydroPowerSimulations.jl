@@ -49,6 +49,8 @@ HiGHS_optimizer = JuMP.optimizer_with_attributes(
 
 Ipopt_optimizer = JuMP.optimizer_with_attributes(
     Ipopt.Optimizer,
+    "max_cpu_time" => 300.0,
+    "print_level" => 0,
 )
 
 ENV["RUNNING_PSI_TESTS"] = "true"
