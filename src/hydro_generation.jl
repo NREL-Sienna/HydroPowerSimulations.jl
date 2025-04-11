@@ -161,6 +161,9 @@ PSI.variable_cost(cost::PSY.StorageCost, ::PSI.ActivePowerVariable, ::PSY.HydroG
 PSI.variable_cost(cost::PSY.StorageCost, ::PSI.ActivePowerInVariable, ::PSY.HydroPumpedStorage, ::HydroDispatchPumpedStorage)=PSY.get_charge_variable_cost(cost)
 PSI.variable_cost(cost::PSY.StorageCost, ::PSI.ActivePowerOutVariable, ::PSY.HydroPumpedStorage, ::HydroDispatchPumpedStorage)=PSY.get_discharge_variable_cost(cost)
 
+const WATER_DENSITY = 10000
+const GRAVITAIONAL_CONSTANT = 9.81
+
 #! format: on
 
 # These methods are defined in PowerSimulations
@@ -912,10 +915,6 @@ function PSI.add_constraints!(
     )
 
     base_power = PSI.get_base_power(container)
-    # TODO: remove constants
-    K1 = 0.0003
-    K2 = 9
-
     t_first = first(time_steps)
     t_final = last(time_steps)
 
@@ -926,6 +925,14 @@ function PSI.add_constraints!(
         reservoir = only(PSY.get_reservoirs(d))
         reservoir_name = PSY.get_name(reservoir)
         initial_level = PSY.get_initial_level(reservoir)
+
+        efficiency = PSY.get_efficiency(d)
+        head_to_volume_factor = PSY.get_head_to_volume_factor(reservoir)
+
+        #TODO: K2 assumes difference of reference height to penstock (H0) and height to river level (Hd) = 1
+        # H0-Hd = 1.0 m
+        K1 = (efficiency * WATER_DENSITY * GRAVITAIONAL_CONSTANT) * head_to_volume_factor
+        K2 = (efficiency * WATER_DENSITY * GRAVITAIONAL_CONSTANT) / (1.0)
 
         constraint[name, t_first] = JuMP.@constraint(
             container.JuMPmodel,
