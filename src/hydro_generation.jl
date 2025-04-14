@@ -1014,7 +1014,7 @@ function PSI.add_constraints!(
 
         constraint[name, t_final] = JuMP.@constraint(
             container.JuMPmodel,
-            energy_var[name, t_final] >= target_level
+            energy_var[name, t_final] == target_level
         )
 
         for t in time_steps[(t_first + 1):(t_final)]
