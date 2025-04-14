@@ -925,6 +925,7 @@ function PSI.add_constraints!(
         reservoir = only(PSY.get_reservoirs(d))
         reservoir_name = PSY.get_name(reservoir)
         initial_level = PSY.get_initial_level(reservoir)
+        max_storage_level = PSY.get_storage_level_limits(reservoir).max
 
         efficiency = PSY.get_efficiency(d)
         head_to_volume_factor = PSY.get_head_to_volume_factor(reservoir)
@@ -1000,16 +1001,15 @@ function PSI.add_constraints!(
         name = PSY.get_name(d)
         initial_level = PSY.get_initial_level(d)
         target_level = PSY.get_level_targets(d)
-
         constraint[name, t_first] = JuMP.@constraint(
             container.JuMPmodel,
             energy_var[name, t_first] ==
-            initial_level +
-            fraction_of_hour * (
-                PSI.get_parameter_column_refs(param_container, name)[t_first] *
-                multiplier[name, t_first] -
-                total_outflow_var[name, t_first] - spillage_var[name, t_first]
-            )
+            initial_level
+            # + fraction_of_hour * (
+            #     PSI.get_parameter_column_refs(param_container, name)[t_first] *
+            #     multiplier[name, t_first] -
+            #     total_outflow_var[name, t_first] - spillage_var[name, t_first]
+            # )
         )
 
         constraint[name, t_final] = JuMP.@constraint(
@@ -1018,6 +1018,8 @@ function PSI.add_constraints!(
         )
 
         for t in time_steps[(t_first + 1):(t_final)]
+            println(t, " ", fraction_of_hour, " ", PSI.get_parameter_column_refs(param_container, name)[t] *
+            multiplier[name, t])
             constraint[name, t] = JuMP.@constraint(
                 container.JuMPmodel,
                 energy_var[name, t] ==
