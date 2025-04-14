@@ -939,8 +939,8 @@ function PSI.add_constraints!(
             container.JuMPmodel,
             hydro_power[name, t_first] ==
             fraction_of_hour * (
-                turbined_out_flow_var[name, t_first] *
-                (0.5 * K1 * (energy_var[reservoir_name, t_first] + initial_level) + K2)
+            turbined_out_flow_var[name, t_first] *
+            (0.5 * K1 * (energy_var[reservoir_name, t_first] + initial_level) + K2)
             ) / base_power
         )
         for t in time_steps[(t_first + 1):t_final]
@@ -948,9 +948,9 @@ function PSI.add_constraints!(
                 container.JuMPmodel,
                 hydro_power[name, t] ==
                 fraction_of_hour * (
-                    turbined_out_flow_var[name, t] * (
-                        0.5 * K1 *
-                        (energy_var[reservoir_name, t] + energy_var[reservoir_name, t - 1]) + K2
+                turbined_out_flow_var[name, t] * (
+                0.5 * K1 *
+                (energy_var[reservoir_name, t] + energy_var[reservoir_name, t - 1]) + K2
                     )
                 ) / base_power
             )
@@ -1005,11 +1005,11 @@ function PSI.add_constraints!(
             container.JuMPmodel,
             energy_var[name, t_first] ==
             initial_level
-            # + fraction_of_hour * (
-            #     PSI.get_parameter_column_refs(param_container, name)[t_first] *
-            #     multiplier[name, t_first] -
-            #     total_outflow_var[name, t_first] - spillage_var[name, t_first]
-            # )
+            + fraction_of_hour * (
+                PSI.get_parameter_column_refs(param_container, name)[t_first] *
+                multiplier[name, t_first] -
+                total_outflow_var[name, t_first] - spillage_var[name, t_first]
+            )
         )
 
         constraint[name, t_final] = JuMP.@constraint(
@@ -1018,8 +1018,6 @@ function PSI.add_constraints!(
         )
 
         for t in time_steps[(t_first + 1):(t_final)]
-            println(t, " ", fraction_of_hour, " ", PSI.get_parameter_column_refs(param_container, name)[t] *
-            multiplier[name, t])
             constraint[name, t] = JuMP.@constraint(
                 container.JuMPmodel,
                 energy_var[name, t] ==
