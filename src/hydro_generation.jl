@@ -290,7 +290,7 @@ function PSI.get_default_attributes(
     ::Type{PSY.HydroReservoir},
     ::Type{HydroEnergyBlockOptimization},
 )
-    return Dict{String, Any}("reservation" => false)
+    return Dict{String, Any}()
 end
 
 """
