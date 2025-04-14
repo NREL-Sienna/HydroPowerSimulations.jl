@@ -88,7 +88,7 @@ The specified constraint is formulated as:
 \\ v_{t} = v_{t-1} + \\Delta t (f^{UR}_{t-1} - f^{Sp}_{t-1} - f^{Tu}_{t-1})
 ```
 """
-struct StorageVolumeConstraint <: PSI.ConstraintType end
+struct ReservoirInventoryConstraint <: PSI.ConstraintType end
 
 """
 Struct to create the constraint for hydro reservoir total outflow
