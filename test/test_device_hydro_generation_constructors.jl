@@ -578,9 +578,8 @@ end
 ####### RESERVOIR TURBINE TESTS #########
 #########################################
 
-@testset "Hydro DCPLossLess HydroEnergyReservoir with HydroCommitmentReservoirBudget Formulations" begin
-    device_model = PSI.DeviceModel(HydroEnergyReservoir, HydroCommitmentReservoirBudget)
-
+@testset "Test Hydro Block Optimization Formulation" begin
+    output_dir = mktempdir(; cleanup = true)
     modeling_horizon = 52 * 24 * 1
     sys = get_test_reservoir_turbine_sys(modeling_horizon)
 
@@ -605,6 +604,9 @@ end
         horizon = Hour(modeling_horizon),
     )
 
-    @test build!(model; output_dir = mktempdir(; cleanup = true)) ==
+    @test build!(model; output_dir = output_dir) ==
           PSI.ModelBuildStatus.BUILT
+
+    @test solve!(model; optimizer = Ipopt_optimizer, output_dir = output_dir) ==
+          IS.Simulation.RunStatus.SUCCESSFULLY_FINALIZED
 end

@@ -43,7 +43,6 @@ export HydroUsageLimitParameter
 ######## Hydro Initial Conditions #######
 export InitialHydroEnergyLevelUp
 export InitialHydroEnergyLevelDown
-export FinalHydroEnergyLevelUp
 
 ######## Hydro Constraints #######
 export EnergyTargetConstraint

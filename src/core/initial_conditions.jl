@@ -8,4 +8,3 @@ Initial condition for Down reservoir in [`PowerSystems.HydroReservoir`](@extref)
 """
 
 struct InitialHydroEnergyLevelDown <: PSI.InitialConditionType end
-

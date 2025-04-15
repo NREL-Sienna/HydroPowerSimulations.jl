@@ -1,6 +1,6 @@
 @testset "Hydro Block Optimization Begin" begin
     output_dir = mktempdir(; cleanup = true)
-    
+
     modeling_horizon = 52 * 24 * 1
     sys = get_test_reservoir_turbine_sys(modeling_horizon)
 
