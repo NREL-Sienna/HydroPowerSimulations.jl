@@ -26,8 +26,7 @@ export HydroEnergyVariableDown
 export WaterSpillageVariable
 export HydroEnergyShortageVariable
 export HydroEnergySurplusVariable
-export HydroTotalOutflowVariable
-export HydroTurbinedOutflowVariable
+export HydroTurbineFlowRateVariable
 
 ######## Hydro Aux Variables ########
 export HydroEnergyOutput
@@ -51,7 +50,7 @@ export EnergyTargetConstraint
 export EnergyCapacityDownConstraint
 export EnergyCapacityUpConstraint
 export EnergyBudgetConstraint
-export TotalOutFlowConstraint
+export ReservoirInventoryConstraint
 
 ######## Hydro feedforwards #######
 export ReservoirTargetFeedforward

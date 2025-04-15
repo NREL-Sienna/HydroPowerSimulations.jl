@@ -48,10 +48,3 @@ Struct to dispatch the creation of a variable for the turbined outflow
 Docs abbreviation: ``f^\\text{Tu}``
 """
 struct HydroTurbineFlowRateVariable <: PSI.VariableType end
-
-"""
-Struct to dispatch the creation of a variable for the total outflow
-
-Docs abbreviation: ``f^\\text{Tu}``
-"""
-struct HydroTotalOutflowVariable <: PSI.VariableType end

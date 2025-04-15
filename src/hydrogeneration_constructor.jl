@@ -1901,13 +1901,6 @@ function PSI.construct_device!(
         HydroEnergyBlockOptimization(),
     )
 
-    PSI.add_variables!(
-        container,
-        HydroTotalOutflowVariable,
-        devices,
-        HydroEnergyBlockOptimization(),
-    )
-
     PSI.add_parameters!(container, InflowTimeSeriesParameter, devices, model)
     PSI.add_feedforward_arguments!(container, model, devices)
     return
@@ -1924,16 +1917,8 @@ function PSI.construct_device!(
 
     PSI.add_constraints!(
         container,
-        StorageVolumeConstraint,
-        devices,
-        model,
-        network_model,
-    )
-
-    PSI.add_constraints!(
-        container,
         sys,
-        TotalOutFlowConstraint,
+        ReservoirInventoryConstraint,
         devices,
         model,
         network_model,
@@ -1963,7 +1948,7 @@ function PSI.construct_device!(
 
     PSI.add_variables!(
         container,
-        HydroTurbinedOutflowVariable,
+        HydroTurbineFlowRateVariable,
         devices,
         HydroEnergyBlockOptimization(),
     )
