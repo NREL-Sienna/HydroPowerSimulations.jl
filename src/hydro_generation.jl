@@ -161,7 +161,7 @@ PSI.variable_cost(cost::PSY.StorageCost, ::PSI.ActivePowerInVariable, ::PSY.Hydr
 PSI.variable_cost(cost::PSY.StorageCost, ::PSI.ActivePowerOutVariable, ::PSY.HydroPumpedStorage, ::HydroDispatchPumpedStorage)=PSY.get_discharge_variable_cost(cost)
 
 const WATER_DENSITY = 1000
-const GRAVITAIONAL_CONSTANT = 9.81
+const GRAVITATIONAL_CONSTANT = 9.81
 
 #! format: on
 
@@ -931,15 +931,15 @@ function PSI.add_constraints!(
 
         #TODO: K2 assumes difference of reference height to penstock (H0) and height to river level (Hd) = 1
         # H0-Hd = 1.0 m
-        K1 = (efficiency * WATER_DENSITY * GRAVITAIONAL_CONSTANT) * head_to_volume_factor
-        K2 = (efficiency * WATER_DENSITY * GRAVITAIONAL_CONSTANT) / (1.0)
+        K1 = (efficiency * WATER_DENSITY * GRAVITATIONAL_CONSTANT) * head_to_volume_factor
+        K2 = (efficiency * WATER_DENSITY * GRAVITATIONAL_CONSTANT) / (1.0)
 
         constraint[name, t_first] = JuMP.@constraint(
             container.JuMPmodel,
             hydro_power[name, t_first] ==
             fraction_of_hour * (
-            turbined_out_flow_var[name, t_first] *
-            (0.5 * K1 * (energy_var[reservoir_name, t_first] + initial_level) + K2)
+                turbined_out_flow_var[name, t_first] *
+                (0.5 * K1 * (energy_var[reservoir_name, t_first] + initial_level) + K2)
             ) / base_power
         )
         for t in time_steps[(t_first + 1):t_final]
@@ -947,9 +947,9 @@ function PSI.add_constraints!(
                 container.JuMPmodel,
                 hydro_power[name, t] ==
                 fraction_of_hour * (
-                turbined_out_flow_var[name, t] * (
-                0.5 * K1 *
-                (energy_var[reservoir_name, t] + energy_var[reservoir_name, t - 1]) + K2
+                    turbined_out_flow_var[name, t] * (
+                        0.5 * K1 *
+                        (energy_var[reservoir_name, t] + energy_var[reservoir_name, t - 1]) + K2
                     )
                 ) / base_power
             )
@@ -981,7 +981,7 @@ function PSI.add_constraints!(
 
     energy_var = PSI.get_variable(container, HydroEnergyVariableUp(), V)
     turbined_out_flow_var =
-    PSI.get_variable(container, HydroTurbineFlowRateVariable(), PSY.HydroTurbine)
+        PSI.get_variable(container, HydroTurbineFlowRateVariable(), PSY.HydroTurbine)
     spillage_var = PSI.get_variable(container, WaterSpillageVariable(), V)
 
     constraint = PSI.add_constraints_container!(
@@ -1010,11 +1010,17 @@ function PSI.add_constraints!(
             container.JuMPmodel,
             energy_var[name, t_first] ==
             initial_level
-            + fraction_of_hour * (
+            +
+            fraction_of_hour * (
                 PSI.get_parameter_column_refs(param_container, name)[t_first] *
                 multiplier[name, t_first] -
-                (sum(turbined_out_flow_var[turbine_name, t_first] for turbine_name in turbine_names)
-                 + spillage_var[name, t_first]
+                (
+                    sum(
+                        turbined_out_flow_var[turbine_name, t_first] for
+                        turbine_name in turbine_names
+                    )
+                    +
+                    spillage_var[name, t_first]
                 )
             )
         )
@@ -1032,8 +1038,13 @@ function PSI.add_constraints!(
                 fraction_of_hour * (
                     PSI.get_parameter_column_refs(param_container, name)[t] *
                     multiplier[name, t] -
-                    (sum(turbined_out_flow_var[turbine_name, t] for turbine_name in turbine_names)
-                     + spillage_var[name, t]
+                    (
+                        sum(
+                            turbined_out_flow_var[turbine_name, t] for
+                            turbine_name in turbine_names
+                        )
+                        +
+                        spillage_var[name, t]
                     )
                 )
             )
@@ -1245,7 +1256,6 @@ function PSI.objective_function!(
     PSI.add_variable_cost!(container, PSI.ActivePowerOutVariable(), devices, T())
     return
 end
-
 
 function PSI.objective_function!(
     container::PSI.OptimizationContainer,
