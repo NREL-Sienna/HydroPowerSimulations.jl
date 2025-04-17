@@ -10,6 +10,9 @@ module HydroPowerSimulations
 # export HydroDispatchRunOfRiverLowerBound
 # export HydroDispatchReservoirBudgetLowerUpperBound
 
+###### Hydro Decision Models #######
+export MediumTermHydroPlanning
+
 ######## Hydro Formulations ########
 export HydroDispatchReservoirBudget
 export HydroDispatchReservoirStorage
@@ -18,6 +21,8 @@ export HydroCommitmentReservoirStorage
 export HydroDispatchPumpedStorage
 export HydroDispatchRunOfRiver
 export HydroCommitmentRunOfRiver
+export HydroLongTermReservoir
+export HydroTurbineBilinearDispatch
 
 ######## Hydro Variables ########
 export HydroEnergyVariableUp
@@ -25,6 +30,9 @@ export HydroEnergyVariableDown
 export WaterSpillageVariable
 export HydroEnergyShortageVariable
 export HydroEnergySurplusVariable
+export HydroReservoirHeadVariable
+export HydroReservoirVolumeVariable
+export HydroTurbineFlowRateVariable
 
 ######## Hydro Aux Variables ########
 export HydroEnergyOutput
@@ -47,6 +55,11 @@ export EnergyTargetConstraint
 export EnergyCapacityDownConstraint
 export EnergyCapacityUpConstraint
 export EnergyBudgetConstraint
+export ReservoirLevelLimitConstraint
+export ReservoirLevelTargetConstraint
+export TurbinePowerOutputConstraint
+export ReservoirHeadToVolumeConstraint
+export ReservoirInventoryConstraint
 
 ######## Hydro feedforwards #######
 export ReservoirTargetFeedforward
@@ -81,16 +94,19 @@ const PM = PowerSimulations.PM
 #################################################################################
 # Includes
 # Core includes
+include("core/definitions.jl")
 include("core/formulations.jl")
 include("core/variables.jl")
 include("core/constraints.jl")
 include("core/expressions.jl")
 include("core/parameters.jl")
 include("core/initial_conditions.jl")
+include("core/decision_models.jl")
 
 # Models
 include("hydro_generation.jl")
 include("hydrogeneration_constructor.jl")
+include("hydro_decision_model.jl")
 include("feedforwards.jl")
 
 end # module
