@@ -12,6 +12,7 @@ function PSI.build_impl!(decision_model::PSI.DecisionModel{MediumTermHydroPlanni
     network_model = PSI.get_network_model(PSI.get_template(decision_model))
     PSI.init_optimization_container!(container, network_model, sys)
     PSI.init_model_store_params!(decision_model)
+    time_steps = PSI.get_time_steps(container)
 
     ###############################
     ######## Variables ############
@@ -21,19 +22,24 @@ function PSI.build_impl!(decision_model::PSI.DecisionModel{MediumTermHydroPlanni
     thermals = PSY.get_components(get_available, PSY.ThermalStandard, sys)
     thermal_model = PSI.get_model(PSI.get_template(decision_model), PSY.ThermalStandard)
     thermal_formulation = PSI.get_formulation(thermal_model)
-    PSI.add_variables(container, PSI.ActivePowerVariable, thermals, thermal_formulation)
+    PSI.add_variables!(container, PSI.ActivePowerVariable, thermals, thermal_formulation())
 
     # Renewables
     renewables = PSY.get_components(get_available, PSY.RenewableDispatch, sys)
     renewable_model = PSI.get_model(PSI.get_template(decision_model), PSY.RenewableDispatch)
     renewable_formulation = PSI.get_formulation(renewable_model)
-    PSI.add_variables(container, PSI.ActivePowerVariable, renewables, renewable_formulation)
+    PSI.add_variables!(
+        container,
+        PSI.ActivePowerVariable,
+        renewables,
+        renewable_formulation(),
+    )
 
     # Turbines
     turbines = PSY.get_components(get_available, PSY.HydroTurbine, sys)
     turbine_model = PSI.get_model(PSI.get_template(decision_model), PSY.HydroTurbine)
     turbine_formulation = PSI.get_formulation(turbine_model)
-    PSI.add_variables(container, PSI.ActivePowerVariable, turbines, turbine_formulation)
+    PSI.add_variables!(container, PSI.ActivePowerVariable, turbines, turbine_formulation())
 
     # Reservoirs
     reservoirs = PSY.get_components(get_available, PSY.HydroReservoir, sys)
@@ -43,23 +49,28 @@ function PSI.build_impl!(decision_model::PSI.DecisionModel{MediumTermHydroPlanni
         container,
         HydroReservoirHeadVariable,
         reservoirs,
-        reservoir_formulation,
+        reservoir_formulation(),
     )
     PSI.add_variables!(
         container,
         HydroReservoirVolumeVariable,
         reservoirs,
-        reservoir_formulation,
+        reservoir_formulation(),
     )
-    PSI.add_variables!(container, WaterSpillageVariable, reservoirs, reservoir_formulation)
+    PSI.add_variables!(
+        container,
+        WaterSpillageVariable,
+        reservoirs,
+        reservoir_formulation(),
+    )
 
     # Joint Variables
-    PSI.add_variables(
+    PSI.add_variables!(
         container,
         HydroTurbineFlowRateVariable,
         turbines,
         reservoirs,
-        turbine_formulation,
+        turbine_formulation(),
     )
 
     ###############################
@@ -82,6 +93,15 @@ function PSI.build_impl!(decision_model::PSI.DecisionModel{MediumTermHydroPlanni
     # Reservoirs
     PSI.add_parameters!(container, InflowTimeSeriesParameter, reservoirs, reservoir_model)
 
+    if haskey(PSI.get_time_series_names(reservoir_model), OutflowTimeSeriesParameter)
+        PSI.add_parameters!(
+            container,
+            OutflowTimeSeriesParameter,
+            reservoirs,
+            reservoir_model,
+        )
+    end
+
     ###############################
     ######## Expressions ##########
     ###############################
@@ -90,9 +110,9 @@ function PSI.build_impl!(decision_model::PSI.DecisionModel{MediumTermHydroPlanni
         PSY.get_number.(
             get_components(x -> PSY.get_bustype(x) == PSY.ACBusTypes.REF, PSY.ACBus, sys)
         )
-    PSI.add_expression_container(
+    PSI.add_expression_container!(
         container,
-        PSI.ActivePowerBalance,
+        EnergyBalanceExpression(),
         PSY.System,
         ref_num,
         time_steps,
@@ -100,44 +120,55 @@ function PSI.build_impl!(decision_model::PSI.DecisionModel{MediumTermHydroPlanni
 
     PSI.add_expressions!(
         container,
+        sys,
         TotalHydroFlowRateReservoirOut,
         reservoirs,
         reservoir_model,
     )
-    PSI.add_expressions!(container, TotalHydroFlowRateTurbineOut, turbines, turbine_model)
 
+    PSI.add_expressions!(
+        container,
+        TotalHydroFlowRateTurbineOut,
+        turbines,
+        turbine_model,
+    )
+
+    hourly_resolution = Float64(Dates.Hour(resolution).value)
     # Thermal
     add_to_balance_expression!(
         container,
-        PSI.ActivePowerBalance,
+        EnergyBalanceExpression,
         PSI.ActivePowerVariable,
         thermals,
         thermal_model,
         network_model,
+        hourly_resolution,
     )
     # Renewable
     add_to_balance_expression!(
         container,
-        PSI.ActivePowerBalance,
+        EnergyBalanceExpression,
         PSI.ActivePowerVariable,
         renewables,
         renewable_model,
         network_model,
+        hourly_resolution,
     )
     # Hydro
     add_to_balance_expression!(
         container,
-        PSI.ActivePowerBalance,
+        EnergyBalanceExpression,
         PSI.ActivePowerVariable,
         turbines,
         turbine_model,
         network_model,
+        hourly_resolution,
     )
     # Load
-    PSI.add_to_expression!(
+    add_to_balance_expression!(
         container,
-        PSI.ActivePowerBalance,
-        PSI.ActivePowerVariable,
+        EnergyBalanceExpression,
+        PSI.ActivePowerTimeSeriesParameter,
         loads,
         load_model,
         network_model,
@@ -150,8 +181,8 @@ function PSI.build_impl!(decision_model::PSI.DecisionModel{MediumTermHydroPlanni
     # Balance Constraint
     PSI.add_constraints!(
         container,
-        PSI.CopperPlateBalanceConstraint,
-        sys,
+        EnergyBalanceExpression,
+        PSI.EnergyBalanceConstraint,
         network_model,
     )
 
@@ -181,11 +212,12 @@ function PSI.build_impl!(decision_model::PSI.DecisionModel{MediumTermHydroPlanni
         reservoirs,
         reservoir_model,
         network_model,
+        hourly_resolution,
     )
 
     PSI.add_constraints!(
         container,
-        ReservoirFinalInventoryConstraint,
+        ReservoirLevelTargetConstraint,
         reservoirs,
         reservoir_model,
         network_model,
@@ -201,26 +233,7 @@ function PSI.build_impl!(decision_model::PSI.DecisionModel{MediumTermHydroPlanni
 
     PSI.add_constraints!(
         container,
-        ReservoirInventoryConstraint,
-        HydroReservoirVolumeVariable,
-        reservoirs,
-        reservoir_model,
-        network_model,
-    )
-
-    # Turbine Constraints
-    PSI.add_constraints!(
-        container,
-        TurbineFlowLimitConstraint,
-        HydroTurbineFlowRateVariable,
-        turbines,
-        turbine_model,
-        network_model,
-    )
-
-    PSI.add_constraints!(
-        container,
-        TurbineFlowLimitConstraint,
+        TurbinePowerOutputConstraint,
         turbines,
         turbine_model,
         network_model,
@@ -254,7 +267,7 @@ function PSI.build_impl!(decision_model::PSI.DecisionModel{MediumTermHydroPlanni
         variable =
             PSI.get_variable(container, PSI.ActivePowerVariable(), PSY.ThermalStandard)
         for t in time_steps
-            lin_cost = prop_term * variable[name, t]
+            lin_cost = prop_term * variable[name, t] * Dates.Hour(resolution).value
             PSI.add_to_objective_invariant_expression!(container, lin_cost)
         end
     end
