@@ -103,7 +103,7 @@ Struct to model the final (target) volume/head storage constraint
 
 TODO
 """
-struct ReservoirFinalInventoryConstraint <: PSI.ConstraintType end
+struct ReservoirLevelTargetConstraint <: PSI.ConstraintType end
 
 """
 Struct to model the transformation from head to volume constraint
