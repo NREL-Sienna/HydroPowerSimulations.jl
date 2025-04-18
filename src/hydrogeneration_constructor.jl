@@ -1915,6 +1915,13 @@ function PSI.construct_device!(
 ) where {H <: PSY.HydroReservoir, S <: PM.AbstractPowerModel}
     devices = PSI.get_available_components(model, sys)
 
+    PSI.add_initial_condition!(
+        container,
+        devices,
+        HydroEnergyBlockOptimization(),
+        InitialReservoirVolume(),
+    )
+
     PSI.add_constraints!(
         container,
         sys,
