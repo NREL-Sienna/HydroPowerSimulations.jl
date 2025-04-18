@@ -18,6 +18,7 @@ export HydroCommitmentReservoirStorage
 export HydroDispatchPumpedStorage
 export HydroDispatchRunOfRiver
 export HydroCommitmentRunOfRiver
+export HydroEnergyBlockOptimization
 
 ######## Hydro Variables ########
 export HydroEnergyVariableUp
@@ -25,6 +26,7 @@ export HydroEnergyVariableDown
 export WaterSpillageVariable
 export HydroEnergyShortageVariable
 export HydroEnergySurplusVariable
+export HydroTurbineFlowRateVariable
 
 ######## Hydro Aux Variables ########
 export HydroEnergyOutput
@@ -47,6 +49,7 @@ export EnergyTargetConstraint
 export EnergyCapacityDownConstraint
 export EnergyCapacityUpConstraint
 export EnergyBudgetConstraint
+export ReservoirInventoryConstraint
 
 ######## Hydro feedforwards #######
 export ReservoirTargetFeedforward
