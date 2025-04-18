@@ -1896,7 +1896,7 @@ function PSI.construct_device!(
     )
     PSI.add_variables!(
         container,
-        HydroEnergyVariableUp,
+        HydroReservoirVolumeVariable,
         devices,
         HydroEnergyBlockOptimization(),
     )
@@ -1919,6 +1919,14 @@ function PSI.construct_device!(
         container,
         sys,
         ReservoirInventoryConstraint,
+        devices,
+        model,
+        network_model,
+    )
+
+    PSI.add_constraints!(
+        container,
+        ReservoirLevelTargetConstraint,
         devices,
         model,
         network_model,

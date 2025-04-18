@@ -1018,7 +1018,8 @@ function PSI.add_constraints!(
     fraction_of_hour = Dates.value(Dates.Minute(resolution)) / PSI.MINUTES_IN_HOUR
     names = [PSY.get_name(x) for x in devices]
 
-    energy_var = PSI.get_variable(container, HydroEnergyVariableUp(), PSY.HydroReservoir)
+    energy_var =
+        PSI.get_variable(container, HydroReservoirVolumeVariable(), PSY.HydroReservoir)
     turbined_out_flow_var =
         PSI.get_variable(container, HydroTurbineFlowRateVariable(), PSY.HydroTurbine)
 
@@ -1090,7 +1091,7 @@ function PSI.add_constraints!(
     ::PSI.NetworkModel{X},
 ) where {
     V <: PSY.HydroReservoir,
-    W <: AbstractHydroReservoirFormulation,
+    W <: HydroEnergyBlockOptimization,
     X <: PM.AbstractPowerModel,
 }
     time_steps = PSI.get_time_steps(container)
@@ -1098,7 +1099,7 @@ function PSI.add_constraints!(
     fraction_of_hour = Dates.value(Dates.Minute(resolution)) / PSI.MINUTES_IN_HOUR
     names = [PSY.get_name(x) for x in devices]
 
-    energy_var = PSI.get_variable(container, HydroEnergyVariableUp(), V)
+    energy_var = PSI.get_variable(container, HydroReservoirVolumeVariable(), V)
     turbined_out_flow_var =
         PSI.get_variable(container, HydroTurbineFlowRateVariable(), PSY.HydroTurbine)
     spillage_var = PSI.get_variable(container, WaterSpillageVariable(), V)
@@ -1142,11 +1143,6 @@ function PSI.add_constraints!(
                     spillage_var[name, t_first]
                 )
             )
-        )
-
-        constraint[name, t_final] = JuMP.@constraint(
-            container.JuMPmodel,
-            energy_var[name, t_final] == target_level
         )
 
         for t in time_steps[(t_first + 1):(t_final)]
@@ -1404,6 +1400,54 @@ function PSI.add_constraints!(
             var = PSI.get_variable(container, HydroReservoirVolumeVariable(), V)
         else
             var = PSI.get_variable(container, HydroReservoirHeadVariable(), V)
+        end
+
+        constraint[name] = JuMP.@constraint(
+            container.JuMPmodel,
+            var[name, time_steps[end]] >= level_targets
+        )
+    end
+    return
+end
+
+"""
+This function define the target level constraint for the reservoir.
+"""
+function PSI.add_constraints!(
+    container::PSI.OptimizationContainer,
+    ::Type{ReservoirLevelTargetConstraint},
+    devices::IS.FlattenIteratorWrapper{V},
+    model::PSI.DeviceModel{V, W},
+    ::PSI.NetworkModel{X},
+) where {
+    V <: PSY.HydroReservoir,
+    W <: HydroEnergyBlockOptimization,
+    X <: PM.AbstractPowerModel,
+}
+    time_steps = PSI.get_time_steps(container)
+    names = PSY.get_name.(devices)
+    constraint =
+        PSI.add_constraints_container!(
+            container,
+            ReservoirLevelTargetConstraint(),
+            V,
+            names,
+        )
+
+    for d in devices
+        name = PSY.get_name(d)
+        level_targets = PSY.get_level_targets(d)
+        h2v_factor = PSY.get_head_to_volume_factor(d)
+        if isa(h2v_factor, PSY.PiecewisePointCurve)
+            error(
+                "EnergyBlockOptimization does not support piecewise head to volume factor",
+            )
+        end
+        if PSY.get_level_data_type(d) == PSY.ReservoirDataType.VOLUME
+            var = PSI.get_variable(container, HydroReservoirVolumeVariable(), V)
+        else
+            var =
+                PSI.get_variable(container, HydroReservoirVolumeVariable(), V) / h2v_factor
         end
 
         constraint[name] = JuMP.@constraint(

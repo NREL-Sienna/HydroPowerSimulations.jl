@@ -64,7 +64,6 @@ The specified constraint is formulated as:
 """
 struct FeedForwardHydroUsageLimitConstraint <: PSI.ConstraintType end
 
-
 """
 Struct to model turbine outflow limits
 
