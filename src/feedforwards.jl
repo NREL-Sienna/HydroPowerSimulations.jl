@@ -522,3 +522,47 @@ function PSI.update_container_parameter_values!(
     )
     return
 end
+
+"""
+    LevelTargetFeedforward(
+        component_type::Type{<:PowerSystems.Component},
+        source::Type{T},
+        affected_values::Vector{DataType},
+        meta = CONTAINER_KEY_EMPTY_META
+    ) where {T}
+
+Adds a constraint to enforce a minimum level (head or volume) for reservoirs based on the source value.
+It is recommended to use the Volume or Head variable as Source, affecting the LevelTargetParameter.
+
+# Arguments:
+
+  - `component_type::Type{<:`[`PowerSystems.Component`](@extref)`}` : Specify the type of component on which the Feedforward will be applied
+  - `source::Type{T}` : Specify the VariableType, ParameterType or AuxVariableType as the source of values for the Feedforward
+  - `affected_values::Vector{DataType}` : Specify the variable on which the hydro limit will be applied using the source values
+"""
+struct LevelTargetFeedforward <: PSI.AbstractAffectFeedforward
+    optimization_container_key::PSI.OptimizationContainerKey
+    affected_values::Vector{<:PSI.OptimizationContainerKey}
+    function LevelTargetFeedforward(;
+        component_type::Type{<:PSY.Component},
+        source::Type{T},
+        affected_values::Vector{DataType},
+        meta = ISOPT.CONTAINER_KEY_EMPTY_META,
+    ) where {T}
+        values_vector = Vector{PSI.ParameterKey}(undef, length(affected_values))
+        for (ix, v) in enumerate(affected_values)
+            if v <: PSI.ParameterType
+                values_vector[ix] =
+                    PSI.get_optimization_container_key(v(), component_type, meta)
+            else
+                error(
+                    "LevelTargetFeedforward is only compatible with VariableType or ParameterType affected values",
+                )
+            end
+        end
+        new(
+            PSI.get_optimization_container_key(T(), component_type, meta),
+            values_vector,
+        )
+    end
+end

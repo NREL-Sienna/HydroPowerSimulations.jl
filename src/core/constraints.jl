@@ -64,9 +64,9 @@ The specified constraint is formulated as:
 """
 struct FeedForwardHydroUsageLimitConstraint <: PSI.ConstraintType end
 
-##############################################################################
+
 """
-Struct to create the constraint for hydro power gneration
+Struct to model turbine outflow limits
 
 For more information check [HydroPowerSimulations Formulations](@ref HydroPowerSimulations-Formulations).
 
@@ -77,6 +77,7 @@ The specified constraint is formulated as:
 ```
 """
 struct HydroPowerConstraint <: PSI.ConstraintType end
+
 """
 Struct to create the constraint for hydro reservoir storage
 
@@ -89,3 +90,47 @@ The specified constraint is formulated as:
 ```
 """
 struct ReservoirInventoryConstraint <: PSI.ConstraintType end
+
+"""
+Struct to limit the turbine flow
+
+```math
+QW^{min} \\le \\sum_{j \\in J(i)}^T wq_{jt} \\le  QW^{max},
+```
+"""
+struct TurbineFlowLimitConstraint <: PSI.ConstraintType end
+
+"""
+Struct to model turbine power output as a function of head
+
+TODO
+"""
+struct TurbinePowerOutputConstraint <: PSI.ConstraintType end
+
+"""
+Struct to model reservoir stored volume/head limits
+
+TODO
+"""
+struct ReservoirLevelLimitConstraint <: PSI.ConstraintType end
+
+"""
+Struct to model time-coupling of stored volume
+
+TODO
+"""
+struct ReservoirInventoryConstraint <: PSI.ConstraintType end
+
+"""
+Struct to model the final (target) volume/head storage constraint
+
+TODO
+"""
+struct ReservoirLevelTargetConstraint <: PSI.ConstraintType end
+
+"""
+Struct to model the transformation from head to volume constraint
+
+TODO
+"""
+struct ReservoirHeadToVolumeConstraint <: PSI.ConstraintType end
