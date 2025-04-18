@@ -21,6 +21,7 @@ export HydroCommitmentReservoirStorage
 export HydroDispatchPumpedStorage
 export HydroDispatchRunOfRiver
 export HydroCommitmentRunOfRiver
+export HydroEnergyBlockOptimization
 export HydroLongTermReservoir
 export HydroTurbineBilinearDispatch
 
