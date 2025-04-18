@@ -115,13 +115,6 @@ TODO
 struct ReservoirLevelLimitConstraint <: PSI.ConstraintType end
 
 """
-Struct to model time-coupling of stored volume
-
-TODO
-"""
-struct ReservoirInventoryConstraint <: PSI.ConstraintType end
-
-"""
 Struct to model the final (target) volume/head storage constraint
 
 TODO
