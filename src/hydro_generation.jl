@@ -162,6 +162,7 @@ PSI.variable_cost(cost::PSY.StorageCost, ::PSI.ActivePowerOutVariable, ::PSY.Hyd
 
 const WATER_DENSITY = 1000
 const GRAVITATIONAL_CONSTANT = 9.81
+const SECONDS_IN_HOUR = 3600
 
 #! format: on
 
@@ -931,15 +932,21 @@ function PSI.add_constraints!(
 
         #TODO: K2 assumes difference of reference height to penstock (H0) and height to river level (Hd) = 1
         # H0-Hd = 1.0 m
-        K1 = (efficiency * WATER_DENSITY * GRAVITATIONAL_CONSTANT) * head_to_volume_factor
-        K2 = (efficiency * WATER_DENSITY * GRAVITATIONAL_CONSTANT) / (1.0)
+        K1 = (efficiency * WATER_DENSITY * GRAVITATIONAL_CONSTANT)
+        # K2 = (efficiency * WATER_DENSITY * GRAVITATIONAL_CONSTANT) / (1.0)
+        
+        ext_res = PSY.get_ext(reservoir)
+        ext_turbine = PSY.get_ext(d)
+        elevation_head = ext_res["intake"] - ext_turbine["elevation"]
+        println(elevation_head)
+        println("fraaction of hour $(fraction_of_hour)")
 
         constraint[name, t_first] = JuMP.@constraint(
             container.JuMPmodel,
             hydro_power[name, t_first] ==
             fraction_of_hour * (
-                turbined_out_flow_var[name, t_first] *
-                (0.5 * K1 * (energy_var[reservoir_name, t_first] + initial_level) + K2)
+                K1 * turbined_out_flow_var[name, t_first] *
+                (0.5 * (energy_var[reservoir_name, t_first] + initial_level) * head_to_volume_factor +  elevation_head)
             ) / base_power
         )
         for t in time_steps[(t_first + 1):t_final]
@@ -947,10 +954,10 @@ function PSI.add_constraints!(
                 container.JuMPmodel,
                 hydro_power[name, t] ==
                 fraction_of_hour * (
-                    turbined_out_flow_var[name, t] * (
-                        0.5 * K1 *
-                        (energy_var[reservoir_name, t] + energy_var[reservoir_name, t - 1]) + K2
-                    )
+                K1 *  turbined_out_flow_var[name, t] * (
+                head_to_volume_factor  *0.5 * (energy_var[reservoir_name, t] + energy_var[reservoir_name, t - 1])
+                 + elevation_head
+                 )
                 ) / base_power
             )
         end
@@ -1011,7 +1018,7 @@ function PSI.add_constraints!(
             energy_var[name, t_first] ==
             initial_level
             +
-            fraction_of_hour * (
+            fraction_of_hour * SECONDS_IN_HOUR * (
                 PSI.get_parameter_column_refs(param_container, name)[t_first] *
                 multiplier[name, t_first] -
                 (
@@ -1035,7 +1042,7 @@ function PSI.add_constraints!(
                 container.JuMPmodel,
                 energy_var[name, t] ==
                 energy_var[name, t - 1] +
-                fraction_of_hour * (
+                fraction_of_hour * SECONDS_IN_HOUR * (
                     PSI.get_parameter_column_refs(param_container, name)[t] *
                     multiplier[name, t] -
                     (
