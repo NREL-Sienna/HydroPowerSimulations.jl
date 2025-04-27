@@ -931,7 +931,7 @@ function PSI.add_constraints!(
         head_to_volume_factor = PSY.get_head_to_volume_factor(reservoir)
 
         K = (efficiency * WATER_DENSITY * GRAVITATIONAL_CONSTANT)
-            
+
         ext_res = PSY.get_ext(reservoir)
         ext_turbine = PSY.get_ext(d)
         elevation_head = ext_res["intake"] - ext_turbine["elevation"]
@@ -943,7 +943,10 @@ function PSI.add_constraints!(
             hydro_power[name, t_first] ==
             fraction_of_hour * (
                 K * turbined_out_flow_var[name, t_first] *
-                (0.5 * (energy_var[reservoir_name, t_first] + initial_level) * head_to_volume_factor +  elevation_head)
+                (
+                    0.5 * (energy_var[reservoir_name, t_first] + initial_level) *
+                    head_to_volume_factor + elevation_head
+                )
             ) / base_power
         )
         for t in time_steps[(t_first + 1):t_final]
@@ -951,10 +954,13 @@ function PSI.add_constraints!(
                 container.JuMPmodel,
                 hydro_power[name, t] ==
                 fraction_of_hour * (
-                K *  turbined_out_flow_var[name, t] * (
-                head_to_volume_factor * 0.5 * (energy_var[reservoir_name, t] + energy_var[reservoir_name, t - 1])
-                 + elevation_head
-                 )
+                    K * turbined_out_flow_var[name, t] *
+                    (
+                        head_to_volume_factor * 0.5 *
+                        (energy_var[reservoir_name, t] + energy_var[reservoir_name, t - 1])
+                        +
+                        elevation_head
+                    )
                 ) / base_power
             )
         end
@@ -1006,7 +1012,7 @@ function PSI.add_constraints!(
         name = PSY.get_name(d)
         initial_level = PSY.get_initial_level(d)
         target_level = PSY.get_level_targets(d)
-        
+
         #TODO: change sum of turbines outflow into an expression
         turbines = get_connected_devices(sys, d)
         turbine_names = [PSY.get_name(turbine) for turbine in turbines]
@@ -1016,7 +1022,8 @@ function PSI.add_constraints!(
             energy_var[name, t_first] ==
             initial_level
             +
-            fraction_of_hour * SECONDS_IN_HOUR * (
+            fraction_of_hour * SECONDS_IN_HOUR *
+            (
                 PSI.get_parameter_column_refs(param_container, name)[t_first] *
                 multiplier[name, t_first] -
                 (
@@ -1040,7 +1047,8 @@ function PSI.add_constraints!(
                 container.JuMPmodel,
                 energy_var[name, t] ==
                 energy_var[name, t - 1] +
-                fraction_of_hour * SECONDS_IN_HOUR * (
+                fraction_of_hour * SECONDS_IN_HOUR *
+                (
                     PSI.get_parameter_column_refs(param_container, name)[t] *
                     multiplier[name, t] -
                     (
