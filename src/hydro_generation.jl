@@ -935,8 +935,6 @@ function PSI.add_constraints!(
         ext_res = PSY.get_ext(reservoir)
         ext_turbine = PSY.get_ext(d)
         elevation_head = ext_res["intake"] - ext_turbine["elevation"]
-        println(elevation_head)
-        println("fraaction of hour $(fraction_of_hour)")
 
         constraint[name, t_first] = JuMP.@constraint(
             container.JuMPmodel,
