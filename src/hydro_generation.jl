@@ -930,11 +930,8 @@ function PSI.add_constraints!(
         efficiency = PSY.get_efficiency(d)
         head_to_volume_factor = PSY.get_head_to_volume_factor(reservoir)
 
-        #TODO: K2 assumes difference of reference height to penstock (H0) and height to river level (Hd) = 1
-        # H0-Hd = 1.0 m
-        K1 = (efficiency * WATER_DENSITY * GRAVITATIONAL_CONSTANT)
-        # K2 = (efficiency * WATER_DENSITY * GRAVITATIONAL_CONSTANT) / (1.0)
-        
+        K = (efficiency * WATER_DENSITY * GRAVITATIONAL_CONSTANT)
+            
         ext_res = PSY.get_ext(reservoir)
         ext_turbine = PSY.get_ext(d)
         elevation_head = ext_res["intake"] - ext_turbine["elevation"]
@@ -945,7 +942,7 @@ function PSI.add_constraints!(
             container.JuMPmodel,
             hydro_power[name, t_first] ==
             fraction_of_hour * (
-                K1 * turbined_out_flow_var[name, t_first] *
+                K * turbined_out_flow_var[name, t_first] *
                 (0.5 * (energy_var[reservoir_name, t_first] + initial_level) * head_to_volume_factor +  elevation_head)
             ) / base_power
         )
@@ -954,8 +951,8 @@ function PSI.add_constraints!(
                 container.JuMPmodel,
                 hydro_power[name, t] ==
                 fraction_of_hour * (
-                K1 *  turbined_out_flow_var[name, t] * (
-                head_to_volume_factor  *0.5 * (energy_var[reservoir_name, t] + energy_var[reservoir_name, t - 1])
+                K *  turbined_out_flow_var[name, t] * (
+                head_to_volume_factor * 0.5 * (energy_var[reservoir_name, t] + energy_var[reservoir_name, t - 1])
                  + elevation_head
                  )
                 ) / base_power
@@ -1009,6 +1006,7 @@ function PSI.add_constraints!(
         name = PSY.get_name(d)
         initial_level = PSY.get_initial_level(d)
         target_level = PSY.get_level_targets(d)
+        
         #TODO: change sum of turbines outflow into an expression
         turbines = get_connected_devices(sys, d)
         turbine_names = [PSY.get_name(turbine) for turbine in turbines]
