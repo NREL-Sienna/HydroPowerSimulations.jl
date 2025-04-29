@@ -757,7 +757,7 @@ function PSI.add_constraints!(
         constraint[name, 1] = JuMP.@constraint(
             container.JuMPmodel,
             energy_var[name, 1] ==
-            PSI.get_value(ic) -
+            PSI.get_value(ic) +
             (
                 spillage_var[name, 1] + powerout_var[name, 1] -
                 powerin_var[name, 1] / efficiency
