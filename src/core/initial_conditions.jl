@@ -12,8 +12,3 @@ struct InitialHydroEnergyLevelDown <: PSI.InitialConditionType end
 Initial condition for volume in reservoir in [`PowerSystems.HydroReservoir`](@extref) formulations
 """
 struct InitialReservoirVolume <: PSI.InitialConditionType end
-
-"""
-Initial condition for head in reservoir in [`PowerSystems.HydroReservoir`](@extref) formulations
-"""
-struct InitialReservoirHead <: PSI.InitialConditionType end
