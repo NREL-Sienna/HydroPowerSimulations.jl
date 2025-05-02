@@ -126,3 +126,8 @@ Struct to model the transformation from head to volume constraint
 TODO
 """
 struct ReservoirHeadToVolumeConstraint <: PSI.ConstraintType end
+
+"""
+TODO
+"""
+struct FeedForwardWaterLevelBudgetConstraint <: PSI.ConstraintType end

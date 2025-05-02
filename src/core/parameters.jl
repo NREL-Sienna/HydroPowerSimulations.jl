@@ -33,6 +33,11 @@ Parameter to define energy usage limit for feedforward
 struct HydroUsageLimitParameter <: PSI.VariableValueParameter end
 
 """
+Parameter to define water usage budget for feedforward
+"""
+struct WaterLevelBudgetParameter <: PSI.VariableValueParameter end
+
+"""
 Parameter to define the level target for feedforward
 """
 struct LevelTargetParameter <: PSI.VariableValueParameter end
