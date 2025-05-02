@@ -175,6 +175,17 @@ function PSI.build_impl!(decision_model::PSI.DecisionModel{MediumTermHydroPlanni
     )
 
     ###############################
+    ##### Initial Conditions ######
+    ###############################
+
+    PSI.add_initial_condition!(
+        container,
+        reservoirs,
+        reservoir_formulation(),
+        InitialReservoirVolume(),
+    )
+
+    ###############################
     ######## Constraints ##########
     ###############################
 
@@ -212,7 +223,6 @@ function PSI.build_impl!(decision_model::PSI.DecisionModel{MediumTermHydroPlanni
         reservoirs,
         reservoir_model,
         network_model,
-        hourly_resolution,
     )
 
     PSI.add_constraints!(
