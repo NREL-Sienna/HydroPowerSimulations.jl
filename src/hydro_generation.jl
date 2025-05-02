@@ -107,10 +107,10 @@ PSI.get_variable_lower_bound(::HydroEnergyVariableUp, d::PSY.HydroReservoir, ::A
 PSI.get_variable_upper_bound(::HydroEnergyVariableUp, d::PSY.HydroReservoir, ::AbstractHydroReservoirFormulation) = PSY.get_storage_level_limits(d).max
 
 ############## HydroTurbine ####################
-PSI.get_variable_binary(::HydroTurbineFlowRateVariable, ::Type{<:PSY.HydroTurbine}, ::AbstractHydroReservoirFormulation) = false
-PSI.get_variable_binary(::PSI.ActivePowerVariable, ::Type{<:PSY.HydroTurbine}, ::AbstractHydroReservoirFormulation) = false
-PSI.get_variable_lower_bound(::HydroTurbineFlowRateVariable, d::PSY.HydroTurbine, ::AbstractHydroReservoirFormulation) = isnothing(PSY.get_outflow_limits(d)) ? 0.0 : PSY.get_outflow_limits(d).min
-PSI.get_variable_upper_bound(::HydroTurbineFlowRateVariable, d::PSY.HydroTurbine, ::AbstractHydroReservoirFormulation) = isnothing(PSY.get_outflow_limits(d)) ? nothing : PSY.get_outflow_limits(d).max
+PSI.get_variable_binary(::HydroTurbineFlowRateVariable, ::Type{<:PSY.HydroTurbine}, ::AbstractHydroFormulation) = false
+PSI.get_variable_binary(::PSI.ActivePowerVariable, ::Type{<:PSY.HydroTurbine}, ::AbstractHydroFormulation) = false
+PSI.get_variable_lower_bound(::HydroTurbineFlowRateVariable, d::PSY.HydroTurbine, ::AbstractHydroFormulation) = isnothing(PSY.get_outflow_limits(d)) ? 0.0 : PSY.get_outflow_limits(d).min
+PSI.get_variable_upper_bound(::HydroTurbineFlowRateVariable, d::PSY.HydroTurbine, ::AbstractHydroFormulation) = isnothing(PSY.get_outflow_limits(d)) ? nothing : PSY.get_outflow_limits(d).max
 
 ############## HydroReservoirHeadVariable, HydroReservoir ####################
 PSI.get_variable_binary(::HydroReservoirHeadVariable, ::Type{PSY.HydroReservoir}, ::AbstractHydroFormulation) = false
@@ -136,7 +136,7 @@ end
 ############## HydroReservoirVolumeVariable, HydroReservoir ####################
 PSI.get_variable_binary(::HydroReservoirVolumeVariable, ::Type{PSY.HydroReservoir}, ::AbstractHydroFormulation) = false
 function PSI.get_variable_upper_bound(::HydroReservoirVolumeVariable, d::PSY.HydroReservoir, ::AbstractHydroFormulation)
-    if PSY.get_level_data_type(d) == PSY.ReservoirDataType.VOLUME
+    if (PSY.get_level_data_type(d) == PSY.ReservoirDataType.USABLE_VOLUME) || (PSY.get_level_data_type(d) == PSY.ReservoirDataType.TOTAL_VOLUME)
         head_limits = PSY.get_storage_level_limits(d)
         if typeof(head_limits) <: PSY.MinMax
             return PSY.get_storage_level_limits(d).max
@@ -145,7 +145,7 @@ function PSI.get_variable_upper_bound(::HydroReservoirVolumeVariable, d::PSY.Hyd
     return nothing
 end
 function PSI.get_variable_lower_bound(::HydroReservoirVolumeVariable, d::PSY.HydroReservoir, ::AbstractHydroFormulation)
-    if PSY.get_level_data_type(d) == PSY.ReservoirDataType.VOLUME
+    if (PSY.get_level_data_type(d) == PSY.ReservoirDataType.USABLE_VOLUME) || (PSY.get_level_data_type(d) == PSY.ReservoirDataType.TOTAL_VOLUME)
         head_limits = PSY.get_storage_level_limits(d)
         if typeof(head_limits) <: PSY.MinMax
             return PSY.get_storage_level_limits(d).min
@@ -168,6 +168,7 @@ PSI.get_multiplier_value(::PSI.TimeSeriesParameter, d::PSY.HydroGen, ::PSI.Fixed
 PSI.get_parameter_multiplier(::PSI.VariableValueParameter, d::PSY.HydroGen, ::AbstractHydroFormulation) = 1.0
 PSI.get_initial_parameter_value(::PSI.VariableValueParameter, d::PSY.HydroGen, ::AbstractHydroFormulation) = 1.0
 PSI.get_initial_parameter_value(::HydroUsageLimitParameter, d::PSY.HydroGen, ::AbstractHydroFormulation) = 1e6 #unbounded
+PSI.get_initial_parameter_value(::WaterLevelBudgetParameter, d::PSY.HydroReservoir, ::AbstractHydroFormulation) = 1e6 #unbounded
 PSI.get_expression_multiplier(::PSI.OnStatusParameter, ::PSI.ActivePowerRangeExpressionUB, d::PSY.HydroGen, ::AbstractHydroFormulation) = PSY.get_active_power_limits(d).max
 PSI.get_expression_multiplier(::PSI.OnStatusParameter, ::PSI.ActivePowerRangeExpressionLB, d::PSY.HydroGen, ::AbstractHydroFormulation) = PSY.get_active_power_limits(d).min
 
@@ -186,9 +187,18 @@ PSI.initial_condition_default(::PSI.InitialTimeDurationOn, d::PSY.HydroGen, ::Ab
 PSI.initial_condition_variable(::PSI.InitialTimeDurationOn, d::PSY.HydroGen, ::AbstractHydroReservoirFormulation) = PSI.OnVariable()
 PSI.initial_condition_default(::PSI.InitialTimeDurationOff, d::PSY.HydroGen, ::AbstractHydroReservoirFormulation) = PSY.get_status(d) ? 0.0 : PSY.get_time_at_status(d)
 PSI.initial_condition_variable(::PSI.InitialTimeDurationOff, d::PSY.HydroGen, ::AbstractHydroReservoirFormulation) = PSI.OnVariable()
-PSI.initial_condition_default(::InitialReservoirHead, d::PSY.HydroReservoir, ::AbstractHydroFormulation) = PSY.get_initial_level(d)
-PSI.initial_condition_variable(::InitialReservoirHead, d::PSY.HydroReservoir, ::AbstractHydroFormulation) = HydroReservoirHeadVariable()
-PSI.initial_condition_default(::InitialReservoirVolume, d::PSY.HydroReservoir, ::AbstractHydroFormulation) = PSY.get_initial_level(d)
+
+function PSI.initial_condition_default(
+    ::InitialReservoirVolume,
+    d::PSY.HydroReservoir,
+    ::AbstractHydroFormulation)
+    
+    if (PSY.get_level_data_type(d) == PSY.ReservoirDataType.USABLE_VOLUME) || (PSY.get_level_data_type(d) == PSY.ReservoirDataType.TOTAL_VOLUME)
+        return PSY.get_initial_level(d) * M3_TO_KM3
+    else
+        return PSY.get_initial_level(d) * PSY.get_head_to_volume_factor(d) * M3_TO_KM3
+    end 
+end
 PSI.initial_condition_variable(::InitialReservoirVolume, d::PSY.HydroReservoir, ::AbstractHydroFormulation) = HydroReservoirVolumeVariable()
 
 ########################Objective Function##################################################
@@ -402,7 +412,6 @@ function PSI.add_variables!(
             PSI.get_jump_model(container),
             base_name = "$(T)_$(D)_{$(name), $(name_res), $(t)}",
         )
-
         ub = PSI.get_variable_upper_bound(variable_type(), d, formulation)
         ub !== nothing && JuMP.set_upper_bound(variable[name, name_res, t], ub)
 
@@ -1287,8 +1296,8 @@ function PSI.add_constraints!(
 
     for d in devices
         name = PSY.get_name(d)
-        res_type = PSY.get_level_data_type(d)
-        if res_type == PSY.ReservoirDataType.VOLUME
+        if (PSY.get_level_data_type(d) == PSY.ReservoirDataType.USABLE_VOLUME) ||
+           (PSY.get_level_data_type(d) == PSY.ReservoirDataType.TOTAL_VOLUME)
             var = PSI.get_variable(container, HydroReservoirVolumeVariable(), V)
         else
             var = PSI.get_variable(container, HydroReservoirHeadVariable(), V)
@@ -1321,12 +1330,13 @@ function PSI.add_constraints!(
     devices::IS.FlattenIteratorWrapper{V},
     model::PSI.DeviceModel{V, W},
     ::PSI.NetworkModel{X},
-    hourly_resolution::Float64,
 ) where {
     V <: PSY.HydroReservoir,
     W <: AbstractHydroFormulation,
     X <: PM.AbstractPowerModel,
 }
+    resolution = PSI.get_resolution(container)
+    hourly_resolution = Float64(Dates.Hour(resolution).value)
     time_steps = PSI.get_time_steps(container)
     names = [PSY.get_name(d) for d in devices]
     constraint =
@@ -1342,25 +1352,24 @@ function PSI.add_constraints!(
     spillage_var = PSI.get_variable(container, WaterSpillageVariable(), V)
     param_container = PSI.get_parameter(container, InflowTimeSeriesParameter(), V)
 
-    for d in devices
+    initial_conditions = PSI.get_initial_condition(
+        container,
+        InitialReservoirVolume(),
+        PSY.HydroReservoir,
+    )
+
+    for ic in initial_conditions
+        d = PSI.get_component(ic)
         name = PSY.get_name(d)
-        initial_level = PSY.get_initial_level(d)
-        h2v_factor = PSY.get_head_to_volume_factor(d)
-        if PSY.get_level_data_type(d) == PSY.ReservoirDataType.VOLUME
-            initial_vol = initial_level
-        else
-            initial_vol = initial_level * h2v_factor
-        end
         inflow = PSI.get_parameter_column_refs(param_container, name)
 
         constraint[name, 1] = JuMP.@constraint(
             container.JuMPmodel,
             volume[name, 1] ==
-            (
-                initial_vol -
-                hourly_resolution * SECONDS_IN_HOUR *
-                (spillage_var[name, 1] + turbine_out[name, 1] - inflow[1])
-            ) * M3_TO_KM3
+            PSI.get_value(ic) -
+            hourly_resolution * SECONDS_IN_HOUR *
+            (spillage_var[name, 1] + turbine_out[name, 1] - inflow[1])
+            * M3_TO_KM3
         )
         for t in time_steps[2:end]
             constraint[name, t] = JuMP.@constraint(
@@ -1404,7 +1413,8 @@ function PSI.add_constraints!(
     for d in devices
         name = PSY.get_name(d)
         level_targets = PSY.get_level_targets(d)
-        if PSY.get_level_data_type(d) == PSY.ReservoirDataType.VOLUME
+        if (PSY.get_level_data_type(d) == PSY.ReservoirDataType.USABLE_VOLUME) ||
+           (PSY.get_level_data_type(d) == PSY.ReservoirDataType.TOTAL_VOLUME)
             var = PSI.get_variable(container, HydroReservoirVolumeVariable(), V)
         else
             var = PSI.get_variable(container, HydroReservoirHeadVariable(), V)
@@ -1451,7 +1461,8 @@ function PSI.add_constraints!(
                 "EnergyBlockOptimization does not support piecewise head to volume factor",
             )
         end
-        if PSY.get_level_data_type(d) == PSY.ReservoirDataType.VOLUME
+        if (PSY.get_level_data_type(d) == PSY.ReservoirDataType.USABLE_VOLUME) ||
+           (PSY.get_level_data_type(d) == PSY.ReservoirDataType.TOTAL_VOLUME)
             var = PSI.get_variable(container, HydroReservoirVolumeVariable(), V)
         else
             var =
@@ -1538,13 +1549,18 @@ function PSI.add_constraints!(
         name = PSY.get_name(d)
         conversion_factor = PSY.get_conversion_factor(d)
         reservoirs = PSY.get_reservoirs(d)
-        res_names = PSY.get_name.(reservoirs)
+        powerhouse_elevation = PSY.get_powerhouse_elevation(d)
         for t in time_steps
             constraint[name, t] = JuMP.@constraint(
                 container.JuMPmodel,
                 power[name, t] ==
                 GRAVITATIONAL_CONSTANT * WATER_DENSITY * conversion_factor *
-                sum(head[res_name, t] * flow[name, res_name, t] for res_name in res_names) / (1e6 * base_power)
+                sum(
+                    (
+                        head[PSY.get_name(res), t] + PSY.get_intake_elevation(res) -
+                        powerhouse_elevation
+                    ) * flow[name, PSY.get_name(res), t] for res in reservoirs
+                ) / (1e6 * base_power)
             )
         end
     end
@@ -2064,53 +2080,6 @@ function PSI.update_initial_conditions!(
     return
 end
 
-function PSI.update_initial_conditions!(
-    ics::Vector{T},
-    store::PSI.EmulationModelStore,
-    ::Dates.Millisecond,
-) where {
-    T <: Union{
-        PSI.InitialCondition{InitialReservoirHead, Float64},
-        PSI.InitialCondition{InitialReservoirHead, JuMP.VariableRef},
-        PSI.InitialCondition{InitialReservoirHead, Nothing},
-    },
-}
-    for ic in ics
-        var_val = PSI.get_variable_value(
-            store,
-            HydroReservoirHeadVariable(),
-            PSI.get_component_type(ic),
-        )
-        PSI.set_ic_quantity!(
-            ic,
-            PSI.get_last_recorded_value(var_val)[PSI.get_component_name(ic)],
-        )
-    end
-    return
-end
-
-function PSI.update_initial_conditions!(
-    ics::Vector{T},
-    state::PSI.SimulationState,
-    ::Dates.Millisecond,
-) where {
-    T <: Union{
-        PSI.InitialCondition{InitialReservoirHead, Float64},
-        PSI.InitialCondition{InitialReservoirHead, JuMP.VariableRef},
-        PSI.InitialCondition{InitialReservoirHead, Nothing},
-    },
-}
-    for ic in ics
-        var_val = PSI.get_system_state_value(
-            state,
-            HydroReservoirHeadVariable(),
-            PSI.get_component_type(ic),
-        )
-        PSI.set_ic_quantity!(ic, var_val[PSI.get_component_name(ic)])
-    end
-    return
-end
-
 function PSI._get_initial_conditions_value(
     ::Vector{T},
     component::W,
@@ -2140,24 +2109,6 @@ function PSI._get_initial_conditions_value(
     V <: AbstractHydroReservoirFormulation,
     W <: PSY.HydroGen,
 } where {U <: Union{InitialHydroEnergyLevelUp, InitialHydroEnergyLevelDown}}
-    var_type = PSI.initial_condition_variable(U(), component, V())
-    val = PSI.initial_condition_default(U(), component, V())
-    @debug "Device $(PSY.get_name(component)) initialized PSI.DeviceStatus as $var_type" _group =
-        PSI.LOG_GROUP_BUILD_INITIAL_CONDITIONS
-    return T(component, val)
-end
-
-function PSI._get_initial_conditions_value(
-    ::Vector{T},
-    component::W,
-    ::U,
-    ::V,
-    container::PSI.OptimizationContainer,
-) where {
-    T <: PSI.InitialCondition{U, Float64},
-    V <: AbstractHydroReservoirFormulation,
-    W <: PSY.HydroReservoir,
-} where {U <: Union{InitialReservoirHead, InitialReservoirVolume}}
     var_type = PSI.initial_condition_variable(U(), component, V())
     val = PSI.initial_condition_default(U(), component, V())
     @debug "Device $(PSY.get_name(component)) initialized PSI.DeviceStatus as $var_type" _group =
@@ -2430,6 +2381,46 @@ function PSI.add_to_expression!(
     for d in devices, t in PSI.get_time_steps(container)
         name = PSY.get_name(d)
         PSI._add_to_jump_expression!(expression[name, t], variable[name, t], -1.0)
+    end
+    return
+end
+
+#### WaterBudget Parameters ###
+
+function PSI._add_parameters!(
+    container::PSI.OptimizationContainer,
+    ::Type{T},
+    devices::V,
+    model::PSI.DeviceModel{D, W},
+) where {
+    T <: WaterLevelBudgetParameter,
+    V <: Union{Vector{D}, IS.FlattenIteratorWrapper{D}},
+    W <: AbstractHydroFormulation,
+} where {D <: PSY.HydroReservoir}
+    #@debug "adding" T D U _group = LOG_GROUP_OPTIMIZATION_CONTAINER
+    names = [PSY.get_name(device) for device in devices]
+    time_steps = PSI.get_time_steps(container)
+    resolution = PSI.get_resolution(container)
+    fraction_of_hour = Dates.value(Dates.Minute(resolution)) / PSI.MINUTES_IN_HOUR
+    HOURS_IN_DAY = 24
+    mult = fraction_of_hour * length(time_steps) / HOURS_IN_DAY
+    key = PSI.ExpressionKey{TotalHydroFlowRateReservoirOut, D}("")
+    parameter_container =
+        PSI.add_param_container!(container, T(), D, key, names, time_steps)
+    jump_model = PSI.get_jump_model(container)
+
+    for d in devices
+        name = PSY.get_name(d)
+        for t in time_steps
+            PSI.set_multiplier!(parameter_container, 1.0, name, t)
+            PSI.set_parameter!(
+                parameter_container,
+                jump_model,
+                mult * PSI.get_initial_parameter_value(T(), d, W()),
+                name,
+                t,
+            )
+        end
     end
     return
 end
