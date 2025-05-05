@@ -196,6 +196,17 @@ function PSI.get_default_time_series_names(
 end
 
 function PSI.get_default_time_series_names(
+    ::Type{<:PSY.HydroGen},
+    ::Type{<:HydroDispatchRunOfRiverBudget},
+)
+    return Dict{Type{<:PSI.TimeSeriesParameter}, String}(
+        PSI.ActivePowerTimeSeriesParameter => "max_active_power",
+        PSI.ReactivePowerTimeSeriesParameter => "max_active_power",
+        EnergyBudgetTimeSeriesParameter => "hydro_budget",
+    )
+end
+
+function PSI.get_default_time_series_names(
     ::Type{PSY.HydroEnergyReservoir},
     ::Type{<:Union{HydroCommitmentReservoirBudget, HydroDispatchReservoirBudget}},
 )
@@ -855,7 +866,7 @@ function PSI.add_constraints!(
     ::PSI.NetworkModel{X},
 ) where {
     V <: PSY.HydroGen,
-    W <: AbstractHydroReservoirFormulation,
+    W <: AbstractHydroDispatchFormulation,
     X <: PM.AbstractPowerModel,
 }
     time_steps = PSI.get_time_steps(container)

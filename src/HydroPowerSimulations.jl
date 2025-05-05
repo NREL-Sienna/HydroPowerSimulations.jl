@@ -17,6 +17,7 @@ export HydroCommitmentReservoirBudget
 export HydroCommitmentReservoirStorage
 export HydroDispatchPumpedStorage
 export HydroDispatchRunOfRiver
+export HydroDispatchRunOfRiverBudget
 export HydroCommitmentRunOfRiver
 
 ######## Hydro Variables ########

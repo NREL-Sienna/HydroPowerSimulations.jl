@@ -30,6 +30,11 @@ Formulation type to add injection variables constrained by a maximum injection t
 struct HydroDispatchRunOfRiver <: AbstractHydroDispatchFormulation end
 
 """
+Formulation type to add injection variables constrained by a maximum injection time series for [`PowerSystems.HydroGen`](@extref) and a buget
+"""
+struct HydroDispatchRunOfRiverBudget <: AbstractHydroDispatchFormulation end
+
+"""
 Formulation type to add commitment and injection variables constrained by total energy production budget defined with a time series for [`PowerSystems.HydroGen`](@extref)
 """
 struct HydroCommitmentReservoirBudget <: AbstractHydroReservoirFormulation end
