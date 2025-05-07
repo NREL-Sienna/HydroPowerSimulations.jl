@@ -22,6 +22,7 @@ function get_test_reservoir_turbine_sys(modeling_horizon)
         ramp_limits = nothing,
         time_limits = nothing,
         base_power = get_base_power(solitude),
+        powerhouse_elevation = 0.0,
     )
 
     turbine_alta = HydroTurbine(;
@@ -37,6 +38,7 @@ function get_test_reservoir_turbine_sys(modeling_horizon)
         ramp_limits = nothing,
         time_limits = nothing,
         base_power = get_base_power(solitude),
+        powerhouse_elevation = 0.0,
     )
 
     reservoir = HydroReservoir(;
@@ -50,6 +52,7 @@ function get_test_reservoir_turbine_sys(modeling_horizon)
         level_targets = 0.15,
         travel_time = nothing,
         head_to_volume_factor = 1.0,
+        intake_elevation = 100.0,
     )
 
     # Add turbines and reservoirs

@@ -28,31 +28,31 @@ end
 #### PUMPED STORAGE DISPATCH TESTS ####
 #########################################
 
-@testset "Hydro DCPLossLess HydroPumpedStorage with HydroDispatchPumpedStorage Formulations" begin
-    device_model = PSI.DeviceModel(
-        HydroPumpedStorage,
-        HydroDispatchPumpedStorage;
-        attributes = Dict{String, Any}("reservation" => false),
-    )
-    c_sys5_phes_ed = PSB.build_system(PSITestSystems, "c_sys5_phes_ed")
+# @testset "Hydro DCPLossLess HydroPumpedStorage with HydroDispatchPumpedStorage Formulations" begin
+#     device_model = PSI.DeviceModel(
+#         HydroPumpedStorage,
+#         HydroDispatchPumpedStorage;
+#         attributes = Dict{String, Any}("reservation" => false),
+#     )
+#     c_sys5_phes_ed = PSB.build_system(PSITestSystems, "c_sys5_phes_ed")
 
-    # No Parameters Testing
-    model = DecisionModel(MockOperationProblem, DCPPowerModel, c_sys5_phes_ed)
-    mock_construct_device!(model, device_model)
-    moi_tests(model, 60, 0, 24, 24, 24, false)
-    psi_checkobjfun_test(model, GAEVF)
-end
+#     # No Parameters Testing
+#     model = DecisionModel(MockOperationProblem, DCPPowerModel, c_sys5_phes_ed)
+#     mock_construct_device!(model, device_model)
+#     moi_tests(model, 60, 0, 24, 24, 24, false)
+#     psi_checkobjfun_test(model, GAEVF)
+# end
 
-@testset "Hydro DCPLossLess HydroPumpedStorage with HydroDispatchPumpedStorage with Reservation Formulations" begin
-    device_model = PSI.DeviceModel(HydroPumpedStorage, HydroDispatchPumpedStorage)
-    c_sys5_phes_ed = PSB.build_system(PSITestSystems, "c_sys5_phes_ed")
+# @testset "Hydro DCPLossLess HydroPumpedStorage with HydroDispatchPumpedStorage with Reservation Formulations" begin
+#     device_model = PSI.DeviceModel(HydroPumpedStorage, HydroDispatchPumpedStorage)
+#     c_sys5_phes_ed = PSB.build_system(PSITestSystems, "c_sys5_phes_ed")
 
-    # No Parameters Testing
-    model = DecisionModel(MockOperationProblem, DCPPowerModel, c_sys5_phes_ed)
-    mock_construct_device!(model, device_model)
-    moi_tests(model, 72, 0, 24, 24, 24, true)
-    psi_checkobjfun_test(model, GAEVF)
-end
+#     # No Parameters Testing
+#     model = DecisionModel(MockOperationProblem, DCPPowerModel, c_sys5_phes_ed)
+#     mock_construct_device!(model, device_model)
+#     moi_tests(model, 72, 0, 24, 24, 24, true)
+#     psi_checkobjfun_test(model, GAEVF)
+# end
 
 #########################################
 ### RESERVOIR BUDGET COMMITMENT TESTS ###
@@ -495,40 +495,40 @@ end
     moi_tests(model, 193, 0, 24, 24, 48, false)
 end
 
-@testset "Test ReservoirLimitFeedforward to HydroEnergyReservoir models" begin
-    device_model = PSI.DeviceModel(HydroPumpedStorage, HydroDispatchPumpedStorage)
+# @testset "Test ReservoirLimitFeedforward to HydroEnergyReservoir models" begin
+#     device_model = PSI.DeviceModel(HydroPumpedStorage, HydroDispatchPumpedStorage)
 
-    ff_il = ReservoirLimitFeedforward(;
-        component_type = HydroPumpedStorage,
-        source = PSI.ActivePowerOutVariable,
-        affected_values = [PSI.ActivePowerOutVariable],
-        number_of_periods = 12,
-    )
+#     ff_il = ReservoirLimitFeedforward(;
+#         component_type = HydroPumpedStorage,
+#         source = PSI.ActivePowerOutVariable,
+#         affected_values = [PSI.ActivePowerOutVariable],
+#         number_of_periods = 12,
+#     )
 
-    PSI.attach_feedforward!(device_model, ff_il)
-    c_sys5_hy = PSB.build_system(PSITestSystems, "c_sys5_phes_ed")
-    model = DecisionModel(MockOperationProblem, DCPPowerModel, c_sys5_hy)
-    mock_construct_device!(model, device_model; built_for_recurrent_solves = true)
-    moi_tests(model, 110, 0, 25, 24, 24, true)
-end
+#     PSI.attach_feedforward!(device_model, ff_il)
+#     c_sys5_hy = PSB.build_system(PSITestSystems, "c_sys5_phes_ed")
+#     model = DecisionModel(MockOperationProblem, DCPPowerModel, c_sys5_hy)
+#     mock_construct_device!(model, device_model; built_for_recurrent_solves = true)
+#     moi_tests(model, 110, 0, 25, 24, 24, true)
+# end
 
-@testset "Test ReservoirTargetFeedforward to HydroEnergyReservoir models" begin
-    device_model = PSI.DeviceModel(HydroPumpedStorage, HydroDispatchPumpedStorage)
+# @testset "Test ReservoirTargetFeedforward to HydroEnergyReservoir models" begin
+#     device_model = PSI.DeviceModel(HydroPumpedStorage, HydroDispatchPumpedStorage)
 
-    ff_up = ReservoirTargetFeedforward(;
-        component_type = HydroPumpedStorage,
-        source = HydroEnergyVariableUp,
-        affected_values = [HydroEnergyVariableUp],
-        target_period = 12,
-        penalty_cost = 1e4,
-    )
+#     ff_up = ReservoirTargetFeedforward(;
+#         component_type = HydroPumpedStorage,
+#         source = HydroEnergyVariableUp,
+#         affected_values = [HydroEnergyVariableUp],
+#         target_period = 12,
+#         penalty_cost = 1e4,
+#     )
 
-    PSI.attach_feedforward!(device_model, ff_up)
-    c_sys5_hy = PSB.build_system(PSITestSystems, "c_sys5_phes_ed")
-    model = DecisionModel(MockOperationProblem, DCPPowerModel, c_sys5_hy)
-    mock_construct_device!(model, device_model; built_for_recurrent_solves = true)
-    moi_tests(model, 122, 0, 24, 25, 24, true)
-end
+#     PSI.attach_feedforward!(device_model, ff_up)
+#     c_sys5_hy = PSB.build_system(PSITestSystems, "c_sys5_phes_ed")
+#     model = DecisionModel(MockOperationProblem, DCPPowerModel, c_sys5_hy)
+#     mock_construct_device!(model, device_model; built_for_recurrent_solves = true)
+#     moi_tests(model, 122, 0, 24, 25, 24, true)
+# end
 
 @testset "Test Reserves from Hydro" begin
     template = ProblemTemplate(CopperPlatePowerModel)
@@ -555,24 +555,24 @@ end
     # moi_tests(model, 240, 0, 48, 96, 72, false)
 end
 
-@testset "Test Reserves from HydroPumpedStorage" begin
-    template = ProblemTemplate(CopperPlatePowerModel)
-    set_device_model!(template, PowerLoad, StaticPowerLoad)
-    set_device_model!(template, HydroPumpedStorage, HydroDispatchPumpedStorage)
-    set_service_model!(
-        template,
-        ServiceModel(VariableReserve{ReserveUp}, RangeReserve, "Reserve7"),
-    )
-    set_service_model!(
-        template,
-        ServiceModel(VariableReserve{ReserveDown}, RangeReserve, "Reserve8"),
-    )
+# @testset "Test Reserves from HydroPumpedStorage" begin
+#     template = ProblemTemplate(CopperPlatePowerModel)
+#     set_device_model!(template, PowerLoad, StaticPowerLoad)
+#     set_device_model!(template, HydroPumpedStorage, HydroDispatchPumpedStorage)
+#     set_service_model!(
+#         template,
+#         ServiceModel(VariableReserve{ReserveUp}, RangeReserve, "Reserve7"),
+#     )
+#     set_service_model!(
+#         template,
+#         ServiceModel(VariableReserve{ReserveDown}, RangeReserve, "Reserve8"),
+#     )
 
-    c_sys5_phes_ed = PSB.build_system(PSITestSystems, "c_sys5_phes_ed"; add_reserves = true)
-    model = DecisionModel(template, c_sys5_phes_ed)
-    @test build!(model; output_dir = mktempdir(; cleanup = true)) ==
-          PSI.ModelBuildStatus.BUILT
-end
+#     c_sys5_phes_ed = PSB.build_system(PSITestSystems, "c_sys5_phes_ed"; add_reserves = true)
+#     model = DecisionModel(template, c_sys5_phes_ed)
+#     @test build!(model; output_dir = mktempdir(; cleanup = true)) ==
+#           PSI.ModelBuildStatus.BUILT
+# end
 
 #########################################
 ####### RESERVOIR TURBINE TESTS #########
