@@ -57,7 +57,6 @@ Docs abbreviation: ``E^\\text{hy,out}``
 """
 struct HydroEnergyOutput <: PSI.AuxVariableType end
 
-
 """
 Struct to dispatch the creation of a variable for the turbined outflow
 
