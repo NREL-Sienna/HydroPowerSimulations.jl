@@ -35,6 +35,19 @@ function PSI.build_impl!(decision_model::PSI.DecisionModel{MediumTermHydroPlanni
         renewable_formulation(),
     )
 
+    # HydroDispatch
+    hydros = PSY.get_components(get_available, PSY.HydroDispatch, sys)
+    hydro_model = PSI.get_model(PSI.get_template(decision_model), PSY.HydroDispatch)
+    if !isnothing(hydro_model)
+        hydro_formulation = PSI.get_formulation(hydro_model)
+        PSI.add_variables!(
+            container,
+            PSI.ActivePowerVariable,
+            hydros,
+            hydro_formulation(),
+        )
+    end
+
     # Turbines
     turbines = PSY.get_components(get_available, PSY.HydroTurbine, sys)
     turbine_model = PSI.get_model(PSI.get_template(decision_model), PSY.HydroTurbine)
@@ -89,6 +102,14 @@ function PSI.build_impl!(decision_model::PSI.DecisionModel{MediumTermHydroPlanni
         renewables,
         renewable_model,
     )
+    if !isnothing(hydro_model)
+        PSI.add_parameters!(
+            container,
+            PSI.ActivePowerTimeSeriesParameter,
+            hydros,
+            hydro_model,
+        )
+    end
 
     # Reservoirs
     PSI.add_parameters!(container, InflowTimeSeriesParameter, reservoirs, reservoir_model)
@@ -154,6 +175,18 @@ function PSI.build_impl!(decision_model::PSI.DecisionModel{MediumTermHydroPlanni
         network_model,
         hourly_resolution,
     )
+    # HydroDispatch
+    if !isnothing(hydro_model)
+        add_to_balance_expression!(
+            container,
+            EnergyBalanceExpression,
+            PSI.ActivePowerVariable,
+            hydros,
+            hydro_model,
+            network_model,
+            hourly_resolution,
+        )
+    end
     # Hydro
     add_to_balance_expression!(
         container,
@@ -206,6 +239,17 @@ function PSI.build_impl!(decision_model::PSI.DecisionModel{MediumTermHydroPlanni
         renewable_model,
         network_model,
     )
+    # HydroDispatch Limits
+    if !isnothing(hydro_model)
+        PSI.add_constraints!(
+            container,
+            PSI.ActivePowerVariableLimitsConstraint,
+            PSI.ActivePowerVariable,
+            hydros,
+            hydro_model,
+            network_model,
+        )
+    end
 
     # Reservoir Constraints
     PSI.add_constraints!(
