@@ -1670,6 +1670,56 @@ function add_to_balance_expression!(
     end
 end
 
+function add_slack_to_balance_expression!(
+    container::PSI.OptimizationContainer,
+    ::Type{U},
+    resolution::Float64,
+) where {
+    U <: PSY.System,
+}
+    time_steps = PSI.get_time_steps(container)
+    expression = PSI.get_expression(container, EnergyBalanceExpression(), PSY.System)
+    ref_buses, time_ax = axes(expression)
+    sl_up = PSI.add_variable_container!(
+        container,
+        PSI.SystemBalanceSlackUp(),
+        PSY.System,
+        ref_buses,
+        time_steps,
+    )
+    sl_dn = PSI.add_variable_container!(
+        container,
+        PSI.SystemBalanceSlackDown(),
+        PSY.System,
+        ref_buses,
+        time_steps,
+    )
+    ref_num = only(ref_buses)
+    for t in time_steps
+        sl_up[ref_num, t] = JuMP.@variable(
+            PSI.get_jump_model(container),
+            base_name = "slack_{$(PSI.SystemBalanceSlackUp), $(ref_num), $t}",
+            lower_bound = 0.0
+        )
+        sl_dn[ref_num, t] = JuMP.@variable(
+            PSI.get_jump_model(container),
+            base_name = "slack_{$(PSI.SystemBalanceSlackDown), $(ref_num), $t}",
+            lower_bound = 0.0
+        )
+    end
+
+    for t in time_steps
+        JuMP.add_to_expression!(
+            expression[ref_num, t],
+            resolution * sl_up[ref_num, t],
+        )
+        JuMP.add_to_expression!(
+            expression[ref_num, t],
+            -resolution * sl_dn[ref_num, t],
+        )
+    end
+end
+
 ##################################### Auxillary Variables ############################
 function PSI.calculate_aux_variable_value!(
     container::PSI.OptimizationContainer,

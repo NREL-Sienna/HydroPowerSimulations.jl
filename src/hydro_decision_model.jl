@@ -206,6 +206,12 @@ function PSI.build_impl!(decision_model::PSI.DecisionModel{MediumTermHydroPlanni
         load_model,
         network_model,
     )
+    # Slacks
+    add_slack_to_balance_expression!(
+        container,
+        PSY.System,
+        hourly_resolution,
+    )
 
     ###############################
     ##### Initial Conditions ######
@@ -322,6 +328,37 @@ function PSI.build_impl!(decision_model::PSI.DecisionModel{MediumTermHydroPlanni
             PSI.get_variable(container, PSI.ActivePowerVariable(), PSY.ThermalStandard)
         for t in time_steps
             lin_cost = prop_term * variable[name, t] * Dates.Hour(resolution).value
+            PSI.add_to_objective_invariant_expression!(container, lin_cost)
+        end
+    end
+    # Add slack cost
+    variable_up = PSI.get_variable(
+        container,
+        PSI.SystemBalanceSlackUp(),
+        PSI._system_expression_type(PSI.CopperPlatePowerModel),
+    )
+    variable_dn = PSI.get_variable(
+        container,
+        PSI.SystemBalanceSlackDown(),
+        PSI._system_expression_type(PSI.CopperPlatePowerModel),
+    )
+    ref_bus = only(ref_num)
+    for t in time_steps
+        lin_cost_up =
+            PSI.BALANCE_SLACK_COST * variable_up[ref_bus, t] * Dates.Hour(resolution).value
+        lin_cost_dn =
+            PSI.BALANCE_SLACK_COST * variable_dn[ref_bus, t] * Dates.Hour(resolution).value
+        PSI.add_to_objective_invariant_expression!(container, lin_cost_up)
+        PSI.add_to_objective_invariant_expression!(container, lin_cost_dn)
+    end
+    # Add water spillage cost
+    for hy in reservoirs
+        name = PSY.get_name(hy)
+        variable =
+            PSI.get_variable(container, WaterSpillageVariable(), PSY.HydroReservoir)
+        for t in time_steps
+            lin_cost =
+                PSI.BALANCE_SLACK_COST * variable[name, t] * Dates.Hour(resolution).value
             PSI.add_to_objective_invariant_expression!(container, lin_cost)
         end
     end
