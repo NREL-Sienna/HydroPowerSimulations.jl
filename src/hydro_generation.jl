@@ -192,7 +192,7 @@ function PSI.initial_condition_default(
     if (PSY.get_level_data_type(d) == PSY.ReservoirDataType.USABLE_VOLUME) || (PSY.get_level_data_type(d) == PSY.ReservoirDataType.TOTAL_VOLUME)
         return PSY.get_initial_level(d) * M3_TO_KM3
     else
-        return PSY.get_initial_level(d) * PSY.get_head_to_volume_factor(d) * M3_TO_KM3
+        return PSY.get_initial_level(d) * PSY.get_proportional_term(PSY.get_head_to_volume_factor(d)) * M3_TO_KM3
     end 
 end
 PSI.initial_condition_variable(::InitialReservoirVolume, d::PSY.HydroReservoir, ::AbstractHydroFormulation) = HydroReservoirVolumeVariable()
@@ -1034,7 +1034,8 @@ function PSI.add_constraints!(
         end
         reservoir_name = PSY.get_name(reservoir)
         efficiency = PSY.get_efficiency(d)
-        head_to_volume_factor = PSY.get_head_to_volume_factor(reservoir)
+        head_to_volume_factor =
+            PSY.get_proportional_term(PSY.get_head_to_volume_factor(reservoir))
 
         #TODO: K2 assumes difference of reference height to penstock (H0) and height to river level (Hd) = 1
         # H0-Hd = 1.0 m
@@ -1424,7 +1425,7 @@ function PSI.add_constraints!(
     for d in devices
         name = PSY.get_name(d)
         level_targets = PSY.get_level_targets(d)
-        h2v_factor = PSY.get_head_to_volume_factor(d)
+        h2v_factor = PSY.get_proportional_term(PSY.get_head_to_volume_factor(d))
         if isa(h2v_factor, PSY.PiecewisePointCurve)
             error(
                 "EnergyBlockOptimization does not support piecewise head to volume factor",
@@ -1475,7 +1476,7 @@ function PSI.add_constraints!(
 
     for d in devices
         name = PSY.get_name(d)
-        h2v_factor = PSY.get_head_to_volume_factor(d)
+        h2v_factor = PSY.get_proportional_term(PSY.get_head_to_volume_factor(d))
         for t in time_steps
             constraint[name, t] = JuMP.@constraint(
                 container.JuMPmodel,
