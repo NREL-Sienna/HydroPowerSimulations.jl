@@ -22,8 +22,10 @@ export HydroDispatchPumpedStorage
 export HydroDispatchRunOfRiver
 export HydroCommitmentRunOfRiver
 export HydroEnergyBlockOptimization
-export HydroLongTermReservoir
+export HydroWaterModelReservoir
 export HydroTurbineBilinearDispatch
+export HydroEnergyModelReservoir
+export HydroTurbineEnergyDispatch
 
 ######## Hydro Variables ########
 export HydroEnergyVariableUp
