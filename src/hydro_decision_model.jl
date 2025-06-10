@@ -55,7 +55,7 @@ function PSI.build_impl!(decision_model::PSI.DecisionModel{MediumTermHydroPlanni
     PSI.add_variables!(container, PSI.ActivePowerVariable, turbines, turbine_formulation())
 
     # Reservoirs
-    reservoirs = PSY.get_components(get_available, PSY.HydroReservoir, sys)
+    reservoirs = get_available_reservoirs(sys)
     reservoir_model = PSI.get_model(PSI.get_template(decision_model), PSY.HydroReservoir)
     reservoir_formulation = PSI.get_formulation(reservoir_model)
     PSI.add_variables!(
