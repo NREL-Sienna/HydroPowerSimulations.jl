@@ -19,6 +19,11 @@ Parameter to define energy outflow from storage or reservoir time series
 struct OutflowTimeSeriesParameter <: PSI.TimeSeriesParameter end
 
 """
+Parameter to define energy capacity limits for hydro pump-turbine time series
+"""
+struct EnergyCapacityTimeSeriesParameter <: PSI.TimeSeriesParameter end
+
+"""
 Parameter to define energy target for feedforward
 """
 struct ReservoirTargetParameter <: PSI.VariableValueParameter end

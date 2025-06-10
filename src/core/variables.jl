@@ -48,6 +48,11 @@ Aux variable which keeps track of water level (head) of hydro reservoirs (in m)
 """
 struct HydroReservoirHeadVariable <: PSI.VariableType end
 
+"""
+Struct to dispatch the creation of a variable for pumped power in a hydro pump turbine (in MWh).
+"""
+struct ActivePowerPumpVariable <: PSI.VariableType end
+
 # convert_result_to_natural_units(::Type{HydroEnergyVariableUp}) = true # TODO: is this pu?
 
 """
