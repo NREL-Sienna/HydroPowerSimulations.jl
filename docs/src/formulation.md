@@ -15,10 +15,9 @@ Hydro generation formulations define the optimization models that describe hydro
  1. [`HydroDispatchRunOfRiver`](#HydroDispatchRunOfRiver)
  2. [`HydroDispatchReservoirBudget`](#HydroDispatchReservoirBudget)
  3. [`HydroDispatchReservoirStorage`](#HydroDispatchReservoirStorage)
- 4. [`HydroDispatchPumpedStorage`](#HydroDispatchPumpedStorage)
- 5. [`HydroCommitmentRunOfRiver`](#HydroCommitmentRunOfRiver)
- 6. [`HydroCommitmentReservoirBudget`](#HydroCommitmentReservoirBudget)
- 7. [`HydroCommitmentReservoirStorage`](#HydroCommitmentReservoirStorage)
+ 4. [`HydroCommitmentRunOfRiver`](#HydroCommitmentRunOfRiver)
+ 5. [`HydroCommitmentReservoirBudget`](#HydroCommitmentReservoirBudget)
+ 6. [`HydroCommitmentReservoirStorage`](#HydroCommitmentReservoirStorage)
 
 ## `HydroDispatchRunOfRiver`
 
@@ -213,104 +212,6 @@ For each hydro unit creates the range constraints for its active and reactive po
 &  Q^\text{hy,min} \le q^\text{hy}_t \le Q^\text{hy,max}, \quad \forall t\in \{1, \dots, T\} \\
 & e_{t} = e_{t-1} - \Delta T (p^\text{hy}_t - s_t) + \text{InflowTimeSeriesParameter}_t, \quad \forall t\in \{1, \dots, T\} \\
 & e_t + e^\text{shortage} + e^\text{surplus} = \text{EnergyTargetTimeSeriesParameter}_t, \quad \forall t\in \{1, \dots, T\}
-\end{align*}
-```
-
-* * *
-
-## HydroDispatchPumpedStorage
-
-This formulation is not available with reactive power. This formulation must be used with [`PowerSystems.HydroPumpedStorage`](@extref) component.
-
-```@docs; canonical=false
-HydroDispatchPumpedStorage
-```
-
-**Variables:**
-
-  - [`PowerSimulations.ActivePowerOutVariable`](@extref):
-    
-      + Bounds: [0.0, ]
-      + Symbol: ``p^\text{hy,out}``
-
-  - [`PowerSimulations.ActivePowerInVariable`](@extref):
-    
-      + Bounds: [0.0, ]
-      + Symbol: ``p^\text{hy,in}``
-  - [`HydroEnergyVariableUp`](@ref):
-    
-      + Bounds: ``[0.0, E^\text{max,up}]``
-      + Symbol: ``e^\text{up}``
-  - [`HydroEnergyVariableDown`](@ref):
-    
-      + Bounds: ``[0.0, E^\text{max,dn}]``
-      + Symbol: ``e^\text{dn}``
-  - [`WaterSpillageVariable`](@ref):
-    
-      + Bounds: [0.0, ]
-      + Symbol: ``s``
-
-If the attribute `reservation` is set to true, the following variable is created:
-
-  - [`PowerSimulations.ReservationVariable`](@extref):
-    
-      + Bounds: ``\{0,1\}``
-      + Symbol: ``ss^\text{hy}``
-
-If `reservation` is set to false (default), then the hydro pumped storage is allowed to pump and discharge simultaneously at each time step.
-
-**Static Parameters:**
-
-  - ``P^\text{out,min}`` = `PowerSystems.get_active_power_limits(device).min`
-  - ``P^\text{out,max}`` = `PowerSystems.get_active_power_limits(device).max`
-  - ``P^\text{in,min}`` = `PowerSystems.get_active_power_limits_pump(device).min`
-  - ``P^\text{in,max}`` = `PowerSystems.get_active_power_limits_pump(device).max`
-  - ``E^\text{max,up}`` = `PowerSystems.get_storage_capacity(device).up`
-  - ``E^\text{max,dn}`` = `PowerSystems.get_storage_capacity(device).down`
-  - ``\eta^\text{pump}`` = `PowerSystems.get_pump_efficiency(device)`
-
-**Initial Conditions:**
-
-The [`InitialHydroEnergyLevelUp`](@ref): ``e_0^\text{up}`` is used as the initial condition for the energy level of the upper reservoir, while [`InitialHydroEnergyLevelDown`](@ref): ``e_0^\text{dn}`` is used as the initial condition for the energy level of the lower reservoir.
-
-**Time Series Parameters:**
-
-Uses the `inflow` and `outflow` timeseries to obtain the inflow and outflow to the reservoir. `inflow` corresponds to the inflow into the upper (up) reservoir, while `outflow` corresponds to the outflow from the lower (down) reservoir.
-
-**Objective:**
-
-Add a cost to the objective function depending on the defined cost structure of the hydro unit by adding it to its `ProductionCostExpression`.
-
-**Expressions:**
-
-Adds ``(p^\text{hy,out} - p^\text{hy,in})`` to the `PowerSimulations.ActivePowerBalance` to be used in the supply-balance constraint depending on the network model used.
-
-**Constraints:**
-
-If `reservation = true`, the limits are given by:
-
-```math
-\begin{align*}
-& ss_t^\text{hy} P^\text{out,min} \le p^\text{hy,out}_t \le ss_t^\text{hy} P^\text{out,max}, \quad \forall t\in \{1, \dots, T\} \\
-& (1-ss_t^\text{hy}) P^\text{in,min} \le p^\text{hy,in}_t \le (1 - ss_t^\text{hy}) P^\text{in,max}, \quad \forall t\in \{1, \dots, T\} 
-\end{align*}
-```
-
-If `reservation = false`, then:
-
-```math
-\begin{align*}
-& P^\text{out,min} \le p^\text{hy,out}_t \le P^\text{out,max}, \quad \forall t\in \{1, \dots, T\} \\
-& P^\text{in,min} \le p^\text{hy,in}_t \le  P^\text{in,max}, \quad \forall t\in \{1, \dots, T\} 
-\end{align*}
-```
-
-The remaining constraints are:
-
-```math
-\begin{align*}
-e_{t}^\text{up} = e_{t-1}^\text{up} + \left (p_t^\text{hy,in} - \frac{p_t^\text{hy,out} + s_t}{\eta^\text{pump}} \right) \Delta T + \text{InflowTimeSeriesParameter}_t, \quad \forall t\in \{1, \dots, T\} \\
-e_{t}^\text{dn} = e_{t-1}^\text{dn} + \left (p_t^\text{hy,out} + s_t - \frac{p_t^\text{hy,in}}{\eta^\text{pump}} \right) \Delta T - \text{OutflowTimeSeriesParameter}_t, \quad \forall t\in \{1, \dots, T\}  
 \end{align*}
 ```
 
