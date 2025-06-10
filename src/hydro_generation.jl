@@ -270,6 +270,7 @@ PSI.variable_cost(cost::PSY.OperationalCost, ::ActivePowerPumpVariable, ::PSY.Hy
 # PSI.variable_cost(cost::PSY.OperationalCost, ::PSI.ActivePowerOutVariable, ::PSY.HydroTurbine, ::AbstractHydroFormulation)=PSY.get_variable(cost)
 
 PSI.variable_cost(cost::PSY.StorageCost, ::PSI.ActivePowerVariable, ::PSY.HydroGen, ::AbstractHydroFormulation)=PSY.get_discharge_variable_cost(cost)
+
 #! format: on
 
 # These methods are defined in PowerSimulations
@@ -960,8 +961,8 @@ function PSI.add_constraints!(
 
         #TODO: K2 assumes difference of reference height to penstock (H0) and height to river level (Hd) = 1
         # H0-Hd = 1.0 m
-        K1 = (efficiency * WATER_DENSITY * GRAVITATIONAL_CONSTANT) * head_to_volume_factor
-        K2 = (efficiency * WATER_DENSITY * GRAVITATIONAL_CONSTANT) / (1.0)
+        K1 = (efficiency * WATER_DENSITY * GRAVITY_CONSTANT) * head_to_volume_factor
+        K2 = (efficiency * WATER_DENSITY * GRAVITY_CONSTANT) / (1.0)
 
         constraint[name, 1] = JuMP.@constraint(
             container.JuMPmodel,
