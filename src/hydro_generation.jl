@@ -289,6 +289,13 @@ function PSI.get_initial_conditions_device_model(
     return model
 end
 
+function PSI.get_initial_conditions_device_model(
+    ::PSI.OperationModel,
+    ::PSI.DeviceModel{T, U},
+) where {T <: PSY.HydroDispatch, U <: HydroDispatchRunOfRiverBudget}
+    return PSI.DeviceModel(PSY.HydroDispatch, HydroDispatchRunOfRiver)
+end
+
 # TODO: This method is up for elimination
 function PSI.get_initial_conditions_device_model(
     ::PSI.OperationModel,
@@ -317,6 +324,17 @@ function PSI.get_default_time_series_names(
     return Dict{Type{<:PSI.TimeSeriesParameter}, String}(
         PSI.ActivePowerTimeSeriesParameter => "max_active_power",
         PSI.ReactivePowerTimeSeriesParameter => "max_active_power",
+    )
+end
+
+function PSI.get_default_time_series_names(
+    ::Type{<:PSY.HydroGen},
+    ::Type{<:HydroDispatchRunOfRiverBudget},
+)
+    return Dict{Type{<:PSI.TimeSeriesParameter}, String}(
+        PSI.ActivePowerTimeSeriesParameter => "max_active_power",
+        PSI.ReactivePowerTimeSeriesParameter => "max_active_power",
+        EnergyBudgetTimeSeriesParameter => "hydro_budget",
     )
 end
 
@@ -493,7 +511,11 @@ function PSI.add_constraints!(
     devices::IS.FlattenIteratorWrapper{V},
     model::PSI.DeviceModel{V, W},
     ::PSI.NetworkModel{X},
-) where {V <: PSY.HydroGen, W <: HydroDispatchRunOfRiver, X <: PM.AbstractPowerModel}
+) where {
+    V <: PSY.HydroGen,
+    W <: Union{HydroDispatchRunOfRiver, HydroDispatchRunOfRiverBudget},
+    X <: PM.AbstractPowerModel,
+}
     if !PSI.has_semicontinuous_feedforward(model, U)
         PSI.add_range_constraints!(container, T, U, devices, model, X)
     end
@@ -516,7 +538,11 @@ function PSI.add_constraints!(
     devices::IS.FlattenIteratorWrapper{V},
     model::PSI.DeviceModel{V, W},
     ::PSI.NetworkModel{X},
-) where {V <: PSY.HydroGen, W <: HydroDispatchRunOfRiver, X <: PM.AbstractPowerModel}
+) where {
+    V <: PSY.HydroGen,
+    W <: Union{HydroDispatchRunOfRiver, HydroDispatchRunOfRiverBudget},
+    X <: PM.AbstractPowerModel,
+}
     if !PSI.has_semicontinuous_feedforward(model, U)
         PSI.add_range_constraints!(container, T, U, devices, model, X)
     end
@@ -1081,7 +1107,6 @@ end
 """
 This function define the budget constraint for the
 active power budget formulation.
-
 `` sum(P[t]) <= Budget ``
 """
 function PSI.add_constraints!(
@@ -1092,7 +1117,7 @@ function PSI.add_constraints!(
     ::PSI.NetworkModel{X},
 ) where {
     V <: PSY.HydroGen,
-    W <: AbstractHydroReservoirFormulation,
+    W <: AbstractHydroDispatchFormulation,
     X <: PM.AbstractPowerModel,
 }
     time_steps = PSI.get_time_steps(container)
@@ -1112,6 +1137,59 @@ function PSI.add_constraints!(
             sum([variable_out[name, t] for t in time_steps]) <=
             sum([multiplier[name, t] * param[t] for t in time_steps])
         )
+    end
+    return
+end
+
+function PSI.add_constraints!(
+    container::PSI.OptimizationContainer,
+    ::Type{EnergyBudgetConstraint},
+    devices::IS.FlattenIteratorWrapper{V},
+    model::PSI.DeviceModel{V, W},
+    ::PSI.NetworkModel{X},
+) where {
+    V <: PSY.HydroGen,
+    W <: HydroDispatchRunOfRiverBudget,
+    X <: PM.AbstractPowerModel,
+}
+    time_steps = PSI.get_time_steps(container)
+    set_name = [PSY.get_name(d) for d in devices]
+    constraint =
+        PSI.add_constraints_container!(container, EnergyBudgetConstraint(), V, set_name)
+    variable_out = PSI.get_variable(container, PSI.ActivePowerVariable(), V)
+    param_container = PSI.get_parameter(container, EnergyBudgetTimeSeriesParameter(), V)
+    multiplier = PSI.get_multiplier_array(param_container)
+    for d in devices
+        name = PSY.get_name(d)
+        param = PSI.get_parameter_column_values(param_container, name)
+        constraint[name] = JuMP.@constraint(
+            container.JuMPmodel,
+            sum([variable_out[name, t] for t in time_steps]) <=
+            sum([multiplier[name, t] * param[t] for t in time_steps])
+        )
+    end
+    hydro_budget_interval = PSI.get_attribute(model, "hydro_budget_interval")
+    if !isnothing(hydro_budget_interval)
+        constraint_aux = PSI.add_constraints_container!(
+            container,
+            EnergyBudgetConstraint(),
+            V,
+            set_name;
+            meta = "interval",
+        )
+        resolution = PSI.get_resolution(container)
+        interval_length =
+            Dates.Millisecond(hydro_budget_interval).value ÷
+            Dates.Millisecond(resolution).value
+        for d in devices
+            name = PSY.get_name(d)
+            param = PSI.get_parameter_column_values(param_container, name)
+            constraint_aux[name] = JuMP.@constraint(
+                container.JuMPmodel,
+                sum([variable_out[name, t] for t in 1:interval_length]) <=
+                sum([multiplier[name, t] * param[t] for t in 1:interval_length])
+            )
+        end
     end
     return
 end
@@ -1862,7 +1940,6 @@ end
 ############################################################################
 ##################### Update Initial Conditions ############################
 ############################################################################
-
 
 function PSI.update_initial_conditions!(
     ics::Vector{T},
