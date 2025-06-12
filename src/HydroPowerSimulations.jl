@@ -56,6 +56,7 @@ export InitialReservoirVolume
 
 ######## Hydro Constraints #######
 export EnergyTargetConstraint
+export ActivePowerPumpReservationConstraint
 export ActivePowerPumpVariableLimitsConstraint
 export EnergyCapacityTimeSeriesLimitsConstraint
 export EnergyBudgetConstraint
