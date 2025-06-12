@@ -2615,6 +2615,7 @@ function PSI.construct_device!(
     PSI.add_variables!(container, PSI.ActivePowerVariable, devices, D())
     PSI.add_variables!(container, ActivePowerPumpVariable, devices, D())
     PSI.add_variables!(container, PSI.EnergyVariable, devices, D())
+    PSI.add_variables!(container, WaterSpillageVariable, devices, D())
 
     PSI.add_variables!(container, PSI.ReactivePowerVariable, devices, D())
 
@@ -2696,6 +2697,7 @@ function PSI.construct_device!(
     PSI.add_variables!(container, PSI.ActivePowerVariable, devices, D())
     PSI.add_variables!(container, ActivePowerPumpVariable, devices, D())
     PSI.add_variables!(container, PSI.EnergyVariable, devices, D())
+    PSI.add_variables!(container, WaterSpillageVariable, devices, D())
 
     if PSI.get_attribute(model, "reservation")
         PSI.add_variables!(container, PSI.ReservationVariable, devices, D())
@@ -2717,6 +2719,15 @@ function PSI.construct_device!(
     PSI.add_to_expression!(
         container,
         PSI.ActivePowerRangeExpressionUB,
+        PSI.ActivePowerVariable,
+        devices,
+        model,
+        network_model,
+    )
+
+    PSI.add_to_expression!(
+        container,
+        PSI.ActivePowerBalance,
         PSI.ActivePowerVariable,
         devices,
         model,
@@ -2788,6 +2799,16 @@ function PSI.construct_device!(
         network_model,
     )
 
+    if PSI.get_attribute(model, "reservation")
+        PSI.add_constraints!(
+            container,
+            ActivePowerPumpReservationConstraint,
+            devices,
+            model,
+            network_model,
+        )
+    end
+
     if PSI.get_attribute(model, "energy_target")
         PSI.add_constraints!(
             container,
@@ -2808,7 +2829,6 @@ function PSI.construct_device!(
             model,
             network_model,
         )
-
         PSI.add_constraints!(
             container,
             PSI.ActivePowerVariableTimeSeriesLimitsConstraint,
