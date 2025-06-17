@@ -1902,6 +1902,7 @@ function PSI.construct_device!(
     if PSI.get_attribute(model, "hydro_budget")
         PSI.add_constraints!(
             container,
+            sys,
             EnergyBudgetConstraint,
             devices,
             model,

@@ -199,6 +199,7 @@ end
 ########################### Parameter related set functions ################################
 PSI.get_multiplier_value(::EnergyBudgetTimeSeriesParameter, d::PSY.HydroGen, ::AbstractHydroFormulation) = PSY.get_max_active_power(d)
 PSI.get_multiplier_value(::EnergyBudgetTimeSeriesParameter, d::PSY.HydroEnergyReservoir, ::AbstractHydroFormulation) = PSY.get_storage_capacity(d)
+PSI.get_multiplier_value(::EnergyBudgetTimeSeriesParameter, d::PSY.HydroReservoir, ::HydroEnergyModelReservoir) = PSY.get_storage_level_limits(d).max / PSY.get_system_base_power(d)
 PSI.get_multiplier_value(::EnergyTargetTimeSeriesParameter, d::PSY.HydroGen, ::AbstractHydroFormulation) = PSY.get_storage_capacity(d)
 PSI.get_multiplier_value(::EnergyTargetTimeSeriesParameter, d::PSY.HydroReservoir, ::HydroEnergyModelReservoir) = PSY.get_level_targets(d) * PSY.get_storage_level_limits(d).max
 PSI.get_multiplier_value(::InflowTimeSeriesParameter, d::PSY.HydroGen, ::AbstractHydroFormulation) = PSY.get_inflow(d) * PSY.get_conversion_factor(d)
@@ -1194,6 +1195,51 @@ function PSI.add_constraints!(
                 sum([multiplier[name, t] * param[t] for t in 1:interval_length])
             )
         end
+    end
+    return
+end
+
+"""
+This function define the budget constraint for the
+active power budget formulation.
+`` sum(P[t]) <= Budget ``
+"""
+function PSI.add_constraints!(
+    container::PSI.OptimizationContainer,
+    sys::PSY.System,
+    ::Type{EnergyBudgetConstraint},
+    devices::IS.FlattenIteratorWrapper{V},
+    model::PSI.DeviceModel{V, W},
+    ::PSI.NetworkModel{X},
+) where {
+    V <: PSY.HydroReservoir,
+    W <: HydroEnergyModelReservoir,
+    X <: PM.AbstractPowerModel,
+}
+    time_steps = PSI.get_time_steps(container)
+    set_name = [PSY.get_name(d) for d in devices]
+    constraint =
+        PSI.add_constraints_container!(container, EnergyBudgetConstraint(), V, set_name)
+
+    variable_out = PSI.get_variable(container, PSI.ActivePowerVariable(), PSY.HydroTurbine)
+    param_container = PSI.get_parameter(container, EnergyBudgetTimeSeriesParameter(), V)
+    multiplier = PSI.get_multiplier_array(param_container)
+
+    for d in devices
+        name = PSY.get_name(d)
+        turbines = get_connected_devices(sys, d)
+        if length(turbines) != 1
+            error(
+                "HydroReservoir $(name) must be connected to exactly one turbine, but found $(length(turbines)) turbines.",
+            )
+        end
+        turbine_name = PSY.get_name(only(turbines))
+        param = PSI.get_parameter_column_values(param_container, name)
+        constraint[name] = JuMP.@constraint(
+            container.JuMPmodel,
+            sum([variable_out[turbine_name, t] for t in time_steps]) <=
+            sum([multiplier[name, t] * param[t] for t in time_steps])
+        )
     end
     return
 end
