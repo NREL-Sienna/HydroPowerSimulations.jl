@@ -1,0 +1,117 @@
+GenName,Type,Rating,BusName,BusNumber,Area
+Powership_K26,ThermalStandard,108.0,56_138kV_KPS26,77,SENI_Zona_Sur_Profundo
+Palamara,ThermalStandard,96.0,51_138kV_Calabaza,131,SENI_Zona_Sur_Profundo
+Monte Río,ThermalStandard,93.0,55_138kV_Monte Rio,47,SENI_Zona_Sur_Profundo
+Powership_K60,ThermalStandard,80.0,58_138kV_KPS60,164,SENI_Zona_Sur_Profundo
+Barahona Carbón,ThermalStandard,52.0,60_138kV_Barahona Carbon,68,SENI_Zona_Sur_Profundo
+Punta Catalina 2,ThermalStandard,366.0,05_345kV_Punta Catalina,153,SENI_Zona_Sur
+Punta Catalina 1,ThermalStandard,366.0,05_345kV_Punta Catalina,153,SENI_Zona_Sur
+Palenque,ThermalStandard,26.0,40_138kV_Palenque,49,SENI_Zona_Sur
+Quiesqueya_1 Gas,ThermalStandard,225.0,02_230kV_Quisqueya,39,SENI_Zona_Norte
+Quiesqueya_2 Gas,ThermalStandard,222.9,02_230kV_Quisqueya,39,SENI_Zona_Norte
+La Vega,ThermalStandard,88.9,63_138kV_Canabacoa,148,SENI_Zona_Norte
+Quiesqueya_1SPM Gas,ThermalStandard,68.0,02_230kV_Quisqueya,39,SENI_Zona_Norte
+Pimentel 3,ThermalStandard,52.0,84_138kV_Pimentel,81,SENI_Zona_Norte
+Pimentel_4,ThermalStandard,34.0,84_138kV_Pimentel,81,SENI_Zona_Norte
+Pimentel 1,ThermalStandard,31.4,84_138kV_Pimentel,81,SENI_Zona_Norte
+Pimentel 2,ThermalStandard,28.0,84_138kV_Pimentel,81,SENI_Zona_Norte
+NG_Quisqueya_1SPM_Gas,ThermalStandard,1.0,02_230kV_Quisqueya,39,SENI_Zona_Norte
+Aes Andrés Gas,ThermalStandard,310.0,02_138kV_138_AES Andres,12,SENI_Zona_Este
+Siba,ThermalStandard,280.0,22_138kV_SIBA,27,SENI_Zona_Este
+CESPM_3 Gas,ThermalStandard,130.0,10_138kV_SPM 2,128,SENI_Zona_Este
+CESPM_1 Gas,ThermalStandard,90.0,10_138kV_SPM 2,128,SENI_Zona_Este
+CESPM_2 Gas,ThermalStandard,90.0,10_138kV_SPM 2,128,SENI_Zona_Este
+Sultana del Este,ThermalStandard,68.0,18_138kV_Sultana del Este,6,SENI_Zona_Este
+Los Orígenes FO6,ThermalStandard,58.9,15_138kV_Los Origenes,23,SENI_Zona_Este
+SAN PEDRO BIO-ENERGY,ThermalStandard,30.69,17_138kV_ BioEnergy,43,SENI_Zona_Este
+Bersal,ThermalStandard,15.0,10_138kV_SPM 2,128,SENI_Zona_Este
+Los Mina_CT Gas,ThermalStandard,315.0,08_138kV_Los Mina,111,SENI_Zona_Central
+EDM_3CCT Gas,ThermalStandard,150.0,32_69kV_EDM 3,121,SENI_Zona_Central
+ITABO 1,ThermalStandard,120.0,34_138kV_Itabo,108,SENI_Zona_Central
+ITABO 2,ThermalStandard,120.0,34_138kV_Itabo,108,SENI_Zona_Central
+EDM_2C Gas,ThermalStandard,110.0,26_138kV_Timbeque 2,67,SENI_Zona_Central
+Haina Gas,ThermalStandard,90.0,33_138kV_Haina,106,SENI_Zona_Central
+Metaldom,ThermalStandard,40.0,39_138kV_Metaldom,64,SENI_Zona_Central
+KM22,ThermalStandard,14.0,35_69kV_Inca,102,SENI_Zona_Central
+PARQUE SOLAR GIRASOL,RenewableDispatch,100.0,50_138kV_Girasol,8,SENI_Zona_Sur_Profundo
+PS_Peravia_Solar_II,RenewableDispatch,68.7,41_138kV_Pizarrete,179,SENI_Zona_Sur_Profundo
+PS_ Peravia_Solar_I,RenewableDispatch,59.2,41_138kV_Pizarrete,179,SENI_Zona_Sur_Profundo
+LOS COCOS 2,RenewableDispatch,56.14,61_138kV_Los Cocos,95,SENI_Zona_Sur_Profundo
+PARQUE FOTOVOLTAICO BAYAHONDA (BAYASOL),RenewableDispatch,50.0,49_138kV_Bayasol,52,SENI_Zona_Sur_Profundo
+PARQUE SOLAR EL SOCO,RenewableDispatch,50.0,80_69kV_Sabana Yegua,165,SENI_Zona_Sur_Profundo
+PARQUE EOLICO MATAFONGO,RenewableDispatch,33.77,25_69kV_Cruce Cabral 2,123,SENI_Zona_Sur_Profundo
+PE_Matafongo,RenewableDispatch,27.33,52_138kV_Matafongo,159,SENI_Zona_Sur_Profundo
+JUANCHO LOS COCOS,RenewableDispatch,24.68,61_138kV_Los Cocos,95,SENI_Zona_Sur_Profundo
+PS_ Los_Negros,RenewableDispatch,16.7,55_138kV_Monte Rio,47,SENI_Zona_Sur_Profundo
+PS_ Lucila,RenewableDispatch,10.1,41_138kV_Pizarrete,179,SENI_Zona_Sur_Profundo
+QUILVIO CABRERA,RenewableDispatch,7.26,61_138kV_Los Cocos,95,SENI_Zona_Sur_Profundo
+PE_Esperanza,RenewableDispatch,91.11,73_138kV_Esperanza,9,SENI_Zona_Norte
+PARQUE FOTOVOLTAICO SANTANASOL,RenewableDispatch,76.0,44_69kV_La Vega Per,112,SENI_Zona_Norte
+PS_ Sajoma,RenewableDispatch,67.1,69_138kV_El Naranjo,99,SENI_Zona_Norte
+PARQUE EOLICO LOS GUZMANCITOS,RenewableDispatch,52.07,74_138kV_Los Guzmancitos,100,SENI_Zona_Norte
+PARQUE FOTOVOLTAICO CALABAZA,RenewableDispatch,50.6,43_69kV_Rincon Nueva,115,SENI_Zona_Norte
+PARQUE FOTOVOLTAICO MATA DE PALMA,RenewableDispatch,50.0,11_69kV_Puerto Plata 2,182,SENI_Zona_Norte
+PARQUE FOTOVOLTAICO CUMAYASA 1,RenewableDispatch,50.0,51_69kV_Bonao Per,29,SENI_Zona_Norte
+PARQUE SOLAR ESPERANZA,RenewableDispatch,50.0,57_69kV_Hatillo,145,SENI_Zona_Norte
+PARQUE EOLICO LARIMAR,RenewableDispatch,49.32,85_138kV_Nagua,44,SENI_Zona_Norte
+PS_ Payita_1,RenewableDispatch,49.0,13_69kV_Nagua,31,SENI_Zona_Norte
+PARQUE EOLICO AGUA CLARA,RenewableDispatch,48.45,75_138kV_Agua Clara,139,SENI_Zona_Norte
+PARQUE EOLICO LARIMAR 2,RenewableDispatch,46.41,85_138kV_Nagua,44,SENI_Zona_Norte
+PARQUE EOLICO LOS GUZMANCITO 2,RenewableDispatch,44.94,74_138kV_Los Guzmancitos,100,SENI_Zona_Norte
+PARQUE FOTOVOLTAICO CUMAYASA 2,RenewableDispatch,30.0,51_69kV_Bonao Per,29,SENI_Zona_Norte
+PARQUE FOTOVOLTAICO MATRISOL,RenewableDispatch,25.0,82_138kV_Salcedo,184,SENI_Zona_Norte
+PS_ Coastal_Solar,RenewableDispatch,107.9,10_138kV_SPM 2,128,SENI_Zona_Este
+PS_ Mirasol,RenewableDispatch,98.1,04_138kV_Guerra,89,SENI_Zona_Este
+PS_ Washington_Capital_Solar_Park_3,RenewableDispatch,49.1,04_138kV_Guerra,89,SENI_Zona_Este
+PS_ Washington_Capital_Solar_Park_2,RenewableDispatch,49.1,04_138kV_Guerra,89,SENI_Zona_Este
+PARQUE SOLAR CANOA,RenewableDispatch,100.0,36_138kV_Herrera,103,SENI_Zona_Central
+PARQUE EOLICO GUANILLO,RenewableDispatch,51.92,09_138kV_Villa Mella,156,SENI_Zona_Central
+PARQUE FOTOVOLTAICO MONTE CRISTI SOLAR1,RenewableDispatch,50.0,20_69kV_Herrera,105,SENI_Zona_Central
+PS_ R.E.W.D_Dominicus,RenewableDispatch,49.1,03_138kV_Arroyo Hondo,130,SENI_Zona_Central
+PS_ La_Victoria,RenewableDispatch,49.06,05_138kV_Hainamosa,107,SENI_Zona_Central
+PS_ Marti,RenewableDispatch,41.7,23_138kV_Dajao,10,SENI_Zona_Central
+MONTE PLATA SOLAR,RenewableDispatch,30.0,16_69kV_Dajao,114,SENI_Zona_Central
+PS_ Monte_Plata_Fase_II,RenewableDispatch,29.4,16_69kV_Dajao,114,SENI_Zona_Central
+PS_ Maranatha,RenewableDispatch,9.8,14_69kV_Hainamosa,92,SENI_Zona_Central
+PALOMINO 1,HydroDispatch,40.01,54_138kV_Palomino,20,SENI_Zona_Sur_Profundo
+PALOMINO 2,HydroDispatch,40.0,54_138kV_Palomino,20,SENI_Zona_Sur_Profundo
+SABANA YEGUA,HydroDispatch,10.5,80_69kV_Sabana Yegua,165,SENI_Zona_Sur_Profundo
+SABANETA,HydroDispatch,5.52,79_69kV_Sabaneta,30,SENI_Zona_Sur_Profundo
+LOS TOROS 2,HydroDispatch,4.7,03_69kV_15 de Azua,24,SENI_Zona_Sur_Profundo
+LOS TOROS 1,HydroDispatch,4.6,03_69kV_15 de Azua,24,SENI_Zona_Sur_Profundo
+LAS DAMAS,HydroDispatch,3.0,29_69kV_Duverge,40,SENI_Zona_Sur_Profundo
+MAGUEYAL 2,HydroDispatch,2.0,82_69kV_Magueyal,85,SENI_Zona_Sur_Profundo
+MAGUEYAL 1,HydroDispatch,2.0,82_69kV_Magueyal,85,SENI_Zona_Sur_Profundo
+DOMINGO RODRIGUEZ 1,HydroDispatch,1.91,76_69kV_Domingo Rodriguez,60,SENI_Zona_Sur_Profundo
+DOMINGO RODRIGUEZ 2,HydroDispatch,1.75,76_69kV_Domingo Rodriguez,60,SENI_Zona_Sur_Profundo
+NIZAO NAJAYO,HydroDispatch,0.3,02_69kV_Pizarrete,135,SENI_Zona_Sur_Profundo
+LOS ANONES,HydroDispatch,0.11,02_69kV_Pizarrete,135,SENI_Zona_Sur_Profundo
+JIGUEY 1,HydroDispatch,47.64,47_138kV_Jiguey,82,SENI_Zona_Sur
+JIGUEY 2,HydroDispatch,42.96,47_138kV_Jiguey,82,SENI_Zona_Sur
+AGUACATE 2,HydroDispatch,28.87,46_138kV_Aguacate,21,SENI_Zona_Sur
+AGUACATE 1,HydroDispatch,28.0,46_138kV_Aguacate,21,SENI_Zona_Sur
+VALDESIA 1,HydroDispatch,25.31,45_138kV_Valdesia,158,SENI_Zona_Sur
+VALDESIA 2,HydroDispatch,25.0,45_138kV_Valdesia,158,SENI_Zona_Sur
+LAS BARIAS,HydroDispatch,9.0,45_138kV_Valdesia,158,SENI_Zona_Sur
+HATILLO,HydroDispatch,50.0,76_138kV_Guanillo,80,SENI_Zona_Norte
+TAVERA 1,HydroDispatch,48.0,65_138kV_Tavera,51,SENI_Zona_Norte
+TAVERA 2,HydroDispatch,48.0,65_138kV_Tavera,51,SENI_Zona_Norte
+CONTRA EMBALSE MONCION 2,HydroDispatch,44.72,81_138kV_Moncion,93,SENI_Zona_Norte
+PINALITO 1,HydroDispatch,25.24,09_69kV_Bonao 2,104,SENI_Zona_Norte
+PINALITO 2,HydroDispatch,25.1,09_69kV_Bonao 2,104,SENI_Zona_Norte
+MONCION 2,HydroDispatch,24.0,81_138kV_Moncion,93,SENI_Zona_Norte
+MONCION 1,HydroDispatch,24.0,81_138kV_Moncion,93,SENI_Zona_Norte
+LOPEZ ANGOSTURA,HydroDispatch,13.86,65_138kV_Tavera,51,SENI_Zona_Norte
+RIO BLANCO 1,HydroDispatch,13.0,09_69kV_Bonao 2,104,SENI_Zona_Norte
+RIO BLANCO 2,HydroDispatch,12.72,09_69kV_Bonao 2,104,SENI_Zona_Norte
+HATILLO 2,HydroDispatch,10.0,57_69kV_Hatillo,145,SENI_Zona_Norte
+RINCON,HydroDispatch,10.0,43_69kV_Rincon Nueva,115,SENI_Zona_Norte
+JIMENOA,HydroDispatch,8.9,52_69kV_Jimenoa,149,SENI_Zona_Norte
+BRAZO DERECHO,HydroDispatch,2.4,10_69kV_ZF Santiago,186,SENI_Zona_Norte
+CONTRA EMBALSE MONCION 1,HydroDispatch,1.4,81_138kV_Moncion,93,SENI_Zona_Norte
+ROSA JULIA DE LA CRUZ,HydroDispatch,1.0,13_69kV_Nagua,31,SENI_Zona_Norte
+BAIGUAQUE 1,HydroDispatch,0.3,65_138kV_Tavera,51,SENI_Zona_Norte
+BAIGUAQUE 2,HydroDispatch,0.3,65_138kV_Tavera,51,SENI_Zona_Norte
+ANIANA VARGAS 1,HydroDispatch,0.3,51_69kV_Bonao Per,29,SENI_Zona_Norte
+ANIANA VARGAS 2,HydroDispatch,0.3,51_69kV_Bonao Per,29,SENI_Zona_Norte
+EL SALTO,HydroDispatch,50.0,14_138kV_El Soco,74,SENI_Zona_Este
