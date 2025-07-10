@@ -526,3 +526,19 @@ end
     @test solve!(model; optimizer = Ipopt_optimizer, output_dir = output_dir) ==
           IS.Simulation.RunStatus.SUCCESSFULLY_FINALIZED
 end
+
+#########################################
+####### Hydro DISPATCH RUN OF RIVER BUDGET TEST ########
+#########################################
+@testset "Test Hydro Dispatch Run Of River " begin
+    device_model = PSI.DeviceModel(HydroDispatch, HydroDispatchRunOfRiverBudget;
+                                    attributes = Dict("hydro_budget_interval" => Hour(24)))
+
+    c_sys5_hyd = PSB.build_system(PSITestSystems, "c_sys5_hyd")
+
+    # No Parameters Testing
+    model = DecisionModel(MockOperationProblem, CopperPlatePowerModel, c_sys5_hyd)
+    mock_construct_device!(model, device_model)
+    moi_tests(model, 0, 0, 0, 0, 0, false)
+    psi_checkobjfun_test(model, GAEVF)
+end
