@@ -559,7 +559,11 @@ end
     add_time_series!(c_sys5_hy, first(get_components(HydroDispatch, c_sys5_hy)), ts)
     transform_single_time_series!(c_sys5_hy, Hour(24), Hour(24))
 
-    template_uc = ProblemTemplate() 
+    template_uc = ProblemTemplate()
+    set_device_model!(template_uc, ThermalStandard, ThermalBasicUnitCommitment)
+    set_device_model!(template_uc, RenewableDispatch, RenewableFullDispatch)
+    set_device_model!(template_uc, PowerLoad, StaticPowerLoad)
+    set_device_model!(template_uc, RenewableNonDispatch, FixedOutput) 
     set_device_model!(template_uc, DeviceModel(HydroDispatch, HydroDispatchRunOfRiverBudget;
                  attributes = Dict("hydro_budget_interval" => Hour(24))))                
     model = DecisionModel(template_uc, sys; optimizer = solver, store_variable_names = true)
