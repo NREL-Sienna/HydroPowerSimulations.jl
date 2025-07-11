@@ -530,15 +530,44 @@ end
 #########################################
 ####### Hydro DISPATCH RUN OF RIVER BUDGET TEST ########
 #########################################
-@testset "Test Hydro Dispatch Run Of River " begin
+@testset "Test Hydro Dispatch Run Of River Formulations " begin
     device_model = PSI.DeviceModel(HydroDispatch, HydroDispatchRunOfRiverBudget;
                                     attributes = Dict("hydro_budget_interval" => Hour(24)))
 
-    c_sys5_hyd = PSB.build_system(PSITestSystems, "c_sys5_hyd")
+    c_sys5_hy = PSB.build_system(PSITestSystems, "c_sys5_hy")
 
-    # No Parameters Testing
-    model = DecisionModel(MockOperationProblem, CopperPlatePowerModel, c_sys5_hyd)
+    tstamp = range(DateTime("2024-01-01T00:00:00"), step = Dates.Hour(1), length = 48)
+    data = ones(length(tstamp)) / (get_base_power(c_sys5_hy) * max_power) 
+    ts = SingleTimeSeries("hydro_budget", TimeArray(tstamp, data))
+    add_time_series!(c_sys5_hy, first(get_components(HydroDispatch, c_sys5_hy)), ts)
+    transform_single_time_series!(c_sys5_hy, Hour(24), Hour(24))    
+
+    model = DecisionModel(MockOperationProblem, CopperPlatePowerModel, c_sys5_hy)
     mock_construct_device!(model, device_model)
-    moi_tests(model, 0, 0, 0, 0, 0, false)
+    moi_tests(model, 24, 0, 50, 24, 0, false)
     psi_checkobjfun_test(model, GAEVF)
+end
+
+@testset "Sovle Hydro Dispatch Run Of River" begin
+    output_dir = mktempdir(; cleanup = true) 
+
+    c_sys5_hy = PSB.build_system(PSITestSystems, "c_sys5_hy")
+    
+    tstamp = range(DateTime("2024-01-01T00:00:00"), step = Dates.Hour(1), length = 48)
+    data = ones(length(tstamp)) / (get_base_power(c_sys5_hy) * max_power) 
+    ts = SingleTimeSeries("hydro_budget", TimeArray(tstamp, data))
+    add_time_series!(c_sys5_hy, first(get_components(HydroDispatch, c_sys5_hy)), ts)
+    transform_single_time_series!(c_sys5_hy, Hour(24), Hour(24))
+
+    template_uc = ProblemTemplate() 
+    set_device_model!(template_uc, DeviceModel(HydroDispatch, HydroDispatchRunOfRiverBudget;
+                 attributes = Dict("hydro_budget_interval" => Hour(24))))                
+    model = DecisionModel(template_uc, sys; optimizer = solver, store_variable_names = true)
+
+    @test build!(model; output_dir = output_dir) ==
+          PSI.ModelBuildStatus.BUILT
+
+    @test solve!(model; output_dir = output_dir) ==
+          IS.Simulation.RunStatus.SUCCESSFULLY_FINALIZED
+          
 end
