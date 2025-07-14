@@ -315,6 +315,17 @@ function PSI.get_initial_conditions_device_model(
     return PSI.DeviceModel(T, HydroCommitmentRunOfRiver)
 end
 
+
+##
+function PSI.get_initial_conditions_device_model(
+    ::PSI.OperationModel,
+    model::PSI.DeviceModel{T, <:AbstractHydroReservoirFormulation},
+) where {T <: PSY.HydroReservoir}
+    return model
+end
+
+##
+
 function PSI.get_default_time_series_names(
     ::Type{<:PSY.HydroGen},
     ::Type{
@@ -1568,6 +1579,8 @@ function PSI.add_expressions!(
 
     for d in devices
         turbines = PSY.get_connected_devices(sys, d)
+        if isempty(turbines)
+            continue end
         turbine_names = PSY.get_name.(turbines)
         reservoir_name = PSY.get_name(d)
         for t in time_steps

@@ -1,7 +1,7 @@
 function get_available_reservoirs(sys::System)
     pump_turbines = PSY.get_components(PSY.get_available, PSY.HydroPumpTurbine, sys)
     if isempty(pump_turbines)
-        return PSY.get_components(get_available, PSY.HydroReservoir, sys)
+        return PSY.get_components(PSY.get_available, PSY.HydroReservoir, sys)
     end
     reservoirs_in_pumps = Set{PSY.HydroReservoir}()
     for pump in pump_turbines
