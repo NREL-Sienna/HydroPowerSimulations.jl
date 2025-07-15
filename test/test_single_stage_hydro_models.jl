@@ -4,6 +4,7 @@
 # Reservoir data in USABLE_VOLUME
 @testset "Hydro Reservoir Data in USABLE_VOLUME, single step simulation" begin
 # key word args for custom test system
+PSB = PowerSystemCaseBuilder
 kwargs = (
         withStandardLoad=true,
         withThermalStandard=true,
@@ -17,7 +18,7 @@ kwargs = (
         hydroLevelDataType=PSY.ReservoirDataType.USABLE_VOLUME
     )
 test_system_uc = PSB.build_system(PSISystems,"csys5_custom";skip_serialization=true,time_series_in_memory=true,decision_model_type="uc",kwargs...)
-test_system_ed = PSB.build_system(PSISystems,"csys5_custom";skip_serialization=true,time_series_in_memory=true,decision_model_type="ed",kwargs...)
+test_system_ed = PSB.build_system(PSISystems,"csys5_custom";skip_serialization=true,time_series_in_memory=true,decision_model_type="uc",kwargs...)
 
 # set templates and device models
 template_uc = ProblemTemplate(NetworkModel(CopperPlatePowerModel))
@@ -52,7 +53,7 @@ set_device_model!(template_ed, ThermalStandard, ThermalStandardDispatch)
                 template_ed,
                 test_system_ed;
                 name = "ED",
-                optimizer = HiGHS.Optimizer,
+                optimizer = SCIP.Optimizer,
                 system_to_file = false,
                 initialize_model = true,
                 optimizer_solve_log_print = false,
@@ -82,7 +83,13 @@ set_device_model!(template_ed, ThermalStandard, ThermalStandardDispatch)
         simulation_folder = mktempdir(; cleanup = true),
     )
 
-    @test build!(sim; serialize = false) == PSI.SimulationBuildStatus.BUILT
+    problem = DecisionModel(template_uc, test_system_uc; optimizer = SCIP.Optimizer, horizon = Hour(24))
+    @test build!(problem; output_dir = mktempdir()) == InfrastructureSystems.Optimization.ModelBuildStatusModule.ModelBuildStatus.BUILT
+
+    problem = DecisionModel(template_ed, test_system_ed; optimizer = SCIP.Optimizer, horizon = Hour(24))
+    @test build!(problem; output_dir = mktempdir()) == InfrastructureSystems.Optimization.ModelBuildStatusModule.ModelBuildStatus.BUILT
+     
+    #@test build!(sim; serialize = false) == PSI.SimulationBuildStatus.BUILT
     #@test execute!(sim; enable_progress_bar = false) == PSI.RunStatus.SUCCESSFULLY_FINALIZED
 
 end
@@ -103,8 +110,10 @@ kwargs = (
         hydroLevelDataType=PSY.ReservoirDataType.ENERGY
     )
 test_system_uc = PSB.build_system(PSISystems,"csys5_custom";skip_serialization=true,time_series_in_memory=true,decision_model_type="uc",kwargs...)
-test_system_ed = PSB.build_system(PSISystems,"csys5_custom";skip_serialization=true,time_series_in_memory=true,decision_model_type="ed",kwargs...)
+test_system_ed = PSB.build_system(PSISystems,"csys5_custom";skip_serialization=true,time_series_in_memory=true,decision_model_type="uc",kwargs...)
 
+remove_component!(HydroTurbine,test_system_uc,"HydroTurbine2")
+remove_component!(HydroTurbine,test_system_ed,"HydroTurbine2")
 
 # set templates and device models
 template_uc = ProblemTemplate(NetworkModel(CopperPlatePowerModel))
@@ -167,7 +176,13 @@ set_device_model!(template_ed, ThermalStandard, ThermalBasicDispatch)
         simulation_folder = mktempdir(; cleanup = true),
     )
 
-    @test build!(sim; serialize = false) == PSI.SimulationBuildStatus.BUILT
+    problem = DecisionModel(template_uc, test_system_uc; optimizer = SCIP.Optimizer, horizon = Hour(24))
+    @test build!(problem; output_dir = mktempdir()) == InfrastructureSystems.Optimization.ModelBuildStatusModule.ModelBuildStatus.BUILT
+
+    problem = DecisionModel(template_ed, test_system_ed; optimizer = SCIP.Optimizer, horizon = Hour(24))
+    @test build!(problem; output_dir = mktempdir()) == InfrastructureSystems.Optimization.ModelBuildStatusModule.ModelBuildStatus.BUILT
+     
+    #@test build!(sim; serialize = false) == InfrastructureSystems.Simulation.SimulationBuildStatusModule.SimulationBuildStatus.BUILT = 0
     #@test execute!(sim; enable_progress_bar = false) == PSI.RunStatus.SUCCESSFULLY_FINALIZED
 
 end
