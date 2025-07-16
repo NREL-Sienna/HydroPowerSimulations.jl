@@ -525,6 +525,8 @@ end
 
     @test solve!(model; optimizer = Ipopt_optimizer, output_dir = output_dir) ==
           IS.Simulation.RunStatus.SUCCESSFULLY_FINALIZED
+
+    # check the second step is equal to the first step + dispatch 
 end
 
 #########################################
@@ -548,7 +550,7 @@ end
     psi_checkobjfun_test(model, GAEVF)
 end
 
-@testset "Sovle Hydro Dispatch Run Of River" begin
+@testset "Solve Hydro Dispatch Run Of River" begin
     output_dir = mktempdir(; cleanup = true) 
 
     c_sys5_hy = PSB.build_system(PSITestSystems, "c_sys5_hy")
@@ -573,5 +575,117 @@ end
 
     @test solve!(model; output_dir = output_dir) ==
           IS.Simulation.RunStatus.SUCCESSFULLY_FINALIZED
+    # read parameters and variables for budget
+    # sum for 24/28 is less than the budget
           
+end
+
+#########################################
+####### Hydro PUMP ENERGY DISPATCH TEST ########
+#########################################
+@testset "Test Hydro Pump Energy Dispatch Formulations " begin
+    device_model = PSI.DeviceModel(
+        HydroPumpTurbine,
+        HPS.HydroPumpEnergyDispatch;
+        attributes = Dict{String, Any}(
+            "reservation" => true,
+            "energy_target" => true,
+        )
+    )
+
+    c_sys5_bat = PSB.build_system(PSITestSystems, "c_sys5_bat"; add_reserves = true)
+    bat = first(PSY.get_components(EnergyReservoirStorage, c_sys5_bat))
+    convert_to_hydropump!(bat, c_sys5_bat)
+    hy_pump = first(PSY.get_components(HydroPumpTurbine, c_sys5_bat))
+
+    ### Add Time Series ###
+    DayAhead = collect(
+        DateTime("1/1/2024  0:00:00", "d/m/y  H:M:S"):Hour(1):DateTime(
+            "1/1/2024  23:00:00",
+            "d/m/y  H:M:S",
+        ),
+    )
+
+    hydro_max_power = 0.8 * ones(48)
+    hydro_max_cap = 0.9 * ones(48)
+    tstamps = vcat(DayAhead, DayAhead .+ Day(1))
+    tarray_power = TimeArray(tstamps, hydro_max_power)
+    tarray_cap = TimeArray(tstamps, hydro_max_cap)
+
+    PSY.add_time_series!(
+        c_sys5_bat,
+        hy_pump,
+        PSY.SingleTimeSeries("max_active_power", tarray_power),
+    )
+    PSY.add_time_series!(
+        c_sys5_bat,
+        hy_pump,
+        PSY.SingleTimeSeries("capacity", tarray_cap),
+    )
+    transform_single_time_series!(c_sys5_bat, Hour(24), Hour(24))
+
+    model = DecisionModel(MockOperationProblem, CopperPlatePowerModel, c_sys5_bat)
+    mock_construct_device!(model, device_model)
+    moi_tests(model, 168, 0, 120, 24, 25, true)
+    psi_checkobjfun_test(model, GAEVF)
+end
+
+@testset "Test Hydro Pump Energy Dispatch Formulations " begin
+    output_dir = mktempdir(; cleanup = true) 
+
+    
+
+    c_sys5_bat = PSB.build_system(PSITestSystems, "c_sys5_bat"; add_reserves = true)
+    bat = first(PSY.get_components(EnergyReservoirStorage, c_sys5_bat))
+    convert_to_hydropump!(bat, c_sys5_bat)
+    hy_pump = first(PSY.get_components(HydroPumpTurbine, c_sys5_bat))
+
+    ### Add Time Series ###
+    DayAhead = collect(
+        DateTime("1/1/2024  0:00:00", "d/m/y  H:M:S"):Hour(1):DateTime(
+            "1/1/2024  23:00:00",
+            "d/m/y  H:M:S",
+        ),
+    )
+
+    hydro_max_power = 0.8 * ones(48)
+    hydro_max_cap = 0.9 * ones(48)
+    tstamps = vcat(DayAhead, DayAhead .+ Day(1))
+    tarray_power = TimeArray(tstamps, hydro_max_power)
+    tarray_cap = TimeArray(tstamps, hydro_max_cap)
+
+    PSY.add_time_series!(
+        c_sys5_bat,
+        hy_pump,
+        PSY.SingleTimeSeries("max_active_power", tarray_power),
+    )
+    PSY.add_time_series!(
+        c_sys5_bat,
+        hy_pump,
+        PSY.SingleTimeSeries("capacity", tarray_cap),
+    )
+    transform_single_time_series!(c_sys5_bat, Hour(24), Hour(24))
+
+    template_uc = ProblemTemplate()
+    set_device_model!(template_uc, ThermalStandard, ThermalBasicUnitCommitment)
+    set_device_model!(template_uc, RenewableDispatch, RenewableFullDispatch)
+    set_device_model!(template_uc, PowerLoad, StaticPowerLoad)
+    set_device_model!(template_uc, RenewableNonDispatch, FixedOutput) 
+    set_device_model!(template_uc, DeviceModel(
+                    HydroPumpTurbine,
+                    HPS.HydroPumpEnergyDispatch;
+                    attributes = Dict{String, Any}(
+                    "reservation" => true,
+                    "energy_target" => true,
+        )
+    )
+    );
+
+    model = DecisionModel(template_uc, sys; optimizer = solver, store_variable_names = true)
+
+    @test build!(model; output_dir = output_dir) ==
+          PSI.ModelBuildStatus.BUILT
+
+    @test solve!(model; output_dir = output_dir) ==
+          IS.Simulation.RunStatus.SUCCESSFULLY_FINALIZED
 end
