@@ -24,11 +24,13 @@ test_system_ed = PSB.build_system(PSISystems,"csys5_custom";skip_serialization=t
 template_uc = ProblemTemplate(NetworkModel(CopperPlatePowerModel))
 set_device_model!(template_uc, HydroReservoir, HydroWaterModelReservoir)
 set_device_model!(template_uc, HydroTurbine, HydroTurbineBilinearDispatch)
-set_device_model!(template_uc, ThermalStandard, ThermalStandardUnitCommitment)
+set_device_model!(template_uc, ThermalStandard, ThermalBasicUnitCommitment)
+set_device_model!(template_uc, PowerLoad, StaticPowerLoad)
 template_ed = ProblemTemplate(NetworkModel(CopperPlatePowerModel))
 set_device_model!(template_ed, HydroReservoir, HydroWaterModelReservoir)
 set_device_model!(template_ed, HydroTurbine, HydroTurbineBilinearDispatch)
-set_device_model!(template_ed, ThermalStandard, ThermalStandardDispatch)
+set_device_model!(template_ed, ThermalStandard, ThermalBasicDispatch)
+set_device_model!(template_ed, PowerLoad, StaticPowerLoad)
 # TODO: Test HydroPumpTurbine formulation?
 
 # see if single decision models will build
