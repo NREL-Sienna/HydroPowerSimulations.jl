@@ -1321,7 +1321,7 @@ function PSI.add_constraints!(
     X <: PM.AbstractPowerModel,
 }
     resolution = PSI.get_resolution(container)
-    hourly_resolution = Float64(Dates.Hour(resolution).value)
+    hourly_resolution = Float64(Dates.Second(resolution).value) / SECONDS_IN_HOUR
     time_steps = PSI.get_time_steps(container)
     names = [PSY.get_name(d) for d in devices]
     constraint =
