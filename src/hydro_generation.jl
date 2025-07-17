@@ -315,7 +315,6 @@ function PSI.get_initial_conditions_device_model(
     return PSI.DeviceModel(T, HydroCommitmentRunOfRiver)
 end
 
-
 ##
 function PSI.get_initial_conditions_device_model(
     ::PSI.OperationModel,
@@ -1342,7 +1341,6 @@ function PSI.add_constraints!(
         InitialReservoirVolume(),
         PSY.HydroReservoir,
     )
-    
 
     for ic in initial_conditions
         d = PSI.get_component(ic)
@@ -1581,7 +1579,8 @@ function PSI.add_expressions!(
     for d in devices
         turbines = PSY.get_connected_devices(sys, d)
         if isempty(turbines)
-            continue end
+            continue
+        end
         turbine_names = PSY.get_name.(turbines)
         reservoir_name = PSY.get_name(d)
         for t in time_steps
