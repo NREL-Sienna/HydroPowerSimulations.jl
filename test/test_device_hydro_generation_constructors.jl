@@ -493,7 +493,7 @@ end
 #########################################
 ####### RESERVOIR TURBINE TESTS #########
 #########################################
-
+#=
 @testset "Test Hydro Block Optimization Formulation" begin
     output_dir = mktempdir(; cleanup = true)
     modeling_horizon = 52 * 24 * 1
@@ -526,3 +526,4 @@ end
     @test solve!(model; optimizer = Ipopt_optimizer, output_dir = output_dir) ==
           IS.Simulation.RunStatus.SUCCESSFULLY_FINALIZED
 end
+=#

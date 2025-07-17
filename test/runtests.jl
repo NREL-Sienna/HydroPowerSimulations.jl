@@ -38,6 +38,7 @@ const PNM = PowerNetworkMatrices
 using JuMP
 using HiGHS
 using Ipopt
+using SCIP
 
 HiGHS_optimizer = JuMP.optimizer_with_attributes(
     HiGHS.Optimizer,
