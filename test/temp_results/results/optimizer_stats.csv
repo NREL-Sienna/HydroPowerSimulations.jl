@@ -1,0 +1,2 @@
+detailed_stats,objective_value,termination_status,primal_status,dual_status,solver_solve_time,result_count,has_values,has_duals,objective_bound,relative_gap,dual_objective_value,solve_time,barrier_iterations,simplex_iterations,node_count,timed_solve_time,timed_calculate_aux_variables,timed_calculate_dual_variables,solve_bytes_alloc,sec_in_gc
+false,1.746444987884089e6,4,1,1,NaN,1,false,false,,,,3.2654049396514893,,,,3.270495,0.001386958,0.00043775,1.4571712e7,0.0
