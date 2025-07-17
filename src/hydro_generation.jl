@@ -144,8 +144,8 @@ PSI.get_variable_binary(::HydroEnergyShortageVariable, ::Type{<:PSY.HydroPumpTur
 PSI.get_variable_binary(::HydroEnergySurplusVariable, ::Type{<:PSY.HydroPumpTurbine}, ::AbstractHydroFormulation) = false
 PSI.get_variable_lower_bound(::HydroEnergyShortageVariable, d::PSY.HydroPumpTurbine, ::AbstractHydroFormulation) = 0.0
 PSI.get_variable_upper_bound(::HydroEnergyShortageVariable, d::PSY.HydroPumpTurbine, ::AbstractHydroFormulation) = PSY.get_storage_level_limits(d.head_reservoir).max
-PSI.get_variable_lower_bound(::HydroEnergySurplusVariable, d::PSY.HydroPumpTurbine, ::AbstractHydroFormulation) = 0.0
-PSI.get_variable_upper_bound(::HydroEnergySurplusVariable, d::PSY.HydroPumpTurbine, ::AbstractHydroFormulation) = - PSY.get_storage_level_limits(d.head_reservoir).max
+PSI.get_variable_lower_bound(::HydroEnergySurplusVariable, d::PSY.HydroPumpTurbine, ::AbstractHydroFormulation) = - PSY.get_storage_level_limits(d.head_reservoir).max
+PSI.get_variable_upper_bound(::HydroEnergySurplusVariable, d::PSY.HydroPumpTurbine, ::AbstractHydroFormulation) = 0.0
 
 
 ############## EnergyShortageVariable, HydroReservoir ####################
