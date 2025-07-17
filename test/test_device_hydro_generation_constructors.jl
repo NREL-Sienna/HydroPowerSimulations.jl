@@ -536,13 +536,25 @@ end
     device_model = PSI.DeviceModel(HydroDispatch, HydroDispatchRunOfRiverBudget;
                                     attributes = Dict("hydro_budget_interval" => Hour(24)))
 
+    # c_sys5_hy = PSB.build_system(PSITestSystems, "c_sys5_hy")
+    
     c_sys5_hy = PSB.build_system(PSITestSystems, "c_sys5_hy")
+    
+    for hy in get_components(HydroDispatch, c_sys5_hy)
+        max_power = get_max_active_power(hy)
+        t_array = get_time_series_array(SingleTimeSeries, hy, "max_active_power")
+        tstamp = timestamp(t_array)
+        # 1 MW per hour: Data added in p.u (divide by base_power) that will be scaled by max_active_power in the model (divide by max_active_power to cancel)
+        data = ones(length(tstamp)) / (get_base_power(c_sys5_hy) * max_power) 
+        ts = SingleTimeSeries("hydro_budget", TimeArray(tstamp, data))
+        add_time_series!(c_sys5_hy, hy, ts)
+    end    
 
-    tstamp = range(DateTime("2024-01-01T00:00:00"), step = Dates.Hour(1), length = 48)
-    data = ones(length(tstamp)) / (get_base_power(c_sys5_hy) * max_power) 
-    ts = SingleTimeSeries("hydro_budget", TimeArray(tstamp, data))
-    add_time_series!(c_sys5_hy, first(get_components(HydroDispatch, c_sys5_hy)), ts)
-    transform_single_time_series!(c_sys5_hy, Hour(24), Hour(24))    
+    # tstamp = range(DateTime("2024-01-01T00:00:00"), step = Dates.Hour(1), length = 48)
+    # data = ones(length(tstamp)) / (get_base_power(c_sys5_hy) * max_power) 
+    # ts = SingleTimeSeries("hydro_budget", TimeArray(tstamp, data))
+    # add_time_series!(c_sys5_hy, first(get_components(HydroDispatch, c_sys5_hy)), ts)
+    # transform_single_time_series!(c_sys5_hy, Hour(24), Hour(24))    
 
     model = DecisionModel(MockOperationProblem, CopperPlatePowerModel, c_sys5_hy)
     mock_construct_device!(model, device_model)
