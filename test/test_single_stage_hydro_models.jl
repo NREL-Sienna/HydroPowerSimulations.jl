@@ -89,6 +89,10 @@ set_device_model!(template_ed, ThermalStandard, ThermalStandardDispatch)
     problem = DecisionModel(template_ed, test_system_ed; optimizer = SCIP.Optimizer, horizon = Hour(24))
     @test build!(problem; output_dir = mktempdir()) == InfrastructureSystems.Optimization.ModelBuildStatusModule.ModelBuildStatus.BUILT
      
+    psi_checksolve_test(
+            problem,
+            [MOI.OPTIMAL, MOI.LOCALLY_SOLVED]
+        )
     #@test build!(sim; serialize = false) == PSI.SimulationBuildStatus.BUILT
     #@test execute!(sim; enable_progress_bar = false) == PSI.RunStatus.SUCCESSFULLY_FINALIZED
 
@@ -182,6 +186,10 @@ set_device_model!(template_ed, ThermalStandard, ThermalBasicDispatch)
     problem = DecisionModel(template_ed, test_system_ed; optimizer = SCIP.Optimizer, horizon = Hour(24))
     @test build!(problem; output_dir = mktempdir()) == InfrastructureSystems.Optimization.ModelBuildStatusModule.ModelBuildStatus.BUILT
      
+    psi_checksolve_test(
+            problem,
+            [MOI.OPTIMAL, MOI.LOCALLY_SOLVED]
+        )
     #@test build!(sim; serialize = false) == InfrastructureSystems.Simulation.SimulationBuildStatusModule.SimulationBuildStatus.BUILT = 0
     #@test execute!(sim; enable_progress_bar = false) == PSI.RunStatus.SUCCESSFULLY_FINALIZED
 
@@ -276,6 +284,10 @@ set_device_model!(template_ed, ThermalStandard, ThermalStandardDispatch)
     problem = DecisionModel(template_ed, test_system_ed; optimizer = SCIP.Optimizer, horizon = Hour(24))
     @test build!(problem; output_dir = mktempdir()) == InfrastructureSystems.Optimization.ModelBuildStatusModule.ModelBuildStatus.BUILT
      
+    psi_checksolve_test(
+                problem,
+                [MOI.OPTIMAL, MOI.LOCALLY_SOLVED]
+            )
     #@test build!(sim; serialize = false) == PSI.SimulationBuildStatus.BUILT
     #@test execute!(sim; enable_progress_bar = false) == PSI.RunStatus.SUCCESSFULLY_FINALIZED
 
@@ -370,6 +382,10 @@ set_device_model!(template_ed, ThermalStandard, ThermalStandardDispatch)
     problem = DecisionModel(template_ed, test_system_ed; optimizer = SCIP.Optimizer, horizon = Hour(24))
     @test build!(problem; output_dir = mktempdir()) == InfrastructureSystems.Optimization.ModelBuildStatusModule.ModelBuildStatus.BUILT
      
+    psi_checksolve_test(
+            problem,
+            [MOI.OPTIMAL, MOI.LOCALLY_SOLVED]
+        )
     #@test build!(sim; serialize = false) == PSI.SimulationBuildStatus.BUILT
     #@test execute!(sim; enable_progress_bar = false) == PSI.RunStatus.SUCCESSFULLY_FINALIZED
 
