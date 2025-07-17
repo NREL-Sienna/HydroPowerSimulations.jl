@@ -112,7 +112,6 @@
         template_ed,
         test_system_ed;
         optimizer = SCIP.Optimizer,
-        horizon = Hour(24),
     )
     @test build!(problem; output_dir = mktempdir()) ==
           InfrastructureSystems.Optimization.ModelBuildStatusModule.ModelBuildStatus.BUILT
