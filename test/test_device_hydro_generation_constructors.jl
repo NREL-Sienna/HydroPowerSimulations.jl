@@ -493,7 +493,6 @@ end
 #########################################
 ####### RESERVOIR TURBINE TESTS #########
 #########################################
-
 @testset "Test Hydro Block Optimization Formulation" begin
     output_dir = mktempdir(; cleanup = true)
     modeling_horizon = 52 * 24 * 1
@@ -559,6 +558,9 @@ end
 
     c_sys5_hy = PSB.build_system(PSITestSystems, "c_sys5_hy")
     
+    hydro_budget = 24;
+    eps = 1e-6
+
     tstamp = range(DateTime("2024-01-01T00:00:00"), step = Dates.Hour(1), length = 48)
     data = ones(length(tstamp)) / (get_base_power(c_sys5_hy) * max_power) 
     ts = SingleTimeSeries("hydro_budget", TimeArray(tstamp, data))
@@ -571,7 +573,7 @@ end
     set_device_model!(template_uc, PowerLoad, StaticPowerLoad)
     set_device_model!(template_uc, RenewableNonDispatch, FixedOutput) 
     set_device_model!(template_uc, DeviceModel(HydroDispatch, HydroDispatchRunOfRiverBudget;
-                 attributes = Dict("hydro_budget_interval" => Hour(24))))                
+                 attributes = Dict("hydro_budget_interval" => Hour(hydro_budget))))                
     model = DecisionModel(template_uc, sys; optimizer = HiGHS_optimizer, store_variable_names = true)
 
     @test build!(model; output_dir = output_dir) ==
@@ -579,8 +581,11 @@ end
 
     @test solve!(model; output_dir = output_dir) ==
           IS.Simulation.RunStatus.SUCCESSFULLY_FINALIZED
-    # read parameters and variables for budget
-    # sum for 24/28 is less than the budget
+
+    res = OptimizationProblemResults(model)
+    hydro_power_sum = sum(read_variable(res, "ActivePowerVariable__HydroDispatch")[!, :HydroDispatch])
+
+    @test abs(hydro_power_sum - hydro_budget) <= eps
           
 end
 
