@@ -536,27 +536,19 @@ end
     device_model = PSI.DeviceModel(HydroDispatch, HydroDispatchRunOfRiverBudget;
                                     attributes = Dict("hydro_budget_interval" => Hour(24)))
 
-    # c_sys5_hy = PSB.build_system(PSITestSystems, "c_sys5_hy")
     
-    c_sys5_hy = PSB.build_system(PSITestSystems, "c_sys5_hy")
-    
-    for hy in get_components(HydroDispatch, c_sys5_hy)
-        max_power = get_max_active_power(hy)
-        t_array = get_time_series_array(SingleTimeSeries, hy, "max_active_power")
-        tstamp = timestamp(t_array)
-        # 1 MW per hour: Data added in p.u (divide by base_power) that will be scaled by max_active_power in the model (divide by max_active_power to cancel)
-        data = ones(length(tstamp)) / (get_base_power(c_sys5_hy) * max_power) 
-        ts = SingleTimeSeries("hydro_budget", TimeArray(tstamp, data))
-        add_time_series!(c_sys5_hy, hy, ts)
-    end    
+    sys = PSB.build_system(PSITestSystems, "c_sys5_hy")
 
-    # tstamp = range(DateTime("2024-01-01T00:00:00"), step = Dates.Hour(1), length = 48)
-    # data = ones(length(tstamp)) / (get_base_power(c_sys5_hy) * max_power) 
-    # ts = SingleTimeSeries("hydro_budget", TimeArray(tstamp, data))
-    # add_time_series!(c_sys5_hy, first(get_components(HydroDispatch, c_sys5_hy)), ts)
-    # transform_single_time_series!(c_sys5_hy, Hour(24), Hour(24))    
+    hy = only(get_components(HydroDispatch, sys))
+    max_power = get_max_active_power(hy)
+    resolution = Dates.Hour(1)
+    tstamp = range(DateTime("2024-01-01T00:00:00"), step = resolution, length = 48)
+    data = ones(length(tstamp)) / (get_base_power(sys) * max_power) 
+    ts = SingleTimeSeries("hydro_budget", TimeArray(tstamp, data))
+    add_time_series!(sys, hy, ts)
+    transform_single_time_series!(sys, Hour(24), Hour(24))
 
-    model = DecisionModel(MockOperationProblem, CopperPlatePowerModel, c_sys5_hy)
+    model = DecisionModel(MockOperationProblem, CopperPlatePowerModel, sys)
     mock_construct_device!(model, device_model)
     moi_tests(model, 24, 0, 50, 24, 0, false)
     psi_checkobjfun_test(model, GAEVF)
@@ -580,7 +572,7 @@ end
     set_device_model!(template_uc, RenewableNonDispatch, FixedOutput) 
     set_device_model!(template_uc, DeviceModel(HydroDispatch, HydroDispatchRunOfRiverBudget;
                  attributes = Dict("hydro_budget_interval" => Hour(24))))                
-    model = DecisionModel(template_uc, sys; optimizer = solver, store_variable_names = true)
+    model = DecisionModel(template_uc, sys; optimizer = HiGHS_optimizer, store_variable_names = true)
 
     @test build!(model; output_dir = output_dir) ==
           PSI.ModelBuildStatus.BUILT
@@ -645,8 +637,6 @@ end
 @testset "Test Hydro Pump Energy Dispatch Formulations " begin
     output_dir = mktempdir(; cleanup = true) 
 
-    
-
     c_sys5_bat = PSB.build_system(PSITestSystems, "c_sys5_bat"; add_reserves = true)
     bat = first(PSY.get_components(EnergyReservoirStorage, c_sys5_bat))
     convert_to_hydropump!(bat, c_sys5_bat)
@@ -693,7 +683,7 @@ end
     )
     );
 
-    model = DecisionModel(template_uc, sys; optimizer = solver, store_variable_names = true)
+    model = DecisionModel(template_uc, sys; optimizer = HiGHS_optimizer, store_variable_names = true)
 
     @test build!(model; output_dir = output_dir) ==
           PSI.ModelBuildStatus.BUILT
