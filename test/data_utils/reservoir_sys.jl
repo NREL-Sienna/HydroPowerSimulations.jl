@@ -1,3 +1,5 @@
+using Statistics
+
 function get_test_reservoir_turbine_sys(modeling_horizon)
     sys_rts = build_system(PSISystems, "modified_RTS_GMLC_DA_sys_noForecast")
     reservoir_data = joinpath(dirname(@__FILE__), "reservoir_data.csv")
@@ -134,7 +136,9 @@ function get_test_reservoir_turbine_sys(modeling_horizon)
     ## Add load time series to 5-bus sys:
     reservoir_hourly = only(get_components(HydroReservoir, sys))
     key = add_time_series!(sys, reservoir_hourly, inflow_hourly_ts)
-    set_inflow!(reservoir_hourly, key)
+
+    # set_inflow!(reservoir_hourly, key)
+    set_inflow!(reservoir_hourly, mean(inflow_data))
 
     transform_single_time_series!(sys, Hour(modeling_horizon), Hour(24))
     return sys
