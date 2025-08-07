@@ -1,5 +1,6 @@
-# _is_hydro_turbine_type(::Type{<:PSY.HydroGen}) = false
-# _is_hydro_turbine_type(::Type{PSY.HydroTurbine}) = true
+####################################################################################################
+##################################### FixedOutput ##################################################
+####################################################################################################
 
 """
 Construct model for [`PowerSystems.HydroGen``](@extref) with [`PowerSimulations.FixedOutput`](@extref) Formulation
@@ -70,6 +71,10 @@ function PSI.construct_device!(
     )
     return
 end
+
+####################################################################################################
+############################### HydroDispatchRunOfRiver ############################################
+####################################################################################################
 
 """
 Construct model for [`PowerSystems.HydroGen`](@extref) with [`HydroDispatchRunOfRiver`](@ref) Formulation
@@ -316,6 +321,141 @@ function PSI.construct_device!(
     return
 end
 
+####################################################################################################
+############################ HydroDispatchRunOfRiverBudget #########################################
+####################################################################################################
+
+"""
+Construct model for [`PowerSystems.HydroGen`](@extref) with [`HydroDispatchRunOfRiverBudget`](@ref) Formulation
+"""
+function PSI.construct_device!(
+    container::PSI.OptimizationContainer,
+    sys::PSY.System,
+    ::PSI.ArgumentConstructStage,
+    model::PSI.DeviceModel{H, D},
+    network_model::PSI.NetworkModel{S},
+) where {
+    H <: PSY.HydroGen,
+    D <: HydroDispatchRunOfRiverBudget,
+    S <: PM.AbstractPowerModel,
+}
+    devices = PSI.get_available_components(model, sys)
+
+    PSI.add_variables!(container, PSI.ActivePowerVariable, devices, D())
+    PSI.add_variables!(container, PSI.ReactivePowerVariable, devices, D())
+    PSI.add_variables!(container, HydroEnergyOutput, devices, D())
+    PSI.add_to_expression!(
+        container,
+        PSI.ActivePowerBalance,
+        PSI.ActivePowerVariable,
+        devices,
+        model,
+        network_model,
+    )
+    PSI.add_to_expression!(
+        container,
+        PSI.ReactivePowerBalance,
+        PSI.ReactivePowerVariable,
+        devices,
+        model,
+        network_model,
+    )
+
+    PSI.add_parameters!(container, PSI.ActivePowerTimeSeriesParameter, devices, model)
+    PSI.add_parameters!(container, EnergyBudgetTimeSeriesParameter, devices, model)
+    PSI.add_to_expression!(
+        container,
+        PSI.ActivePowerRangeExpressionLB,
+        PSI.ActivePowerVariable,
+        devices,
+        model,
+        network_model,
+    )
+    PSI.add_to_expression!(
+        container,
+        PSI.ActivePowerRangeExpressionUB,
+        PSI.ActivePowerVariable,
+        devices,
+        model,
+        network_model,
+    )
+
+    PSI.add_expressions!(container, PSI.ProductionCostExpression, devices, model)
+    if PSI.has_service_model(model)
+        PSI.add_expressions!(container, HydroServedReserveUpExpression, devices, model)
+        PSI.add_expressions!(container, HydroServedReserveDownExpression, devices, model)
+    end
+
+    PSI.add_feedforward_arguments!(container, model, devices)
+    return
+end
+
+function PSI.construct_device!(
+    container::PSI.OptimizationContainer,
+    sys::PSY.System,
+    ::PSI.ModelConstructStage,
+    model::PSI.DeviceModel{H, D},
+    network_model::PSI.NetworkModel{S},
+) where {
+    H <: PSY.HydroGen,
+    D <: HydroDispatchRunOfRiverBudget,
+    S <: PM.AbstractPowerModel,
+}
+    devices = PSI.get_available_components(model, sys)
+
+    if PSI.has_service_model(model)
+        PSI.add_to_expression!(
+            container,
+            HydroServedReserveUpExpression,
+            PSI.ActivePowerReserveVariable,
+            devices,
+            model,
+            network_model,
+        )
+        PSI.add_to_expression!(
+            container,
+            HydroServedReserveDownExpression,
+            PSI.ActivePowerReserveVariable,
+            devices,
+            model,
+            network_model,
+        )
+    end
+
+    PSI.add_constraints!(
+        container,
+        PSI.ActivePowerVariableLimitsConstraint,
+        PSI.ActivePowerRangeExpressionLB,
+        devices,
+        model,
+        network_model,
+    )
+    PSI.add_constraints!(
+        container,
+        PSI.ActivePowerVariableLimitsConstraint,
+        PSI.ActivePowerRangeExpressionUB,
+        devices,
+        model,
+        network_model,
+    )
+    PSI.add_constraints!(
+        container,
+        PSI.ReactivePowerVariableLimitsConstraint,
+        PSI.ReactivePowerVariable,
+        devices,
+        model,
+        network_model,
+    )
+    PSI.add_constraints!(container, EnergyBudgetConstraint, devices, model, network_model)
+
+    PSI.add_feedforward_constraints!(container, model, devices)
+
+    PSI.objective_function!(container, devices, model, S)
+
+    PSI.add_constraint_dual!(container, sys, model)
+    return
+end
+
 """
 Construct model for [`PowerSystems.HydroGen`](@extref) with [`HydroDispatchRunOfRiverBudget`](@ref) Formulation
 with only Active Power.
@@ -431,6 +571,7 @@ function PSI.construct_device!(
     return
 end
 
+#=
 """
 Construct model for [`PowerSystems.HydroGen`](@extref) with ReservoirBudget Dispatch Formulation
 """
@@ -1627,6 +1768,12 @@ function PSI.construct_device!(
     return
 end
 
+=#
+
+################################################################################################
+############################ HydroCommitmentRunOfRiver #########################################
+################################################################################################
+
 """
 Construct model for [`PowerSystems.HydroGen`](@extref) with [`HydroCommitmentRunOfRiver`](@ref) Formulation
 """
@@ -1804,7 +1951,7 @@ function PSI.construct_device!(
 end
 
 ################################################################################################
-############################# New Energy Only Models ###########################################
+############################ HydroEnergyModelReservoir #########################################
 ################################################################################################
 
 """
@@ -1902,6 +2049,7 @@ function PSI.construct_device!(
     if PSI.get_attribute(model, "hydro_budget")
         PSI.add_constraints!(
             container,
+            sys,
             EnergyBudgetConstraint,
             devices,
             model,
@@ -1916,6 +2064,10 @@ function PSI.construct_device!(
     PSI.add_constraint_dual!(container, sys, model)
     return
 end
+
+########################################################################################
+########################### HydroTurbineEnergyDispatch #################################
+########################################################################################
 
 """
 Construct model for [`PowerSystems.HydroTurbine`](@extref) with [`HydroTurbineEnergyDispatch`](@ref) Formulation
@@ -2110,6 +2262,253 @@ function PSI.construct_device!(
 ) where {
     H <: PSY.HydroTurbine,
     D <: HydroTurbineEnergyDispatch,
+    S <: PM.AbstractActivePowerModel,
+}
+    devices = PSI.get_available_components(model, sys)
+
+    if PSI.has_service_model(model)
+        PSI.add_to_expression!(
+            container,
+            HydroServedReserveUpExpression,
+            PSI.ActivePowerReserveVariable,
+            devices,
+            model,
+            network_model,
+        )
+        PSI.add_to_expression!(
+            container,
+            HydroServedReserveDownExpression,
+            PSI.ActivePowerReserveVariable,
+            devices,
+            model,
+            network_model,
+        )
+    end
+
+    PSI.add_constraints!(
+        container,
+        PSI.ActivePowerVariableLimitsConstraint,
+        PSI.ActivePowerRangeExpressionLB,
+        devices,
+        model,
+        network_model,
+    )
+    PSI.add_constraints!(
+        container,
+        PSI.ActivePowerVariableLimitsConstraint,
+        PSI.ActivePowerRangeExpressionUB,
+        devices,
+        model,
+        network_model,
+    )
+
+    PSI.add_feedforward_constraints!(container, model, devices)
+
+    PSI.objective_function!(container, devices, model, S)
+    PSI.add_constraint_dual!(container, sys, model)
+
+    return
+end
+
+##########################################################################################
+############################ HydroTurbineEnergyCommitment ################################
+##########################################################################################
+
+"""
+Construct model for [`PowerSystems.HydroTurbine`](@extref) with [`HydroTurbineEnergyCommitment`](@ref) Formulation
+"""
+function PSI.construct_device!(
+    container::PSI.OptimizationContainer,
+    sys::PSY.System,
+    ::PSI.ArgumentConstructStage,
+    model::PSI.DeviceModel{H, D},
+    network_model::PSI.NetworkModel{S},
+) where {
+    H <: PSY.HydroTurbine,
+    D <: HydroTurbineEnergyCommitment,
+    S <: PM.AbstractPowerModel,
+}
+    devices = PSI.get_available_components(model, sys)
+
+    PSI.add_variables!(container, PSI.ActivePowerVariable, devices, D())
+    PSI.add_variables!(container, PSI.ReactivePowerVariable, devices, D())
+    PSI.add_variables!(container, PSI.OnVariable, devices, D())
+    PSI.add_variables!(container, HydroEnergyOutput, devices, D())
+    PSI.add_to_expression!(
+        container,
+        PSI.ActivePowerBalance,
+        PSI.ActivePowerVariable,
+        devices,
+        model,
+        network_model,
+    )
+    PSI.add_to_expression!(
+        container,
+        PSI.ReactivePowerBalance,
+        PSI.ReactivePowerVariable,
+        devices,
+        model,
+        network_model,
+    )
+
+    PSI.add_expressions!(container, PSI.ProductionCostExpression, devices, model)
+
+    if PSI.has_service_model(model)
+        PSI.add_expressions!(container, HydroServedReserveUpExpression, devices, model)
+        PSI.add_expressions!(container, HydroServedReserveDownExpression, devices, model)
+    end
+
+    PSI.add_to_expression!(
+        container,
+        PSI.ActivePowerRangeExpressionLB,
+        PSI.ActivePowerVariable,
+        devices,
+        model,
+        network_model,
+    )
+    PSI.add_to_expression!(
+        container,
+        PSI.ActivePowerRangeExpressionUB,
+        PSI.ActivePowerVariable,
+        devices,
+        model,
+        network_model,
+    )
+
+    PSI.add_feedforward_arguments!(container, model, devices)
+    return
+end
+
+function PSI.construct_device!(
+    container::PSI.OptimizationContainer,
+    sys::PSY.System,
+    ::PSI.ModelConstructStage,
+    model::PSI.DeviceModel{H, D},
+    network_model::PSI.NetworkModel{S},
+) where {
+    H <: PSY.HydroTurbine,
+    D <: HydroTurbineEnergyCommitment,
+    S <: PM.AbstractPowerModel,
+}
+    devices = PSI.get_available_components(model, sys)
+
+    if PSI.has_service_model(model)
+        PSI.add_to_expression!(
+            container,
+            HydroServedReserveUpExpression,
+            PSI.ActivePowerReserveVariable,
+            devices,
+            model,
+            network_model,
+        )
+        PSI.add_to_expression!(
+            container,
+            HydroServedReserveDownExpression,
+            PSI.ActivePowerReserveVariable,
+            devices,
+            model,
+            network_model,
+        )
+    end
+
+    PSI.add_constraints!(
+        container,
+        PSI.ActivePowerVariableLimitsConstraint,
+        PSI.ActivePowerRangeExpressionLB,
+        devices,
+        model,
+        network_model,
+    )
+    PSI.add_constraints!(
+        container,
+        PSI.ActivePowerVariableLimitsConstraint,
+        PSI.ActivePowerRangeExpressionUB,
+        devices,
+        model,
+        network_model,
+    )
+
+    PSI.add_constraints!(
+        container,
+        PSI.ReactivePowerVariableLimitsConstraint,
+        PSI.ReactivePowerVariable,
+        devices,
+        model,
+        network_model,
+    )
+    PSI.add_feedforward_constraints!(container, model, devices)
+
+    PSI.objective_function!(container, devices, model, S)
+    PSI.add_constraint_dual!(container, sys, model)
+
+    return
+end
+
+"""
+Construct model for [`PowerSystems.HydroTurbine`](@extref) with [`HydroTurbineEnergyCommitment`](@ref) Formulation with only Active Power.
+"""
+function PSI.construct_device!(
+    container::PSI.OptimizationContainer,
+    sys::PSY.System,
+    ::PSI.ArgumentConstructStage,
+    model::PSI.DeviceModel{H, D},
+    network_model::PSI.NetworkModel{S},
+) where {
+    H <: PSY.HydroTurbine,
+    D <: HydroTurbineEnergyCommitment,
+    S <: PM.AbstractActivePowerModel,
+}
+    devices = PSI.get_available_components(model, sys)
+
+    PSI.add_variables!(container, PSI.ActivePowerVariable, devices, D())
+    PSI.add_variables!(container, HydroEnergyOutput, devices, D())
+    PSI.add_variables!(container, PSI.OnVariable, devices, D())
+    PSI.add_to_expression!(
+        container,
+        PSI.ActivePowerBalance,
+        PSI.ActivePowerVariable,
+        devices,
+        model,
+        network_model,
+    )
+
+    PSI.add_expressions!(container, PSI.ProductionCostExpression, devices, model)
+
+    if PSI.has_service_model(model)
+        PSI.add_expressions!(container, HydroServedReserveUpExpression, devices, model)
+        PSI.add_expressions!(container, HydroServedReserveDownExpression, devices, model)
+    end
+
+    PSI.add_to_expression!(
+        container,
+        PSI.ActivePowerRangeExpressionLB,
+        PSI.ActivePowerVariable,
+        devices,
+        model,
+        network_model,
+    )
+    PSI.add_to_expression!(
+        container,
+        PSI.ActivePowerRangeExpressionUB,
+        PSI.ActivePowerVariable,
+        devices,
+        model,
+        network_model,
+    )
+
+    PSI.add_feedforward_arguments!(container, model, devices)
+    return
+end
+
+function PSI.construct_device!(
+    container::PSI.OptimizationContainer,
+    sys::PSY.System,
+    ::PSI.ModelConstructStage,
+    model::PSI.DeviceModel{H, D},
+    network_model::PSI.NetworkModel{S},
+) where {
+    H <: PSY.HydroTurbine,
+    D <: HydroTurbineEnergyCommitment,
     S <: PM.AbstractActivePowerModel,
 }
     devices = PSI.get_available_components(model, sys)

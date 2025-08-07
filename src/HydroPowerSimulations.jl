@@ -14,10 +14,6 @@ module HydroPowerSimulations
 export MediumTermHydroPlanning
 
 ######## Hydro Formulations ########
-export HydroDispatchReservoirBudget
-export HydroDispatchReservoirStorage
-export HydroCommitmentReservoirBudget
-export HydroCommitmentReservoirStorage
 export HydroDispatchRunOfRiver
 export HydroDispatchRunOfRiverBudget
 export HydroCommitmentRunOfRiver
@@ -26,10 +22,10 @@ export HydroWaterModelReservoir
 export HydroTurbineBilinearDispatch
 export HydroEnergyModelReservoir
 export HydroTurbineEnergyDispatch
+export HydroTurbineEnergyCommitment
+export HydroPumpEnergyDispatch
 
 ######## Hydro Variables ########
-export HydroEnergyVariableUp
-export HydroEnergyVariableDown
 export WaterSpillageVariable
 export HydroEnergyShortageVariable
 export HydroEnergySurplusVariable
