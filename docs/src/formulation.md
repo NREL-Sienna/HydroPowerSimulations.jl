@@ -424,3 +424,55 @@ For each hydro unit creates the range constraints for its active and reactive po
 & e_t + e^\text{shortage} + e^\text{surplus} = \text{EnergyTargetTimeSeriesParameter}_t, \quad \forall t\in \{1, \dots, T\}
 \end{align*}
 ```
+
+## `HydroTurbineEnergyDispatch`
+
+```@docs; canonical=false
+HydroTurbineEnergyDispatch
+```
+
+**Variables:**
+
+  - [`PowerSimulations.ActivePowerVariable`](@extref):
+    
+      + Bounds: [0.0, ]
+      + Symbol: ``p^\text{hy}``
+
+  - [`PowerSimulations.ReactivePowerVariable`](@extref):
+    
+      + Bounds: [0.0, ]
+      + Symbol: ``q^\text{hy}``
+
+**Auxiliary Variables:**
+
+  - [`HydroEnergyOutput`](@ref):
+    
+      + Symbol: ``E^\text{hy,out}``
+
+The [`HydroEnergyOutput`](@ref) is computed as the energy used at each time step from the hydro turbine, computed simply as ``E^\text{hy,out} = p^\text{hy} \cdot \Delta T``, where ``\Delta T`` is the duration (in hours) of each time step.
+
+**Static Parameters:**
+
+  - ``P^\text{hy,min}`` = `PowerSystems.get_active_power_limits(device).min`
+  - ``P^\text{hy,max}`` = `PowerSystems.get_active_power_limits(device).max`
+  - ``Q^\text{hy,min}`` = `PowerSystems.get_reactive_power_limits(device).min`
+  - ``Q^\text{hy,max}`` = `PowerSystems.get_reactive_power_limits(device).max`
+
+**Objective:**
+
+Add a cost to the objective function depending on the defined cost structure of the hydro turbine by adding it to its `ProductionCostExpression`.
+
+**Expressions:**
+
+Adds ``p^\text{hy}`` to the `PowerSimulations.ActivePowerBalance` expression and ``q^\text{hy}`` to the `PowerSimulations.ReactivePowerBalance`, to be used in the supply-balance constraint depending on the network model used.
+
+**Constraints:**
+
+For each hydro turbine creates the range constraints for its active and reactive power depending on its static parameters, and energy balance constraints for the reservoir.
+
+```math
+\begin{align*}
+&  P^\text{hy,min} \le p^\text{hy}_t \le P^\text{hy,max}, \quad \forall t\in \{1, \dots, T\} \\
+&  Q^\text{hy,min} \le q^\text{hy}_t \le Q^\text{hy,max}, \quad \forall t\in \{1, \dots, T\} 
+\end{align*}
+```
