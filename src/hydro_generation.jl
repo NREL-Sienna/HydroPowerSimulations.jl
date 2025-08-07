@@ -2221,7 +2221,7 @@ function PSI.add_constraints!(
     ::PSI.NetworkModel{X},
 ) where {
     V <: PSY.HydroPumpTurbine,
-    W <: HydroEnergyPumpTurbine,
+    W <: HydroPumpEnergyDispatch,
     X <: PM.AbstractPowerModel,
 }
     time_steps = PSI.get_time_steps(container)
