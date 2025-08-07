@@ -126,8 +126,8 @@ PSI.get_variable_binary(::HydroEnergyShortageVariable, ::Type{<:PSY.HydroPumpTur
 PSI.get_variable_binary(::HydroEnergySurplusVariable, ::Type{<:PSY.HydroPumpTurbine}, ::HydroPumpEnergyDispatch) = false
 PSI.get_variable_lower_bound(::HydroEnergyShortageVariable, d::PSY.HydroPumpTurbine, ::HydroPumpEnergyDispatch) = 0.0
 PSI.get_variable_upper_bound(::HydroEnergyShortageVariable, d::PSY.HydroPumpTurbine, ::HydroPumpEnergyDispatch) = PSY.get_storage_level_limits(d.head_reservoir).max
-PSI.get_variable_lower_bound(::HydroEnergySurplusVariable, d::PSY.HydroPumpTurbine, ::HydroPumpEnergyDispatch) = 0.0
-PSI.get_variable_upper_bound(::HydroEnergySurplusVariable, d::PSY.HydroPumpTurbine, ::HydroPumpEnergyDispatch) = - PSY.get_storage_level_limits(d.head_reservoir).max
+PSI.get_variable_lower_bound(::HydroEnergySurplusVariable, d::PSY.HydroPumpTurbine, ::HydroPumpEnergyDispatch) = - PSY.get_storage_level_limits(d.head_reservoir).max
+PSI.get_variable_upper_bound(::HydroEnergySurplusVariable, d::PSY.HydroPumpTurbine, ::HydroPumpEnergyDispatch) = 0.0
 
 
 ############## EnergyShortageVariable, HydroReservoir ####################
@@ -963,11 +963,8 @@ function PSI.add_constraints!(
     resolution = PSI.get_resolution(container)
     fraction_of_hour = Dates.value(Dates.Minute(resolution)) / PSI.MINUTES_IN_HOUR
     names = [PSY.get_name(x) for x in devices]
-    initial_conditions =
-        PSI.get_initial_condition(container, InitialReservoirVolume(), PSY.HydroReservoir)
 
-    energy_var =
-        PSI.get_variable(container, HydroReservoirVolumeVariable(), PSY.HydroReservoir)
+    energy_var = PSI.get_variable(container, HydroEnergyVariableUp(), PSY.HydroReservoir)
     turbined_out_flow_var =
         PSI.get_variable(container, HydroTurbineFlowRateVariable(), PSY.HydroTurbine)
 
@@ -982,46 +979,49 @@ function PSI.add_constraints!(
     )
 
     base_power = PSI.get_base_power(container)
+    t_first = first(time_steps)
+    t_final = last(time_steps)
 
     for d in devices
         name = PSY.get_name(d)
 
         ##TODO: fix for mutiplple turbine-reservoir mapping
         reservoir = only(PSY.get_reservoirs(d))
-        # TODO: Improve this to retrieve initial condition for reservoir
-        ic = nothing
-        for ini_cond in initial_conditions
-            if PSI.get_component(ini_cond) == reservoir
-                ic = ini_cond
-                break
-            end
-        end
         reservoir_name = PSY.get_name(reservoir)
+        initial_level = PSY.get_initial_level(reservoir)
+        max_storage_level = PSY.get_storage_level_limits(reservoir).max
+
         efficiency = PSY.get_efficiency(d)
-        head_to_volume_factor =
-            PSY.get_proportional_term(PSY.get_head_to_volume_factor(reservoir))
+        head_to_volume_factor = PSY.get_head_to_volume_factor(reservoir)
 
-        #TODO: K2 assumes difference of reference height to penstock (H0) and height to river level (Hd) = 1
-        # H0-Hd = 1.0 m
-        K1 = (efficiency * WATER_DENSITY * GRAVITY_CONSTANT) * head_to_volume_factor
-        K2 = (efficiency * WATER_DENSITY * GRAVITY_CONSTANT) / (1.0)
+        K = (efficiency * WATER_DENSITY * GRAVITATIONAL_CONSTANT)
 
-        constraint[name, 1] = JuMP.@constraint(
+        ext_res = PSY.get_ext(reservoir)
+        ext_turbine = PSY.get_ext(d)
+        elevation_head = ext_res["intake"] - ext_turbine["elevation"]
+
+        constraint[name, t_first] = JuMP.@constraint(
             container.JuMPmodel,
-            hydro_power[name, 1] ==
+            hydro_power[name, t_first] ==
             fraction_of_hour * (
-                turbined_out_flow_var[name, 1] *
-                (0.5 * K1 * (energy_var[reservoir_name, 1] + PSI.get_value(ic)) + K2)
+                K * turbined_out_flow_var[name, t_first] *
+                (
+                    0.5 * (energy_var[reservoir_name, t_first] + initial_level) *
+                    head_to_volume_factor + elevation_head
+                )
             ) / base_power
         )
-        for t in time_steps[2:end]
+        for t in time_steps[(t_first + 1):t_final]
             constraint[name, t] = JuMP.@constraint(
                 container.JuMPmodel,
                 hydro_power[name, t] ==
                 fraction_of_hour * (
-                    turbined_out_flow_var[name, t] * (
-                        0.5 * K1 *
-                        (energy_var[reservoir_name, t] + energy_var[reservoir_name, t - 1]) + K2
+                    K * turbined_out_flow_var[name, t] *
+                    (
+                        head_to_volume_factor * 0.5 *
+                        (energy_var[reservoir_name, t] + energy_var[reservoir_name, t - 1])
+                        +
+                        elevation_head
                     )
                 ) / base_power
             )
@@ -1043,7 +1043,7 @@ function PSI.add_constraints!(
     ::PSI.NetworkModel{X},
 ) where {
     V <: PSY.HydroReservoir,
-    W <: HydroEnergyBlockOptimization,
+    W <: AbstractHydroReservoirFormulation,
     X <: PM.AbstractPowerModel,
 }
     time_steps = PSI.get_time_steps(container)
@@ -1051,10 +1051,7 @@ function PSI.add_constraints!(
     fraction_of_hour = Dates.value(Dates.Minute(resolution)) / PSI.MINUTES_IN_HOUR
     names = [PSY.get_name(x) for x in devices]
 
-    initial_conditions =
-        PSI.get_initial_condition(container, InitialReservoirVolume(), PSY.HydroReservoir)
-
-    energy_var = PSI.get_variable(container, HydroReservoirVolumeVariable(), V)
+    energy_var = PSI.get_variable(container, HydroEnergyVariableUp(), V)
     turbined_out_flow_var =
         PSI.get_variable(container, HydroTurbineFlowRateVariable(), PSY.HydroTurbine)
     spillage_var = PSI.get_variable(container, WaterSpillageVariable(), V)
@@ -1070,38 +1067,50 @@ function PSI.add_constraints!(
     param_container = PSI.get_parameter(container, InflowTimeSeriesParameter(), V)
     multiplier = PSI.get_multiplier_array(param_container)
 
-    for ic in initial_conditions
-        d = PSI.get_component(ic)
+    t_first = first(time_steps)
+    t_final = last(time_steps)
+
+    for d in devices
         name = PSY.get_name(d)
+        initial_level = PSY.get_initial_level(d)
+        target_level = PSY.get_level_targets(d)
+
         #TODO: change sum of turbines outflow into an expression
         turbines = get_connected_devices(sys, d)
         turbine_names = [PSY.get_name(turbine) for turbine in turbines]
 
-        constraint[name, 1] = JuMP.@constraint(
+        constraint[name, t_first] = JuMP.@constraint(
             container.JuMPmodel,
-            energy_var[name, 1] ==
-            PSI.get_value(ic)
+            energy_var[name, t_first] ==
+            initial_level
             +
-            fraction_of_hour * (
-                PSI.get_parameter_column_refs(param_container, name)[1] *
-                multiplier[name, 1] -
+            fraction_of_hour * SECONDS_IN_HOUR *
+            (
+                PSI.get_parameter_column_refs(param_container, name)[t_first] *
+                multiplier[name, t_first] -
                 (
                     sum(
-                        turbined_out_flow_var[turbine_name, 1] for
+                        turbined_out_flow_var[turbine_name, t_first] for
                         turbine_name in turbine_names
                     )
                     +
-                    spillage_var[name, 1]
+                    spillage_var[name, t_first]
                 )
             )
         )
 
-        for t in time_steps[2:end]
+        constraint[name, t_final] = JuMP.@constraint(
+            container.JuMPmodel,
+            energy_var[name, t_final] == target_level
+        )
+
+        for t in time_steps[(t_first + 1):(t_final)]
             constraint[name, t] = JuMP.@constraint(
                 container.JuMPmodel,
                 energy_var[name, t] ==
                 energy_var[name, t - 1] +
-                fraction_of_hour * (
+                fraction_of_hour * SECONDS_IN_HOUR *
+                (
                     PSI.get_parameter_column_refs(param_container, name)[t] *
                     multiplier[name, t] -
                     (
