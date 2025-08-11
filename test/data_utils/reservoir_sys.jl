@@ -8,6 +8,8 @@ function get_test_reservoir_turbine_sys(modeling_horizon)
     sys = PSB.build_system(PSITestSystems, "c_sys5_hy_ems_ed")
     remove_time_series!(sys, Deterministic)
 
+    hy_res = first(PSY.get_components(HydroEnergyReservoir, sys))
+
     solitude = get_component(ThermalStandard, sys, "Solitude")
     alta = get_component(ThermalStandard, sys, "Alta")
 
@@ -120,25 +122,30 @@ function get_test_reservoir_turbine_sys(modeling_horizon)
         add_time_series!(sys, ren_5bus, ren_new_ts)
     end
 
-    # Add Hourly Inflow
-    load_region1 = get_component(PowerLoad, sys_rts, "Alber")
-    ts_ld1 = get_time_series_array(
-        SingleTimeSeries,
-        load_region1,
-        "max_active_power";
-        ignore_scaling_factors = true,
-    )
-    tstamps = timestamp(ts_ld1)[1:(52 * 24 * 7)] # 52 weeks in a year, 7 days a week, 24 hours in a day
-    inflow_data_hourly = repeat(inflow_data; inner = 24)
-    inflow_hourly_ts =
-        SingleTimeSeries(; name = "inflow", data = TimeArray(tstamps, inflow_data_hourly))
+    # # Add Hourly Inflow
+    # load_region1 = get_component(PowerLoad, sys_rts, "Alber")
+    # ts_ld1 = get_time_series_array(
+    #     SingleTimeSeries,
+    #     load_region1,
+    #     "max_active_power";
+    #     ignore_scaling_factors = true,
+    # )
+    # tstamps = timestamp(ts_ld1)[1:(52 * 24 * 7)] # 52 weeks in a year, 7 days a week, 24 hours in a day
+    # inflow_data_hourly = repeat(inflow_data; inner = 24)
+    # inflow_hourly_ts =
+    #     SingleTimeSeries(; name = "inflow", data = TimeArray(tstamps, inflow_data_hourly))
 
     ## Add load time series to 5-bus sys:
     reservoir_hourly = only(get_components(HydroReservoir, sys))
-    key = add_time_series!(sys, reservoir_hourly, inflow_hourly_ts)
-
+    # key = add_time_series!(sys, reservoir_hourly, inflow_hourly_ts)
     # set_inflow!(reservoir_hourly, key)
-    set_inflow!(reservoir_hourly, mean(inflow_data))
+
+    println("copying time series")
+    copy_time_series!(reservoir_hourly, hy_res)
+    println(sys)
+    println(reservoir_hourly)
+
+    set_inflow!(reservoir_hourly, 1.0)
 
     transform_single_time_series!(sys, Hour(modeling_horizon), Hour(24))
     return sys
