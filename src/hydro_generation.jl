@@ -193,6 +193,7 @@ PSI.get_multiplier_value(::OutflowTimeSeriesParameter, d::PSY.HydroGen, ::Abstra
 PSI.get_multiplier_value(::InflowTimeSeriesParameter, d::PSY.HydroReservoir, ::AbstractHydroFormulation) = 1.0
 PSI.get_multiplier_value(::OutflowTimeSeriesParameter, d::PSY.HydroReservoir, ::AbstractHydroFormulation) = 1.0
 PSI.get_multiplier_value(::InflowTimeSeriesParameter, d::PSY.HydroReservoir, ::HydroEnergyModelReservoir) = PSY.get_inflow(d)
+PSI.get_multiplier_value(::InflowTimeSeriesParameter, d::PSY.HydroReservoir, ::HydroEnergyBlockOptimization) = PSY.get_inflow(d)
 PSI.get_multiplier_value(::PSI.TimeSeriesParameter, d::PSY.HydroGen, ::AbstractHydroFormulation) = PSY.get_max_active_power(d)
 PSI.get_multiplier_value(::PSI.TimeSeriesParameter, d::PSY.HydroGen, ::PSI.FixedOutput) = PSY.get_max_active_power(d)
 PSI.get_multiplier_value(::PSI.ActivePowerTimeSeriesParameter, d::PSY.HydroPumpTurbine, ::HydroPumpEnergyDispatch) = PSY.get_active_power_limits(d).max
@@ -964,7 +965,7 @@ function PSI.add_constraints!(
     fraction_of_hour = Dates.value(Dates.Minute(resolution)) / PSI.MINUTES_IN_HOUR
     names = [PSY.get_name(x) for x in devices]
 
-    energy_var = PSI.get_variable(container, HydroEnergyVariableUp(), PSY.HydroReservoir)
+    energy_var = PSI.get_variable(container, HydroReservoirVolumeVariable(), PSY.HydroReservoir)
     turbined_out_flow_var =
         PSI.get_variable(container, HydroTurbineFlowRateVariable(), PSY.HydroTurbine)
 
@@ -984,21 +985,19 @@ function PSI.add_constraints!(
 
     for d in devices
         name = PSY.get_name(d)
-
-        ##TODO: fix for mutiplple turbine-reservoir mapping
         reservoir = only(PSY.get_reservoirs(d))
         reservoir_name = PSY.get_name(reservoir)
         initial_level = PSY.get_initial_level(reservoir)
-        max_storage_level = PSY.get_storage_level_limits(reservoir).max
-
+        elevation_head = PSY.get_intake_elevation(reservoir) - PSY.get_powerhouse_elevation(d)
         efficiency = PSY.get_efficiency(d)
-        head_to_volume_factor = PSY.get_head_to_volume_factor(reservoir)
+        K = efficiency * WATER_DENSITY * GRAVITATIONAL_CONSTANT
 
-        K = (efficiency * WATER_DENSITY * GRAVITATIONAL_CONSTANT)
-
-        ext_res = PSY.get_ext(reservoir)
-        ext_turbine = PSY.get_ext(d)
-        elevation_head = ext_res["intake"] - ext_turbine["elevation"]
+        h2v_factor = PSY.get_proportional_term(PSY.get_head_to_volume_factor(reservoir))
+        if isa(h2v_factor, PSY.PiecewisePointCurve)
+            error(
+                "EnergyBlockOptimization does not support piecewise head to volume factor",
+            )
+        end        
 
         constraint[name, t_first] = JuMP.@constraint(
             container.JuMPmodel,
@@ -1007,7 +1006,7 @@ function PSI.add_constraints!(
                 K * turbined_out_flow_var[name, t_first] *
                 (
                     0.5 * (energy_var[reservoir_name, t_first] + initial_level) *
-                    head_to_volume_factor + elevation_head
+                    h2v_factor + elevation_head
                 )
             ) / base_power
         )
@@ -1018,7 +1017,7 @@ function PSI.add_constraints!(
                 fraction_of_hour * (
                     K * turbined_out_flow_var[name, t] *
                     (
-                        head_to_volume_factor * 0.5 *
+                        h2v_factor * 0.5 *
                         (energy_var[reservoir_name, t] + energy_var[reservoir_name, t - 1])
                         +
                         elevation_head
@@ -1051,7 +1050,7 @@ function PSI.add_constraints!(
     fraction_of_hour = Dates.value(Dates.Minute(resolution)) / PSI.MINUTES_IN_HOUR
     names = [PSY.get_name(x) for x in devices]
 
-    energy_var = PSI.get_variable(container, HydroEnergyVariableUp(), V)
+    energy_var = PSI.get_variable(container, HydroReservoirVolumeVariable(), V)
     turbined_out_flow_var =
         PSI.get_variable(container, HydroTurbineFlowRateVariable(), PSY.HydroTurbine)
     spillage_var = PSI.get_variable(container, WaterSpillageVariable(), V)
