@@ -35,7 +35,6 @@ const PM = PSI.PM
 const PNM = PowerNetworkMatrices
 const HPS = HydroPowerSimulations
 
-
 # Test Utils
 using JuMP
 using HiGHS

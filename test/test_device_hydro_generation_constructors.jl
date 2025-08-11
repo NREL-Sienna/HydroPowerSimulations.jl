@@ -489,5 +489,3 @@ end
     # The value of this test needs to be revised
     # moi_tests(model, 240, 0, 48, 96, 72, false)
 end
-
-

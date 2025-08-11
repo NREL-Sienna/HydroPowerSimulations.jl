@@ -3,16 +3,15 @@
 #########################################
 @testset "Test Hydro Dispatch Run Of River Formulations " begin
     device_model = PSI.DeviceModel(HydroDispatch, HydroDispatchRunOfRiverBudget;
-                                    attributes = Dict("hydro_budget_interval" => Hour(24)))
+        attributes = Dict("hydro_budget_interval" => Hour(24)))
 
-    
     sys = PSB.build_system(PSITestSystems, "c_sys5_hy")
 
     hy = only(get_components(HydroDispatch, sys))
     max_power = get_max_active_power(hy)
     resolution = Dates.Hour(1)
-    tstamp = range(DateTime("2024-01-01T00:00:00"), step = resolution, length = 48)
-    data = ones(length(tstamp)) / (get_base_power(sys) * max_power) 
+    tstamp = range(DateTime("2024-01-01T00:00:00"); step = resolution, length = 48)
+    data = ones(length(tstamp)) / (get_base_power(sys) * max_power)
     ts = SingleTimeSeries("hydro_budget", TimeArray(tstamp, data))
     add_time_series!(sys, hy, ts)
     transform_single_time_series!(sys, Hour(24), Hour(24))
@@ -24,19 +23,18 @@
 end
 
 @testset "Solve Hydro Dispatch Run Of River" begin
-    output_dir = mktempdir(; cleanup = true) 
+    output_dir = mktempdir(; cleanup = true)
 
     c_sys5_hy = PSB.build_system(PSITestSystems, "c_sys5_hy")
-    
-    hydro_budget = 24;
-    eps = 1e-6
 
+    hydro_budget = 24
+    eps = 1e-6
 
     hy = only(get_components(HydroDispatch, c_sys5_hy))
     max_power = get_max_active_power(hy)
 
-    tstamp = range(DateTime("2024-01-01T00:00:00"), step = Dates.Hour(1), length = 48)
-    data = ones(length(tstamp)) / (get_base_power(c_sys5_hy) * max_power) 
+    tstamp = range(DateTime("2024-01-01T00:00:00"); step = Dates.Hour(1), length = 48)
+    data = ones(length(tstamp)) / (get_base_power(c_sys5_hy) * max_power)
     ts = SingleTimeSeries("hydro_budget", TimeArray(tstamp, data))
     add_time_series!(c_sys5_hy, first(get_components(HydroDispatch, c_sys5_hy)), ts)
     transform_single_time_series!(c_sys5_hy, Hour(24), Hour(24))
@@ -45,10 +43,18 @@ end
     set_device_model!(template_uc, ThermalStandard, ThermalBasicUnitCommitment)
     set_device_model!(template_uc, RenewableDispatch, RenewableFullDispatch)
     set_device_model!(template_uc, PowerLoad, StaticPowerLoad)
-    set_device_model!(template_uc, RenewableNonDispatch, FixedOutput) 
-    set_device_model!(template_uc, DeviceModel(HydroDispatch, HydroDispatchRunOfRiverBudget;
-                 attributes = Dict("hydro_budget_interval" => Hour(hydro_budget))))                
-    model = DecisionModel(template_uc, c_sys5_hy; optimizer = HiGHS_optimizer, store_variable_names = true)
+    set_device_model!(template_uc, RenewableNonDispatch, FixedOutput)
+    set_device_model!(
+        template_uc,
+        DeviceModel(HydroDispatch, HydroDispatchRunOfRiverBudget;
+            attributes = Dict("hydro_budget_interval" => Hour(hydro_budget))),
+    )
+    model = DecisionModel(
+        template_uc,
+        c_sys5_hy;
+        optimizer = HiGHS_optimizer,
+        store_variable_names = true,
+    )
 
     @test build!(model; output_dir = output_dir) ==
           PSI.ModelBuildStatus.BUILT
@@ -57,7 +63,8 @@ end
           IS.Simulation.RunStatus.SUCCESSFULLY_FINALIZED
 
     res = OptimizationProblemResults(model)
-    hydro_power_sum = sum(read_variable(res, "ActivePowerVariable__HydroDispatch")[!, :HydroDispatch])
+    hydro_power_sum =
+        sum(read_variable(res, "ActivePowerVariable__HydroDispatch")[!, :HydroDispatch])
 
     @test abs(hydro_power_sum - hydro_budget) <= eps
 end
@@ -72,7 +79,7 @@ end
         attributes = Dict{String, Any}(
             "reservation" => true,
             "energy_target" => true,
-        )
+        ),
     )
 
     c_sys5_bat = PSB.build_system(PSITestSystems, "c_sys5_bat"; add_reserves = true)
@@ -113,7 +120,7 @@ end
 end
 
 @testset "Test Hydro Pump Energy Dispatch Formulations " begin
-    output_dir = mktempdir(; cleanup = true) 
+    output_dir = mktempdir(; cleanup = true)
 
     c_sys5_bat = PSB.build_system(PSITestSystems, "c_sys5_bat"; add_reserves = true)
     bat = first(PSY.get_components(EnergyReservoirStorage, c_sys5_bat))
@@ -150,18 +157,25 @@ end
     set_device_model!(template_uc, ThermalStandard, ThermalBasicUnitCommitment)
     set_device_model!(template_uc, RenewableDispatch, RenewableFullDispatch)
     set_device_model!(template_uc, PowerLoad, StaticPowerLoad)
-    set_device_model!(template_uc, RenewableNonDispatch, FixedOutput) 
-    set_device_model!(template_uc, DeviceModel(
-                    HydroPumpTurbine,
-                    HPS.HydroPumpEnergyDispatch;
-                    attributes = Dict{String, Any}(
-                    "reservation" => true,
-                    "energy_target" => true,
-        )
+    set_device_model!(template_uc, RenewableNonDispatch, FixedOutput)
+    set_device_model!(
+        template_uc,
+        DeviceModel(
+            HydroPumpTurbine,
+            HPS.HydroPumpEnergyDispatch;
+            attributes = Dict{String, Any}(
+                "reservation" => true,
+                "energy_target" => true,
+            ),
+        ),
     )
-    );
 
-    model = DecisionModel(template_uc, c_sys5_bat; optimizer = HiGHS_optimizer, store_variable_names = true)
+    model = DecisionModel(
+        template_uc,
+        c_sys5_bat;
+        optimizer = HiGHS_optimizer,
+        store_variable_names = true,
+    )
 
     @test build!(model; output_dir = output_dir) ==
           PSI.ModelBuildStatus.BUILT

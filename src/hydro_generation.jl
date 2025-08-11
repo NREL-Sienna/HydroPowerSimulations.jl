@@ -965,7 +965,8 @@ function PSI.add_constraints!(
     fraction_of_hour = Dates.value(Dates.Minute(resolution)) / PSI.MINUTES_IN_HOUR
     names = [PSY.get_name(x) for x in devices]
 
-    energy_var = PSI.get_variable(container, HydroReservoirVolumeVariable(), PSY.HydroReservoir)
+    energy_var =
+        PSI.get_variable(container, HydroReservoirVolumeVariable(), PSY.HydroReservoir)
     turbined_out_flow_var =
         PSI.get_variable(container, HydroTurbineFlowRateVariable(), PSY.HydroTurbine)
 
@@ -988,7 +989,8 @@ function PSI.add_constraints!(
         reservoir = only(PSY.get_reservoirs(d))
         reservoir_name = PSY.get_name(reservoir)
         initial_level = PSY.get_initial_level(reservoir)
-        elevation_head = PSY.get_intake_elevation(reservoir) - PSY.get_powerhouse_elevation(d)
+        elevation_head =
+            PSY.get_intake_elevation(reservoir) - PSY.get_powerhouse_elevation(d)
         efficiency = PSY.get_efficiency(d)
         K = efficiency * WATER_DENSITY * GRAVITATIONAL_CONSTANT
 
@@ -997,7 +999,7 @@ function PSI.add_constraints!(
             error(
                 "EnergyBlockOptimization does not support piecewise head to volume factor",
             )
-        end        
+        end
 
         constraint[name, t_first] = JuMP.@constraint(
             container.JuMPmodel,

@@ -6,9 +6,9 @@ function get_test_reservoir_turbine_sys(modeling_horizon)
 
     ### Start Creating Structs for 5-bus System ####
     sys = PSB.build_system(PSITestSystems, "c_sys5_hy_ems_ed")
-    remove_time_series!(sys, Deterministic)
-
     hy_res = first(PSY.get_components(HydroEnergyReservoir, sys))
+
+    remove_time_series!(sys, Deterministic)
 
     solitude = get_component(ThermalStandard, sys, "Solitude")
     alta = get_component(ThermalStandard, sys, "Alta")
