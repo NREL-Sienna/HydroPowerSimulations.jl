@@ -1,5 +1,5 @@
 @testset "Test HydroUsageLimitFeedforward with HydroDispatch" begin
-    sys = new_c_sys5_hyd_dispatch(; with_reserves = true)
+    sys = PSB.build_system(PSITestSystems, "c_sys5_hy"; add_reserves = true)
     sys_ed = deepcopy(sys)
 
     for s in [sys, sys_ed]
@@ -129,11 +129,11 @@
     # Test HydroUsage match with the AuxVar
     @test isapprox(uc_energy_hy * 100.0, uc_p_hy + 0.4 * uc_hy_regup - 0.3 * uc_hy_regdn)
     # Test HydroUsage in ED is bounded by UC
-    @test cumsum(ed_energy_hy)[end] <= cumsum(uc_energy_hy)[end]
+    @test isapprox(cumsum(ed_energy_hy)[end] - cumsum(uc_energy_hy)[end], 0.0, atol = 1e-6)
 end
 
 @testset "Test HydroUsageLimitFeedforward with HydroTurbine" begin
-    sys = new_c_sys5_hyd(; with_reserves = true)
+    sys = PSB.build_system(PSITestSystems, "c_sys5_hy_turbine_energy"; add_reserves = true)
     sys_ed = deepcopy(sys)
 
     for s in [sys, sys_ed]
@@ -161,7 +161,7 @@ end
     set_service_model!(template_ed, VariableReserve{ReserveUp}, RangeReserve)
     set_service_model!(template_ed, VariableReserve{ReserveDown}, RangeReserve)
 
-    for hydro in get_components(HydroDispatch, sys)
+    for hydro in get_components(HydroTurbine, sys)
         op_cost = get_operation_cost(hydro)
         new_opcost = HydroGenerationCost(;
             variable = CostCurve(;
@@ -353,23 +353,23 @@ end
     )
 
     PSI.attach_feedforward!(device_model, ff_il)
-    c_sys5_hy = new_c_sys5_hyd()
+    c_sys5_hy = PSB.build_system(PSITestSystems, "c_sys5_hy_turbine_energy")
     model = DecisionModel(MockOperationProblem, DCPPowerModel, c_sys5_hy)
     mock_construct_device!(model, device_model; built_for_recurrent_solves = true)
     moi_tests(model, 48, 0, 26, 24, 0, false)
 end
 
 @testset "Test LowerBoundFeedforward to HydroTurbine with HydroTurbineEnergyDispatch model" begin
-    device_model = PSI.DeviceModel(HydroEnergyReservoir, HydroDispatchReservoirStorage)
+    device_model = PSI.DeviceModel(HydroTurbine, HydroTurbineEnergyDispatch)
     ff_il = LowerBoundFeedforward(;
-        component_type = HydroEnergyReservoir,
+        component_type = HydroTurbine,
         source = PSI.ActivePowerVariable,
         affected_values = [PSI.ActivePowerVariable],
     )
 
     PSI.attach_feedforward!(device_model, ff_il)
-    c_sys5_hy = PSB.build_system(PSITestSystems, "c_sys5_hyd_ems")
+    c_sys5_hy = PSB.build_system(PSITestSystems, "c_sys5_hy_turbine_energy")
     model = DecisionModel(MockOperationProblem, DCPPowerModel, c_sys5_hy)
     mock_construct_device!(model, device_model; built_for_recurrent_solves = true)
-    moi_tests(model, 193, 0, 24, 48, 48, false)
+    moi_tests(model, 48, 0, 24, 48, 0, false)
 end
