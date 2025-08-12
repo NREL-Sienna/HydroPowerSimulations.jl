@@ -133,8 +133,8 @@ function new_c_sys5_hyd_block(; with_reserves = false)
         level_targets = hy_res.storage_target,
         travel_time = nothing,
         head_to_volume_factor = 1.0,
-        intake_elevation = 0.0,
-        level_data_type = PowerSystems.ReservoirDataType.ENERGY,
+        intake_elevation = 1.0,
+        level_data_type = PowerSystems.ReservoirDataType.USABLE_VOLUME,
     )
 
     add_component!(sys, turbine_res)
