@@ -1045,7 +1045,7 @@ function PSI.add_constraints!(
     ::PSI.NetworkModel{X},
 ) where {
     V <: PSY.HydroReservoir,
-    W <: AbstractHydroReservoirFormulation,
+    W <: HydroEnergyBlockOptimization,
     X <: PM.AbstractPowerModel,
 }
     time_steps = PSI.get_time_steps(container)
@@ -1099,11 +1099,6 @@ function PSI.add_constraints!(
                     spillage_var[name, t_first]
                 )
             )
-        )
-
-        constraint[name, t_final] = JuMP.@constraint(
-            container.JuMPmodel,
-            energy_var[name, t_final] == target_level
         )
 
         for t in time_steps[(t_first + 1):(t_final)]
