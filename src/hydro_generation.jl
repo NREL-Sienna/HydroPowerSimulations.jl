@@ -130,6 +130,7 @@ PSI.get_variable_lower_bound(::HydroEnergySurplusVariable, d::PSY.HydroPumpTurbi
 PSI.get_variable_upper_bound(::HydroEnergySurplusVariable, d::PSY.HydroPumpTurbine, ::HydroPumpEnergyDispatch) = 0.0
 
 
+
 ############## EnergyShortageVariable, HydroReservoir ####################
 PSI.get_variable_binary(::HydroEnergyShortageVariable, ::Type{<:PSY.HydroReservoir}, ::HydroEnergyModelReservoir) = false
 PSI.get_variable_lower_bound(::HydroEnergyShortageVariable, d::PSY.HydroReservoir, ::HydroEnergyModelReservoir) = 0.0
@@ -1047,7 +1048,7 @@ function PSI.add_constraints!(
     ::PSI.NetworkModel{X},
 ) where {
     V <: PSY.HydroReservoir,
-    W <: AbstractHydroReservoirFormulation,
+    W <: HydroEnergyBlockOptimization,
     X <: PM.AbstractPowerModel,
 }
     time_steps = PSI.get_time_steps(container)

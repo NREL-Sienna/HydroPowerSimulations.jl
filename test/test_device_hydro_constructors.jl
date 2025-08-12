@@ -11,7 +11,8 @@
             "hydro_budget" => true,
         ),
     )
-    c_sys5_hyd = new_c_sys5_hyd()
+
+    c_sys5_hyd = PSB.build_system(PSITestSystems, "c_sys5_hy_turbine_energy")
 
     # No Parameters Testing
     model = DecisionModel(MockOperationProblem, DCPPowerModel, c_sys5_hyd)
@@ -31,7 +32,8 @@ end
             "hydro_budget" => true,
         ),
     )
-    c_sys5_hyd = new_c_sys5_hyd()
+
+    c_sys5_hyd = PSB.build_system(PSITestSystems, "c_sys5_hy_turbine_energy")
 
     # No Parameters Testing
     model = DecisionModel(MockOperationProblem, ACPPowerModel, c_sys5_hyd)
@@ -55,7 +57,8 @@ end
             "hydro_budget" => true,
         ),
     )
-    c_sys5_hyd = new_c_sys5_hyd()
+
+    c_sys5_hyd = PSB.build_system(PSITestSystems, "c_sys5_hy_turbine_energy")
 
     # No Parameters Testing
     model = DecisionModel(MockOperationProblem, DCPPowerModel, c_sys5_hyd)
@@ -75,7 +78,8 @@ end
             "hydro_budget" => true,
         ),
     )
-    c_sys5_hyd = new_c_sys5_hyd()
+
+    c_sys5_hyd = PSB.build_system(PSITestSystems, "c_sys5_hy_turbine_energy")
 
     # No Parameters Testing
     model = DecisionModel(MockOperationProblem, ACPPowerModel, c_sys5_hyd)
@@ -99,7 +103,8 @@ end
             "hydro_budget" => false,
         ),
     )
-    c_sys5_hyd = new_c_sys5_hyd()
+
+    c_sys5_hyd = PSB.build_system(PSITestSystems, "c_sys5_hy_turbine_energy")
 
     # No Parameters Testing
     model = DecisionModel(MockOperationProblem, DCPPowerModel, c_sys5_hyd)
@@ -119,7 +124,8 @@ end
             "hydro_budget" => false,
         ),
     )
-    c_sys5_hyd = new_c_sys5_hyd()
+
+    c_sys5_hyd = PSB.build_system(PSITestSystems, "c_sys5_hy_turbine_energy")
 
     # No Parameters Testing
     model = DecisionModel(MockOperationProblem, ACPPowerModel, c_sys5_hyd)
@@ -178,12 +184,37 @@ end
     end
 end
 
+@testset "Test Reserves from Hydro with RunOfRiver" begin
+    template = ProblemTemplate(CopperPlatePowerModel)
+    set_device_model!(template, PowerLoad, StaticPowerLoad)
+    set_device_model!(template, HydroEnergyReservoir, HydroDispatchRunOfRiver)
+    set_service_model!(
+        template,
+        ServiceModel(VariableReserve{ReserveUp}, RangeReserve, "Reserve5"),
+    )
+    set_service_model!(
+        template,
+        ServiceModel(VariableReserve{ReserveDown}, RangeReserve, "Reserve6"),
+    )
+    set_service_model!(
+        template,
+        ServiceModel(ReserveDemandCurve{ReserveUp}, StepwiseCostReserve, "ORDC1"),
+    )
+
+    c_sys5_hyd = PSB.build_system(PSITestSystems, "c_sys5_hyd"; add_reserves = true)
+    model = DecisionModel(template, c_sys5_hyd)
+    @test build!(model; output_dir = mktempdir(; cleanup = true)) ==
+          PSI.ModelBuildStatus.BUILT
+    # The value of this test needs to be revised
+    # moi_tests(model, 240, 0, 48, 96, 72, false)
+end
+
 #########################################
 ###### RESERVOIR SYSTEM TESTS ###########
 #########################################
 
 @testset "Solving ED Hydro System using Dispatch with Reservoir" begin
-    sys = new_c_sys5_hyd()
+    sys = PSB.build_system(PSITestSystems, "c_sys5_hy_turbine_energy")
     networks = [ACPPowerModel, DCPPowerModel]
     turbine_model = PSI.DeviceModel(HydroTurbine, HydroTurbineEnergyDispatch)
     models = [
@@ -242,7 +273,7 @@ end
 end
 
 @testset "Solving ED Hydro System using Commitment with Reservoir" begin
-    sys = new_c_sys5_hyd()
+    sys = PSB.build_system(PSITestSystems, "c_sys5_hy_turbine_energy")
     net = DCPPowerModel
     turbine_model = PSI.DeviceModel(HydroTurbine, HydroTurbineEnergyCommitment)
     models = [
@@ -294,4 +325,41 @@ end
             )
         end
     end
+end
+
+#########################################
+######## HydroBlock model Tests #########
+#########################################
+
+@testset "Test Hydro Block Optimization Formulation" begin
+    output_dir = mktempdir(; cleanup = true)
+    modeling_horizon = 52 * 24 * 1
+    sys = get_test_reservoir_turbine_sys(modeling_horizon)
+
+    template_ed = ProblemTemplate(
+        NetworkModel(
+            CopperPlatePowerModel;
+        ),
+    )
+    set_device_model!(template_ed, PowerLoad, StaticPowerLoad)
+    set_device_model!(template_ed, ThermalStandard, ThermalDispatchNoMin)
+    set_device_model!(template_ed, HydroReservoir, HydroEnergyBlockOptimization)
+    set_device_model!(template_ed, HydroTurbine, HydroEnergyBlockOptimization)
+
+    model = DecisionModel(
+        template_ed,
+        sys;
+        name = "ED",
+        optimizer = Ipopt_optimizer,
+        optimizer_solve_log_print = true,
+        store_variable_names = true,
+        system_to_file = true,
+        horizon = Hour(modeling_horizon),
+    )
+
+    @test build!(model; output_dir = output_dir) ==
+          PSI.ModelBuildStatus.BUILT
+
+    @test solve!(model; optimizer = Ipopt_optimizer, output_dir = output_dir) ==
+          IS.Simulation.RunStatus.SUCCESSFULLY_FINALIZED
 end
