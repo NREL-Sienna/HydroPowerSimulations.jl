@@ -4,7 +4,7 @@
 @testset "Test Hydro Block Optimization Formulation" begin
     output_dir = mktempdir(; cleanup = true)
     modeling_horizon = 52 * 24 * 1
-    
+
     sys = new_c_sys5_hyd_block(; with_reserves = false)
 
     template_ed = ProblemTemplate(
