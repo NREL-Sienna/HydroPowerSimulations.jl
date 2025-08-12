@@ -125,6 +125,7 @@ function run_tests()
 
     include("data_utils/reservoir_sys.jl")
     include("data_utils/new_reservoir_test_sys.jl")
+    include("data_utils/test_utils.jl")
 
     IS.open_file_logger(config.filename, config.file_level) do file_logger
         levels = (Logging.Info, Logging.Warn, Logging.Error)
