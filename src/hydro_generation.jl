@@ -988,13 +988,14 @@ function PSI.add_constraints!(
         name = PSY.get_name(d)
         reservoir = only(PSY.get_reservoirs(d))
         reservoir_name = PSY.get_name(reservoir)
-        initial_level = PSY.get_initial_level(reservoir)
+        initial_level = PSY.get_initial_level(reservoir) * PSY.get_storage_level_limits(reservoir).max
         elevation_head =
             PSY.get_intake_elevation(reservoir) - PSY.get_powerhouse_elevation(d)
         efficiency = PSY.get_efficiency(d)
         K = efficiency * WATER_DENSITY * GRAVITATIONAL_CONSTANT
 
         h2v_factor = PSY.get_proportional_term(PSY.get_head_to_volume_factor(reservoir))
+        println(h2v_factor)
         if isa(h2v_factor, PSY.PiecewisePointCurve)
             error(
                 "EnergyBlockOptimization does not support piecewise head to volume factor",
@@ -1007,8 +1008,8 @@ function PSI.add_constraints!(
             fraction_of_hour * (
                 K * turbined_out_flow_var[name, t_first] *
                 (
-                    0.5 * (energy_var[reservoir_name, t_first] + initial_level) *
-                    h2v_factor + elevation_head
+                    0.5 * h2v_factor * (energy_var[reservoir_name, t_first] + initial_level)
+                    + elevation_head
                 )
             ) / base_power
         )
@@ -1019,7 +1020,7 @@ function PSI.add_constraints!(
                 fraction_of_hour * (
                     K * turbined_out_flow_var[name, t] *
                     (
-                        h2v_factor * 0.5 *
+                        0.5 * h2v_factor *
                         (energy_var[reservoir_name, t] + energy_var[reservoir_name, t - 1])
                         +
                         elevation_head
@@ -1073,8 +1074,8 @@ function PSI.add_constraints!(
 
     for d in devices
         name = PSY.get_name(d)
-        initial_level = PSY.get_initial_level(d)
-        target_level = PSY.get_level_targets(d)
+        initial_level = PSY.get_initial_level(d) * PSY.get_storage_level_limits(d).max
+        target_level = PSY.get_level_targets(d) * PSY.get_storage_level_limits(d).max
 
         #TODO: change sum of turbines outflow into an expression
         turbines = get_connected_devices(sys, d)
@@ -1100,10 +1101,10 @@ function PSI.add_constraints!(
             )
         )
 
-        constraint[name, t_final] = JuMP.@constraint(
-            container.JuMPmodel,
-            energy_var[name, t_final] == target_level
-        )
+        # constraint[name, t_final] = JuMP.@constraint(
+        #     container.JuMPmodel,
+        #     energy_var[name, t_final] == target_level
+        # )
 
         for t in time_steps[(t_first + 1):(t_final)]
             constraint[name, t] = JuMP.@constraint(
