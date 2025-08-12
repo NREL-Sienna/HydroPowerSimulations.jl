@@ -945,7 +945,9 @@ function PSI.add_constraints!(
     return
 end
 
-##################################### Energy Block Optimization ############################
+###################################################################
+################ Energy Block Optimization  #######################
+###################################################################
 """
 This function defines the constraint for the hydro power generation
 for the [`HydroEnergyBlockOptimization`](@extref).
@@ -1100,11 +1102,6 @@ function PSI.add_constraints!(
                 )
             )
         )
-
-        # constraint[name, t_final] = JuMP.@constraint(
-        #     container.JuMPmodel,
-        #     energy_var[name, t_final] == target_level
-        # )
 
         for t in time_steps[(t_first + 1):(t_final)]
             constraint[name, t] = JuMP.@constraint(
