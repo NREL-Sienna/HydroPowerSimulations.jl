@@ -57,11 +57,4 @@ Docs abbreviation: ``E^\\text{hy,out}``
 """
 struct HydroEnergyOutput <: PSI.AuxVariableType end
 
-"""
-Struct to dispatch the creation of a variable for the turbined outflow
-
-Docs abbreviation: ``f^\\text{Tu}``
-"""
-struct HydroTurbineFlowRateVariable <: PSI.VariableType end
-
 PSI.should_write_resulting_value(::Type{HydroTurbineFlowRateVariable}) = false
