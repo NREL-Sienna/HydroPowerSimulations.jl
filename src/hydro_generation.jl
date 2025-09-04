@@ -58,7 +58,7 @@ function PSI.get_variable_lower_bound(::WaterSpillageVariable, d::PSY.HydroReser
    if typeof(spillage_limits) <: PSY.MinMax
        return PSY.get_spillage_limits(d).min
    end
-   return 0.0  
+   return 0.0
 end
 function PSI.get_variable_upper_bound(::WaterSpillageVariable, d::PSY.HydroReservoir, ::AbstractHydroReservoirFormulation)
     spillage_limits = PSY.get_spillage_limits(d)
@@ -67,6 +67,7 @@ function PSI.get_variable_upper_bound(::WaterSpillageVariable, d::PSY.HydroReser
     end
     return nothing
  end
+
  function PSI.get_variable_upper_bound(::WaterSpillageVariable, d::PSY.HydroPumpTurbine, ::HydroPumpEnergyDispatch)
     spillage_limits = PSY.get_spillage_limits(d.head_reservoir)
     if typeof(spillage_limits) <: PSY.MinMax
@@ -74,8 +75,6 @@ function PSI.get_variable_upper_bound(::WaterSpillageVariable, d::PSY.HydroReser
     end
     return nothing
  end
-
-    
 
 ############## PSI.ReservationVariable, HydroGen ####################
 PSI.get_variable_binary(::PSI.ReservationVariable, ::Type{<:PSY.HydroGen}, ::AbstractHydroFormulation) = true
@@ -91,6 +90,7 @@ PSI.get_variable_upper_bound(::HydroEnergySurplusVariable, d::PSY.HydroGen, ::Ab
 PSI.get_variable_lower_bound(::HydroEnergySurplusVariable, d::PSY.HydroGen, ::AbstractHydroReservoirFormulation) = - PSY.get_storage_capacity(d)
 
 ############## HydroReservoir ####################
+
 PSI.get_variable_binary(::PSI.EnergyVariable, ::Type{<:PSY.HydroReservoir}, ::AbstractHydroFormulation) = false
 PSI.get_variable_binary(::HydroEnergyShortageVariable, ::Type{<:PSY.HydroReservoir}, ::AbstractHydroFormulation) = false
 PSI.get_variable_binary(::HydroEnergySurplusVariable, ::Type{<:PSY.HydroReservoir}, ::AbstractHydroFormulation) = false
@@ -199,7 +199,6 @@ PSI.get_multiplier_value(::PSI.TimeSeriesParameter, d::PSY.HydroGen, ::AbstractH
 PSI.get_multiplier_value(::PSI.TimeSeriesParameter, d::PSY.HydroGen, ::PSI.FixedOutput) = PSY.get_max_active_power(d)
 PSI.get_multiplier_value(::PSI.ActivePowerTimeSeriesParameter, d::PSY.HydroPumpTurbine, ::HydroPumpEnergyDispatch) = PSY.get_active_power_limits(d).max
 PSI.get_multiplier_value(::EnergyCapacityTimeSeriesParameter, d::PSY.HydroPumpTurbine, ::HydroPumpEnergyDispatch) = PSY.get_storage_level_limits(d.head_reservoir).max / PSY.get_system_base_power(d)
-
 
 PSI.get_parameter_multiplier(::PSI.VariableValueParameter, d::PSY.HydroGen, ::AbstractHydroFormulation) = 1.0
 PSI.get_initial_parameter_value(::PSI.VariableValueParameter, d::PSY.HydroGen, ::AbstractHydroFormulation) = 1.0
