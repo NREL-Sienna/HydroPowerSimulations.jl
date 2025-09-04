@@ -410,9 +410,10 @@ end
             "energy_target" => true,
         ),
     )
-    #transform this do PSB
-    c_sys5_bat = PSB.build_system(PSITestSystems, "c_sys5_hydro_pump_energy"; add_reserves = true)
-    
+
+    c_sys5_bat =
+        PSB.build_system(PSITestSystems, "c_sys5_hydro_pump_energy"; add_reserves = true)
+
     hy_pump = first(PSY.get_components(HydroPumpTurbine, c_sys5_bat))
 
     ### Add Time Series ###
@@ -450,8 +451,9 @@ end
 @testset "Test Hydro Pump Energy Dispatch Formulations 2" begin
     output_dir = mktempdir(; cleanup = true)
 
-    c_sys5_bat = PSB.build_system(PSITestSystems, "c_sys5_hydro_pump_energy"; add_reserves = true)
-    
+    c_sys5_bat =
+        PSB.build_system(PSITestSystems, "c_sys5_hydro_pump_energy"; add_reserves = true)
+
     hy_pump = first(PSY.get_components(HydroPumpTurbine, c_sys5_bat))
 
     ### Add Time Series ###
@@ -520,8 +522,8 @@ end
     modeling_horizon = 52 * 24 * 1
 
     sys = PSB.build_system(PSITestSystems, "c_sys5_hy_turbine_energy")
-    res = first( PSY.get_components( HydroReservoir,sys ) )
-    
+    res = first(PSY.get_components(HydroReservoir, sys))
+
     set_head_to_volume_factor!(res, LinearCurve(1.0))
     template_ed = ProblemTemplate(
         NetworkModel(
