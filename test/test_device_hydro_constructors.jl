@@ -554,3 +554,65 @@ end
 
     # check the second step is equal to the first step + dispatch 
 end
+
+################################################
+######## HydroWaterModelReservoir TEST #########
+################################################
+
+@testset "Solve HydroWaterModelReservoir" begin
+    output_dir = mktempdir(; cleanup = true)
+
+    c_sys5_hy = PSB.build_system(PSITestSystems, "c_sys5_hy_turbine_head")
+
+    template = ProblemTemplate()
+    set_device_model!(template, HydroTurbine, HydroTurbineBilinearDispatch)
+    set_device_model!(template, HydroReservoir, HydroWaterModelReservoir)
+
+    set_device_model!(template, ThermalStandard, ThermalDispatchNoMin)
+    set_device_model!(template, PowerLoad, StaticPowerLoad)
+
+    model = DecisionModel(
+        template,
+        sys;
+        optimizer = Ipopt_optimizer,
+        store_variable_names = true,
+    )
+
+    @test build!(model; output_dir = output_dir) ==
+          PSI.ModelBuildStatus.BUILT
+
+    @test solve!(model; output_dir = output_dir) ==
+          IS.Simulation.RunStatus.SUCCESSFULLY_FINALIZED
+
+    res = OptimizationProblemResults(model)
+
+    moi_tests(model, 240, 0, 168, 168, 72, false)
+    psi_checkobjfun_test(model, AffExpr)
+
+    df_outflow = read_expression(res, "TotalHydroFlowRateTurbineOut__HydroTurbine")
+    hydro_vol_df =
+        read_variables(res, [(HydroReservoirVolumeVariable, HydroReservoir)])["HydroReservoirVolumeVariable__HydroReservoir"]
+    hydro_head_df =
+        read_variables(res, [(HydroReservoirHeadVariable, HydroReservoir)])["HydroReservoirHeadVariable__HydroReservoir"]
+    hydro_spillage_df =
+        read_variables(res, [(WaterSpillageVariable, HydroReservoir)])["WaterSpillageVariable__HydroReservoir"]
+    hydro_inflow_df =
+        read_parameters(res, [(InflowTimeSeriesParameter, HydroReservoir)])["InflowTimeSeriesParameter__HydroReservoir"]
+
+    total_inflow = sum(values(hydro_inflow_ts))
+    total_outflow = sum(df_outflow[!, "Water_Turbine"])
+    total_spillage = sum(hydro_spillage_df[!, "Water_Reservoir"])
+
+    calculated_vf =
+        (hydro_vol_df[1, "Water_Reservoir"]) +
+        ((total_inflow - total_outflow - total_spillage) * 3600 * 1e-9)
+
+    @test abs(calculated_vf - hydro_vol_df[end, "Water_Reservoir"]) <= 1e-4
+    
+    psi_checksolve_test(
+            model,
+            [MOI.OPTIMAL, MOI.ALMOST_OPTIMAL, MOI.LOCALLY_SOLVED],
+            158187.86,
+            1000,
+        )
+end
