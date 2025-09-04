@@ -608,11 +608,11 @@ end
         ((total_inflow - total_outflow - total_spillage) * 3600 * 1e-9)
 
     @test abs(calculated_vf - hydro_vol_df[end, "Water_Reservoir"]) <= 1e-4
-    
+
     psi_checksolve_test(
-            model,
-            [MOI.OPTIMAL, MOI.ALMOST_OPTIMAL, MOI.LOCALLY_SOLVED],
-            158187.86,
-            1000,
-        )
+        model,
+        [MOI.OPTIMAL, MOI.ALMOST_OPTIMAL, MOI.LOCALLY_SOLVED],
+        158187.86,
+        1000,
+    )
 end
