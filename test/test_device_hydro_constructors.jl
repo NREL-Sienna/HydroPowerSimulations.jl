@@ -563,6 +563,8 @@ end
     output_dir = mktempdir(; cleanup = true)
 
     c_sys5_hy = PSB.build_system(PSITestSystems, "c_sys5_hy_turbine_head")
+    reservoir = only(get_components(HydroReservoir, c_sys5_hy))
+    hydro_inflow_ts = get_time_series_array(Deterministic, reservoir, "inflow")
 
     template = ProblemTemplate()
     set_device_model!(template, HydroTurbine, HydroTurbineBilinearDispatch)
@@ -573,7 +575,7 @@ end
 
     model = DecisionModel(
         template,
-        sys;
+        c_sys5_hy;
         optimizer = Ipopt_optimizer,
         store_variable_names = true,
     )
