@@ -11,7 +11,7 @@
     template = ProblemTemplate(CopperPlatePowerModel)
     set_device_model!(template, ThermalStandard, ThermalBasicUnitCommitment)
     set_device_model!(template, PowerLoad, StaticPowerLoad)
-    set_device_model!(template, HydroEnergyReservoir, HydroDispatchReservoirBudget)
+    set_device_model!(template, HydroEnergyReservoir, HydroDispatchRunOfRiver)
 
     template_uc = ProblemTemplate(CopperPlatePowerModel)
     set_device_model!(template_uc, ThermalStandard, ThermalBasicUnitCommitment)
@@ -89,7 +89,7 @@ function test_2_stage_decision_models_with_feedforwards(in_memory)
     template_uc = get_template_basic_uc_simulation()
     template_ed = get_template_nomin_ed_simulation()
     set_device_model!(template_ed, InterruptiblePowerLoad, StaticPowerLoad)
-    set_device_model!(template_ed, HydroEnergyReservoir, HydroDispatchReservoirBudget)
+    set_device_model!(template_ed, HydroEnergyReservoir, HydroDispatchRunOfRiver)
     set_network_model!(template_uc, PSI.NetworkModel(
         CopperPlatePowerModel,
         # MILP "duals" not supported with free solvers
