@@ -187,7 +187,7 @@ end
 @testset "Test Reserves from Hydro with RunOfRiver" begin
     template = ProblemTemplate(CopperPlatePowerModel)
     set_device_model!(template, PowerLoad, StaticPowerLoad)
-    set_device_model!(template, HydroEnergyReservoir, HydroDispatchRunOfRiver)
+    # set_device_model!(template, HydroEnergyReservoir, HydroDispatchRunOfRiver)
     set_service_model!(
         template,
         ServiceModel(VariableReserve{ReserveUp}, RangeReserve, "Reserve5"),
@@ -552,7 +552,7 @@ end
     # @test solve!(model; optimizer = Ipopt_optimizer, output_dir = output_dir) ==
     #       IS.Simulation.RunStatus.SUCCESSFULLY_FINALIZED
 
-    # check the second step is equal to the first step + dispatch 
+    # check the second step is equal to the first step + dispatch
 end
 
 ################################################

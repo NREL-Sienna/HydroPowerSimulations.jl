@@ -185,7 +185,7 @@ end
 
 ########################### Parameter related set functions ################################
 PSI.get_multiplier_value(::EnergyBudgetTimeSeriesParameter, d::PSY.HydroGen, ::AbstractHydroFormulation) = PSY.get_max_active_power(d)
-PSI.get_multiplier_value(::EnergyBudgetTimeSeriesParameter, d::PSY.HydroEnergyReservoir, ::AbstractHydroFormulation) = PSY.get_storage_capacity(d)
+# PSI.get_multiplier_value(::EnergyBudgetTimeSeriesParameter, d::PSY.HydroEnergyReservoir, ::AbstractHydroFormulation) = PSY.get_storage_capacity(d)
 PSI.get_multiplier_value(::EnergyBudgetTimeSeriesParameter, d::PSY.HydroReservoir, ::HydroEnergyModelReservoir) = PSY.get_storage_level_limits(d).max / PSY.get_system_base_power(d)
 PSI.get_multiplier_value(::EnergyTargetTimeSeriesParameter, d::PSY.HydroGen, ::AbstractHydroFormulation) = PSY.get_storage_capacity(d)
 PSI.get_multiplier_value(::EnergyTargetTimeSeriesParameter, d::PSY.HydroReservoir, ::HydroEnergyModelReservoir) = PSY.get_level_targets(d) * PSY.get_storage_level_limits(d).max / PSY.get_system_base_power(d)
@@ -227,12 +227,12 @@ function PSI.initial_condition_default(
     ::InitialReservoirVolume,
     d::PSY.HydroReservoir,
     ::AbstractHydroFormulation)
-    
+
     if (PSY.get_level_data_type(d) == PSY.ReservoirDataType.USABLE_VOLUME) || (PSY.get_level_data_type(d) == PSY.ReservoirDataType.TOTAL_VOLUME)
         return PSY.get_initial_level(d) * PSY.get_storage_level_limits(d).max * M3_TO_KM3
     else
         return PSY.get_initial_level(d) * PSY.get_storage_level_limits(d).max * PSY.get_proportional_term(PSY.get_head_to_volume_factor(d)) * M3_TO_KM3
-    end 
+    end
 end
 PSI.initial_condition_variable(::InitialReservoirVolume, d::PSY.HydroReservoir, ::AbstractHydroFormulation) = HydroReservoirVolumeVariable()
 
@@ -265,6 +265,7 @@ PSI.variable_cost(cost::PSY.StorageCost, ::PSI.ActivePowerVariable, ::PSY.HydroG
 
 #! format: on
 
+#=
 # These methods are defined in PowerSimulations
 function PSI.get_initial_conditions_device_model(
     ::PSI.OperationModel,
@@ -272,6 +273,7 @@ function PSI.get_initial_conditions_device_model(
 ) where {T <: PSY.HydroEnergyReservoir}
     return model
 end
+=#
 
 # These methods are defined in PowerSimulations
 function PSI.get_initial_conditions_device_model(
@@ -697,6 +699,7 @@ end
 
 ######################## Energy balance constraints ############################
 
+#=
 """
 This function defines the constraints for the water level (or state of charge)
 for the [`PowerSystems.HydroEnergyReservoir`](@extref).
@@ -755,6 +758,7 @@ function PSI.add_constraints!(
     end
     return
 end
+=#
 
 """
 This function defines the constraints for the energy level for the
@@ -2196,7 +2200,7 @@ function PSI.add_constraints!(
 end
 
 """
-This function defines the constraints for the energy level 
+This function defines the constraints for the energy level
 for the [`PowerSystems.HydroPumpTurbine`](@extref).
 """
 function PSI.add_constraints!(
@@ -2317,7 +2321,7 @@ function PSI.add_constraints!(
 end
 
 """
-This function defines the constraints for the energy level 
+This function defines the constraints for the energy level
 for the [`PowerSystems.HydroPumpTurbine`](@extref).
 """
 function PSI.add_constraints!(

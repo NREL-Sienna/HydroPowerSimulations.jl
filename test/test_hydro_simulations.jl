@@ -11,17 +11,17 @@
     template = ProblemTemplate(CopperPlatePowerModel)
     set_device_model!(template, ThermalStandard, ThermalBasicUnitCommitment)
     set_device_model!(template, PowerLoad, StaticPowerLoad)
-    set_device_model!(template, HydroEnergyReservoir, HydroDispatchRunOfRiver)
+    #set_device_model!(template, HydroEnergyReservoir, HydroDispatchRunOfRiver)
 
     template_uc = ProblemTemplate(CopperPlatePowerModel)
     set_device_model!(template_uc, ThermalStandard, ThermalBasicUnitCommitment)
     set_device_model!(template_uc, PowerLoad, StaticPowerLoad)
-    set_device_model!(template_uc, HydroEnergyReservoir, HydroDispatchRunOfRiver)
+    #set_device_model!(template_uc, HydroEnergyReservoir, HydroDispatchRunOfRiver)
 
     template_ed = ProblemTemplate(CopperPlatePowerModel)
     set_device_model!(template_ed, ThermalStandard, ThermalBasicUnitCommitment)
     set_device_model!(template_ed, PowerLoad, StaticPowerLoad)
-    set_device_model!(template_ed, HydroEnergyReservoir, HydroDispatchRunOfRiver)
+    #set_device_model!(template_ed, HydroEnergyReservoir, HydroDispatchRunOfRiver)
 
     models = SimulationModels([
         DecisionModel(
