@@ -35,6 +35,19 @@ function PSI.build_impl!(decision_model::PSI.DecisionModel{MediumTermHydroPlanni
         renewable_formulation(),
     )
 
+    # HydroDispatch
+    hydros = PSY.get_components(get_available, PSY.HydroDispatch, sys)
+    hydro_model = PSI.get_model(PSI.get_template(decision_model), PSY.HydroDispatch)
+    if !isnothing(hydro_model)
+        hydro_formulation = PSI.get_formulation(hydro_model)
+        PSI.add_variables!(
+            container,
+            PSI.ActivePowerVariable,
+            hydros,
+            hydro_formulation(),
+        )
+    end
+
     # Turbines
     turbines = PSY.get_components(get_available, PSY.HydroTurbine, sys)
     turbine_model = PSI.get_model(PSI.get_template(decision_model), PSY.HydroTurbine)
@@ -42,7 +55,7 @@ function PSI.build_impl!(decision_model::PSI.DecisionModel{MediumTermHydroPlanni
     PSI.add_variables!(container, PSI.ActivePowerVariable, turbines, turbine_formulation())
 
     # Reservoirs
-    reservoirs = PSY.get_components(get_available, PSY.HydroReservoir, sys)
+    reservoirs = get_available_reservoirs(sys)
     reservoir_model = PSI.get_model(PSI.get_template(decision_model), PSY.HydroReservoir)
     reservoir_formulation = PSI.get_formulation(reservoir_model)
     PSI.add_variables!(
@@ -89,6 +102,14 @@ function PSI.build_impl!(decision_model::PSI.DecisionModel{MediumTermHydroPlanni
         renewables,
         renewable_model,
     )
+    if !isnothing(hydro_model)
+        PSI.add_parameters!(
+            container,
+            PSI.ActivePowerTimeSeriesParameter,
+            hydros,
+            hydro_model,
+        )
+    end
 
     # Reservoirs
     PSI.add_parameters!(container, InflowTimeSeriesParameter, reservoirs, reservoir_model)
@@ -154,6 +175,18 @@ function PSI.build_impl!(decision_model::PSI.DecisionModel{MediumTermHydroPlanni
         network_model,
         hourly_resolution,
     )
+    # HydroDispatch
+    if !isnothing(hydro_model)
+        add_to_balance_expression!(
+            container,
+            EnergyBalanceExpression,
+            PSI.ActivePowerVariable,
+            hydros,
+            hydro_model,
+            network_model,
+            hourly_resolution,
+        )
+    end
     # Hydro
     add_to_balance_expression!(
         container,
@@ -172,6 +205,23 @@ function PSI.build_impl!(decision_model::PSI.DecisionModel{MediumTermHydroPlanni
         loads,
         load_model,
         network_model,
+    )
+    # Slacks
+    add_slack_to_balance_expression!(
+        container,
+        PSY.System,
+        hourly_resolution,
+    )
+
+    ###############################
+    ##### Initial Conditions ######
+    ###############################
+
+    PSI.add_initial_condition!(
+        container,
+        reservoirs,
+        reservoir_formulation(),
+        InitialReservoirVolume(),
     )
 
     ###############################
@@ -195,6 +245,17 @@ function PSI.build_impl!(decision_model::PSI.DecisionModel{MediumTermHydroPlanni
         renewable_model,
         network_model,
     )
+    # HydroDispatch Limits
+    if !isnothing(hydro_model)
+        PSI.add_constraints!(
+            container,
+            PSI.ActivePowerVariableLimitsConstraint,
+            PSI.ActivePowerVariable,
+            hydros,
+            hydro_model,
+            network_model,
+        )
+    end
 
     # Reservoir Constraints
     PSI.add_constraints!(
@@ -212,7 +273,6 @@ function PSI.build_impl!(decision_model::PSI.DecisionModel{MediumTermHydroPlanni
         reservoirs,
         reservoir_model,
         network_model,
-        hourly_resolution,
     )
 
     PSI.add_constraints!(
@@ -268,6 +328,37 @@ function PSI.build_impl!(decision_model::PSI.DecisionModel{MediumTermHydroPlanni
             PSI.get_variable(container, PSI.ActivePowerVariable(), PSY.ThermalStandard)
         for t in time_steps
             lin_cost = prop_term * variable[name, t] * Dates.Hour(resolution).value
+            PSI.add_to_objective_invariant_expression!(container, lin_cost)
+        end
+    end
+    # Add slack cost
+    variable_up = PSI.get_variable(
+        container,
+        PSI.SystemBalanceSlackUp(),
+        PSI._system_expression_type(PSI.CopperPlatePowerModel),
+    )
+    variable_dn = PSI.get_variable(
+        container,
+        PSI.SystemBalanceSlackDown(),
+        PSI._system_expression_type(PSI.CopperPlatePowerModel),
+    )
+    ref_bus = only(ref_num)
+    for t in time_steps
+        lin_cost_up =
+            PSI.BALANCE_SLACK_COST * variable_up[ref_bus, t] * Dates.Hour(resolution).value
+        lin_cost_dn =
+            PSI.BALANCE_SLACK_COST * variable_dn[ref_bus, t] * Dates.Hour(resolution).value
+        PSI.add_to_objective_invariant_expression!(container, lin_cost_up)
+        PSI.add_to_objective_invariant_expression!(container, lin_cost_dn)
+    end
+    # Add water spillage cost
+    for hy in reservoirs
+        name = PSY.get_name(hy)
+        variable =
+            PSI.get_variable(container, WaterSpillageVariable(), PSY.HydroReservoir)
+        for t in time_steps
+            lin_cost =
+                PSI.BALANCE_SLACK_COST * variable[name, t] * Dates.Hour(resolution).value
             PSI.add_to_objective_invariant_expression!(container, lin_cost)
         end
     end

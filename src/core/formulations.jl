@@ -10,34 +10,14 @@ abstract type AbstractHydroReservoirFormulation <: AbstractHydroDispatchFormulat
 abstract type AbstractHydroUnitCommitment <: AbstractHydroFormulation end
 
 """
-Formulation type to add injection variables constrained by total energy production budget defined with a time series for [`PowerSystems.HydroGen`](@extref)
-"""
-struct HydroDispatchReservoirBudget <: AbstractHydroReservoirFormulation end
-
-"""
-Formulation type to constrain hydropower production with a representation of the energy storage capacity and water inflow time series of a reservoir for [`PowerSystems.HydroGen`](@extref)
-"""
-struct HydroDispatchReservoirStorage <: AbstractHydroReservoirFormulation end
-
-"""
-Formulation type to constrain energy production from pumped storage with a representation of the energy storage capacity of upper and lower reservoirs and water inflow time series of upper reservoir and outflow time series of lower reservoir for [`PowerSystems.HydroPumpedStorage`](@extref)
-"""
-struct HydroDispatchPumpedStorage <: AbstractHydroReservoirFormulation end
-
-"""
 Formulation type to add injection variables constrained by a maximum injection time series for [`PowerSystems.HydroGen`](@extref)
 """
 struct HydroDispatchRunOfRiver <: AbstractHydroDispatchFormulation end
 
 """
-Formulation type to add commitment and injection variables constrained by total energy production budget defined with a time series for [`PowerSystems.HydroGen`](@extref)
+Formulation type to add injection variables constrained by a maximum injection time series for [`PowerSystems.HydroGen`](@extref) and a budget
 """
-struct HydroCommitmentReservoirBudget <: AbstractHydroReservoirFormulation end
-
-"""
-Formulation type to constrain hydropower production with unit commitment variables and a representation of the energy storage capacity and water inflow time series of a reservoir for [`PowerSystems.HydroGen`](@extref)
-"""
-struct HydroCommitmentReservoirStorage <: AbstractHydroReservoirFormulation end
+struct HydroDispatchRunOfRiverBudget <: AbstractHydroDispatchFormulation end
 
 """
 Formulation type to constrain hydropower production with an energy block optimization representation of the energy storage capacity and water inflow time series of a reservoir for [`PowerSystems.HydroGen`](@extref)
@@ -50,16 +30,31 @@ Formulation type to add commitment and injection variables constrained by a maxi
 struct HydroCommitmentRunOfRiver <: AbstractHydroUnitCommitment end
 
 """
-Formulation type to add commitment and injection variables constrained by a maximum injection time series for [`PowerSystems.HydroGen`](@extref)
+Formulation type to add reservoir methods with hydro turbines using water flow variables for [`PowerSystems.HydroGen`](@extref)
 """
-struct HydroReservoirRunOfRiver <: AbstractHydroUnitCommitment end
+struct HydroWaterModelReservoir <: AbstractHydroReservoirFormulation end
 
 """
-Formulation type to add reservoir methods with hydro turbines for [`PowerSystems.HydroGen`](@extref)
+Formulation type to add reservoir methods with hydro turbines using only energy inflow/outflow variables (no water flow variables) for [`PowerSystems.HydroGen`](@extref)
 """
-struct HydroLongTermReservoir <: AbstractHydroReservoirFormulation end
+struct HydroEnergyModelReservoir <: AbstractHydroReservoirFormulation end
 
 """
-Formulation type to add injection variables for a HydroTurbine connected to reservoirs using a bilinear model [`PowerSystems.HydroGen`](@extref)
+Formulation type to add injection variables for a HydroTurbine connected to reservoirs using a bilinear model (with water flow variables) [`PowerSystems.HydroGen`](@extref)
 """
 struct HydroTurbineBilinearDispatch <: AbstractHydroDispatchFormulation end
+
+"""
+Formulation type to add injection variables for a [`PowerSystems.HydroTurbine`](@extref) only using energy variables (no water flow variables)
+"""
+struct HydroTurbineEnergyDispatch <: AbstractHydroDispatchFormulation end
+
+"""
+Formulation type to add injection variables for a [`PowerSystems.HydroTurbine`](@extref) only using energy variables (no water flow variables) and commitment variables
+"""
+struct HydroTurbineEnergyCommitment <: AbstractHydroUnitCommitment end
+
+"""
+Formulation type to add injection variables for a HydroPumpTurbine only using energy variables (no water flow variables) [`PowerSystems.HydroGen`](@extref)
+"""
+struct HydroPumpEnergyDispatch <: AbstractHydroDispatchFormulation end

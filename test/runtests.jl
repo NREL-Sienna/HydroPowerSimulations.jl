@@ -33,6 +33,7 @@ const PSB = PowerSystemCaseBuilder
 const IS = InfrastructureSystems
 const PM = PSI.PM
 const PNM = PowerNetworkMatrices
+const HPS = HydroPowerSimulations
 
 # Test Utils
 using JuMP
@@ -121,8 +122,6 @@ function run_tests()
         )
     end
     console_logger = ConsoleLogger(config.console_stream, config.console_level)
-
-    include("data_utils/reservoir_sys.jl")
 
     IS.open_file_logger(config.filename, config.file_level) do file_logger
         levels = (Logging.Info, Logging.Warn, Logging.Error)

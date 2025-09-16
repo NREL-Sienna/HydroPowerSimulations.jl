@@ -14,26 +14,25 @@ module HydroPowerSimulations
 export MediumTermHydroPlanning
 
 ######## Hydro Formulations ########
-export HydroDispatchReservoirBudget
-export HydroDispatchReservoirStorage
-export HydroCommitmentReservoirBudget
-export HydroCommitmentReservoirStorage
-export HydroDispatchPumpedStorage
 export HydroDispatchRunOfRiver
+export HydroDispatchRunOfRiverBudget
 export HydroCommitmentRunOfRiver
 export HydroEnergyBlockOptimization
-export HydroLongTermReservoir
+export HydroWaterModelReservoir
 export HydroTurbineBilinearDispatch
+export HydroEnergyModelReservoir
+export HydroTurbineEnergyDispatch
+export HydroTurbineEnergyCommitment
+export HydroPumpEnergyDispatch
 
 ######## Hydro Variables ########
-export HydroEnergyVariableUp
-export HydroEnergyVariableDown
 export WaterSpillageVariable
 export HydroEnergyShortageVariable
 export HydroEnergySurplusVariable
 export HydroReservoirHeadVariable
 export HydroReservoirVolumeVariable
 export HydroTurbineFlowRateVariable
+export ActivePowerPumpVariable
 
 ######## Hydro Aux Variables ########
 export HydroEnergyOutput
@@ -46,30 +45,29 @@ export OutflowTimeSeriesParameter
 export ReservoirTargetParameter
 export ReservoirLimitParameter
 export HydroUsageLimitParameter
+export WaterLevelBudgetParameter
 
 ######## Hydro Initial Conditions #######
-export InitialHydroEnergyLevelUp
-export InitialHydroEnergyLevelDown
+export InitialReservoirVolume
 
 ######## Hydro Constraints #######
 export EnergyTargetConstraint
-export EnergyCapacityDownConstraint
-export EnergyCapacityUpConstraint
+export ActivePowerPumpReservationConstraint
+export ActivePowerPumpVariableLimitsConstraint
+export EnergyCapacityTimeSeriesLimitsConstraint
 export EnergyBudgetConstraint
 export ReservoirLevelLimitConstraint
 export ReservoirLevelTargetConstraint
 export TurbinePowerOutputConstraint
 export ReservoirHeadToVolumeConstraint
 export ReservoirInventoryConstraint
+export FeedForwardWaterLevelBudgetConstraint
 
 ######## Hydro feedforwards #######
 export ReservoirTargetFeedforward
 export ReservoirLimitFeedforward
 export HydroUsageLimitFeedforward
-
-######## Hydro Expressions #######
-export ReserveRangeExpressionLB
-export ReserveRangeExpressionUB
+export WaterLevelBudgetFeedforward
 
 #################################################################################
 # Imports
@@ -109,5 +107,8 @@ include("hydro_generation.jl")
 include("hydrogeneration_constructor.jl")
 include("hydro_decision_model.jl")
 include("feedforwards.jl")
+
+# Utils
+include("utils.jl")
 
 end # module
