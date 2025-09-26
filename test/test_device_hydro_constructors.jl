@@ -185,6 +185,7 @@ end
 end
 
 @testset "Test Reserves from Hydro with RunOfRiver" begin
+    # this errors at the following line, saying "contributing devices for service Reserve5 is empty"
     template = ProblemTemplate(CopperPlatePowerModel)
     set_device_model!(template, PowerLoad, StaticPowerLoad)
     # set_device_model!(template, HydroEnergyReservoir, HydroDispatchRunOfRiver)
