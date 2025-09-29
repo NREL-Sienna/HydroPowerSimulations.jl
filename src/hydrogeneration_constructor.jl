@@ -16,6 +16,7 @@ function PSI.construct_device!(
 
     PSI.add_parameters!(container, PSI.ActivePowerTimeSeriesParameter, devices, model)
     PSI.add_parameters!(container, PSI.ReactivePowerTimeSeriesParameter, devices, model)
+    PSI.process_market_bid_parameters!(container, devices, model)
 
     # Expression
     PSI.add_to_expression!(
@@ -59,6 +60,7 @@ function PSI.construct_device!(
     devices = PSI.get_available_components(model, sys)
 
     PSI.add_parameters!(container, PSI.ActivePowerTimeSeriesParameter, devices, model)
+    PSI.process_market_bid_parameters!(container, devices, model)
 
     # Expression
     PSI.add_to_expression!(
@@ -113,6 +115,7 @@ function PSI.construct_device!(
     )
 
     PSI.add_parameters!(container, PSI.ActivePowerTimeSeriesParameter, devices, model)
+    PSI.process_market_bid_parameters!(container, devices, model)
 
     PSI.add_expressions!(container, PSI.ProductionCostExpression, devices, model)
 
@@ -236,6 +239,7 @@ function PSI.construct_device!(
     )
 
     PSI.add_parameters!(container, PSI.ActivePowerTimeSeriesParameter, devices, model)
+    PSI.process_market_bid_parameters!(container, devices, model)
 
     PSI.add_to_expression!(
         container,
@@ -363,6 +367,8 @@ function PSI.construct_device!(
 
     PSI.add_parameters!(container, PSI.ActivePowerTimeSeriesParameter, devices, model)
     PSI.add_parameters!(container, EnergyBudgetTimeSeriesParameter, devices, model)
+    PSI.process_market_bid_parameters!(container, devices, model)
+
     PSI.add_to_expression!(
         container,
         PSI.ActivePowerRangeExpressionLB,
@@ -486,6 +492,8 @@ function PSI.construct_device!(
 
     PSI.add_parameters!(container, PSI.ActivePowerTimeSeriesParameter, devices, model)
     PSI.add_parameters!(container, EnergyBudgetTimeSeriesParameter, devices, model)
+    PSI.process_market_bid_parameters!(container, devices, model)
+
     PSI.add_to_expression!(
         container,
         PSI.ActivePowerRangeExpressionLB,
@@ -737,6 +745,7 @@ function PSI.construct_device!(
         HydroDispatchReservoirBudget(),
     )
     PSI.add_parameters!(container, EnergyBudgetTimeSeriesParameter, devices, model)
+    PSI.process_market_bid_parameters!(container, devices, model)
 
     PSI.add_expressions!(container, PSI.ProductionCostExpression, devices, model)
     if PSI.has_service_model(model)
@@ -885,6 +894,7 @@ function PSI.construct_device!(
     )
     PSI.add_parameters!(container, EnergyTargetTimeSeriesParameter, devices, model)
     PSI.add_parameters!(container, InflowTimeSeriesParameter, devices, model)
+    PSI.process_market_bid_parameters!(container, devices, model)
 
     PSI.add_expressions!(container, PSI.ProductionCostExpression, devices, model)
     if PSI.has_service_model(model)
@@ -1065,6 +1075,7 @@ function PSI.construct_device!(
 
     PSI.add_parameters!(container, EnergyTargetTimeSeriesParameter, devices, model)
     PSI.add_parameters!(container, InflowTimeSeriesParameter, devices, model)
+    PSI.process_market_bid_parameters!(container, devices, model)
 
     PSI.add_expressions!(container, PSI.ProductionCostExpression, devices, model)
     if PSI.has_service_model(model)
@@ -1196,6 +1207,7 @@ function PSI.construct_device!(
     )
 
     PSI.add_parameters!(container, EnergyBudgetTimeSeriesParameter, devices, model)
+    PSI.process_market_bid_parameters!(container, devices, model)
 
     PSI.add_expressions!(container, PSI.ProductionCostExpression, devices, model)
     if PSI.has_service_model(model)
@@ -1317,6 +1329,7 @@ function PSI.construct_device!(
     )
 
     PSI.add_parameters!(container, EnergyBudgetTimeSeriesParameter, devices, model)
+    PSI.process_market_bid_parameters!(container, devices, model)
 
     PSI.add_expressions!(container, PSI.ProductionCostExpression, devices, model)
     if PSI.has_service_model(model)
@@ -1483,6 +1496,7 @@ function PSI.construct_device!(
 
     PSI.add_parameters!(container, EnergyTargetTimeSeriesParameter, devices, model)
     PSI.add_parameters!(container, InflowTimeSeriesParameter, devices, model)
+    PSI.process_market_bid_parameters!(container, devices, model)
 
     PSI.add_expressions!(container, PSI.ProductionCostExpression, devices, model)
     if PSI.has_service_model(model)
@@ -1672,6 +1686,7 @@ function PSI.construct_device!(
     )
     PSI.add_parameters!(container, EnergyTargetTimeSeriesParameter, devices, model)
     PSI.add_parameters!(container, InflowTimeSeriesParameter, devices, model)
+    PSI.process_market_bid_parameters!(container, devices, model)
 
     PSI.add_expressions!(container, PSI.ProductionCostExpression, devices, model)
     if PSI.has_service_model(model)
@@ -1809,6 +1824,7 @@ function PSI.construct_device!(
     )
 
     PSI.add_parameters!(container, PSI.ActivePowerTimeSeriesParameter, devices, model)
+    PSI.process_market_bid_parameters!(container, devices, model)
 
     PSI.add_expressions!(container, PSI.ProductionCostExpression, devices, model)
     if PSI.has_service_model(model)
@@ -1866,6 +1882,7 @@ function PSI.construct_device!(
     )
 
     PSI.add_parameters!(container, PSI.ActivePowerTimeSeriesParameter, devices, model)
+    PSI.process_market_bid_parameters!(container, devices, model)
 
     PSI.add_expressions!(container, PSI.ProductionCostExpression, devices, model)
     if PSI.has_service_model(model)
@@ -1944,6 +1961,7 @@ function PSI.construct_device!(
 
     PSI.add_feedforward_constraints!(container, model, devices)
 
+    # this is erroring when there's a market bid cost.
     PSI.objective_function!(container, devices, model, S)
 
     PSI.add_constraint_dual!(container, sys, model)
@@ -2083,6 +2101,7 @@ function PSI.construct_device!(
     D <: HydroTurbineEnergyDispatch,
     S <: PM.AbstractPowerModel,
 }
+    # why is there no add_parameters here?
     devices = PSI.get_available_components(model, sys)
 
     PSI.add_variables!(container, PSI.ActivePowerVariable, devices, D())
@@ -3076,6 +3095,7 @@ function PSI.construct_device!(
     if haskey(PSI.get_time_series_names(model), EnergyCapacityTimeSeriesParameter)
         PSI.add_parameters!(container, EnergyCapacityTimeSeriesParameter, devices, model)
     end
+    PSI.process_market_bid_parameters!(container, devices, model)
 
     PSI.add_feedforward_arguments!(container, model, devices)
     return
@@ -3148,6 +3168,7 @@ function PSI.construct_device!(
     if haskey(PSI.get_time_series_names(model), EnergyCapacityTimeSeriesParameter)
         PSI.add_parameters!(container, EnergyCapacityTimeSeriesParameter, devices, model)
     end
+    PSI.process_market_bid_parameters!(container, devices, model)
 
     PSI.add_feedforward_arguments!(container, model, devices)
     return

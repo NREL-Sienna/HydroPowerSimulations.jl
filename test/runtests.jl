@@ -11,6 +11,7 @@ using Dates
 using InfrastructureSystems
 using Test
 using Logging
+import OrderedCollections: OrderedDict
 
 import Aqua
 Aqua.test_unbound_args(HydroPowerSimulations)
