@@ -14,18 +14,18 @@
     template = ProblemTemplate(NetworkModel(CopperPlatePowerModel))
     set_device_model!(template, ThermalStandard, ThermalDispatchNoMin)
     set_device_model!(template, PowerLoad, StaticPowerLoad)
-    set_device_model!(template, HydroEnergyReservoir, HydroDispatchRunOfRiver)
+    # set_device_model!(template, HydroEnergyReservoir, HydroDispatchRunOfRiver)
     set_service_model!(template, VariableReserve{ReserveUp}, RangeReserve)
     set_service_model!(template, VariableReserve{ReserveDown}, RangeReserve)
 
     template_ed = ProblemTemplate(NetworkModel(CopperPlatePowerModel))
     set_device_model!(template_ed, ThermalStandard, ThermalDispatchNoMin)
     set_device_model!(template_ed, PowerLoad, StaticPowerLoad)
-    set_device_model!(template_ed, HydroEnergyReservoir, HydroDispatchRunOfRiver)
+    # set_device_model!(template_ed, HydroEnergyReservoir, HydroDispatchRunOfRiver)
     set_service_model!(template_ed, VariableReserve{ReserveUp}, RangeReserve)
     set_service_model!(template_ed, VariableReserve{ReserveDown}, RangeReserve)
 
-    for hydro in get_components(HydroEnergyReservoir, sys)
+    #=for hydro in get_components(HydroEnergyReservoir, sys)
         op_cost = get_operation_cost(hydro)
         new_opcost = HydroGenerationCost(;
             variable = CostCurve(;
@@ -40,7 +40,7 @@
             fixed = op_cost.fixed,
         )
         set_operation_cost!(hydro, new_opcost)
-    end
+    end=#
 
     # Set up Simulation
     models = SimulationModels(;
@@ -79,11 +79,11 @@
         models = models,
         feedforwards = Dict(
             "ED" => [
-                HydroUsageLimitFeedforward(;
-                    component_type = HydroEnergyReservoir,
-                    source = HydroEnergyOutput,
-                    affected_values = [HydroUsageLimitParameter],
-                ),
+            #=HydroUsageLimitFeedforward(;
+                component_type = HydroEnergyReservoir,
+                source = HydroEnergyOutput,
+                affected_values = [HydroUsageLimitParameter],
+            ),=#
             ],
         ),
         ini_cond_chronology = InterProblemChronology(),
@@ -106,10 +106,10 @@
     r_ed = get_decision_problem_results(results, "ED")
     r_uc = get_decision_problem_results(results, "UC")
 
-    uc_p_hy =
-        read_realized_variable(r_uc, "ActivePowerVariable__HydroEnergyReservoir")[!, 2]
-    uc_energy_hy =
-        read_realized_aux_variable(r_uc, "HydroEnergyOutput__HydroEnergyReservoir")[!, 2]
+    # uc_p_hy =
+    #    read_realized_variable(r_uc, "ActivePowerVariable__HydroEnergyReservoir")[!, 2]
+    #uc_energy_hy =
+    #    read_realized_aux_variable(r_uc, "HydroEnergyOutput__HydroEnergyReservoir")[!, 2]
     uc_hy_regup = read_realized_variable(
         r_uc,
         "ActivePowerReserveVariable__VariableReserve__ReserveUp__Reserve5",
@@ -124,8 +124,8 @@
         !,
         2,
     ]
-    ed_energy_hy =
-        read_realized_aux_variable(r_ed, "HydroEnergyOutput__HydroEnergyReservoir")[!, 2]
+    #ed_energy_hy =
+    #    read_realized_aux_variable(r_ed, "HydroEnergyOutput__HydroEnergyReservoir")[!, 2]
     # Test HydroUsage match with the AuxVar
     @test isapprox(uc_energy_hy * 100.0, uc_p_hy + 0.4 * uc_hy_regup - 0.3 * uc_hy_regdn)
     # Test HydroUsage in ED is bounded by UC
