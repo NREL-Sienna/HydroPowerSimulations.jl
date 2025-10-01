@@ -1892,9 +1892,6 @@ function PSI.objective_function!(
     ::Type{<:PM.AbstractPowerModel},
 ) where {T <: PSY.HydroGen, U <: AbstractHydroUnitCommitment}
     PSI.add_variable_cost!(container, PSI.ActivePowerVariable(), devices, U())
-    # this is erroring if there's a market bid cost.
-    # need to write define proportional_cost of MBC for hydros, similar to line 100
-    # of thermal_generation.jl in PSI.
     PSI.add_proportional_cost!(container, PSI.OnVariable(), devices, U())
     return
 end
@@ -1973,6 +1970,15 @@ PSI.is_time_variant_term(
     PSI.is_time_variant(PSY.get_incremental_initial_input(cost))
 
 # end copy-paste
+
+PSI._include_min_gen_power_in_constraint(
+    ::PSY.EnergyReservoirStorage,
+    ::PSI.ActivePowerInVariable,
+) = false
+PSI._include_min_gen_power_in_constraint(
+    ::PSY.EnergyReservoirStorage,
+    ::PSI.ActivePowerOutVariable,
+) = false
 
 function PSI.objective_function!(
     container::PSI.OptimizationContainer,
