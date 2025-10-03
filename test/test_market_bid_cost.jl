@@ -4,6 +4,14 @@ const TIME1 = DateTime("2024-01-01T00:00:00")
 const SEL_INCR = make_selector(ThermalStandard, "Test Unit1")
 const SEL_DECR = make_selector(InterruptiblePowerLoad, "IloadBus4")
 const SEL_MULTISTART = make_selector(ThermalMultiStart, "115_STEAM_1")
+const DEFAULT_DEVICE_TO_MODEL =
+    Dict{Type{<:PSY.Device}, Type{<:PSI.AbstractDeviceFormulation}}(
+        ThermalStandard => ThermalBasicUnitCommitment,
+        ThermalMultiStart => ThermalMultiStartUnitCommitment,
+        PowerLoad => StaticPowerLoad,
+        RenewableDispatch => RenewableFullDispatch,
+        HydroDispatch => HydroCommitmentRunOfRiver,
+    )
 
 function transfer_mbc_time_series!(
     new_comp::PSY.Device,
@@ -74,14 +82,25 @@ function _make_deterministic_ts(
 )
     series1 = [ini_val .+ i * res_incr for i in 0:(horizon - 1)]
     series2 = [ini_val .+ i * res_incr .+ interval_incr for i in 1:horizon]
-    startup_data = OrderedDict(
-        TIME1 => series1,
-        TIME1 + interval => series2,
-    )
+    if interval == zero(DateTime)
+        startup_data = OrderedDict(
+            TIME1 => series1,
+        )
+    else
+        startup_data = OrderedDict(
+            TIME1 => series1,
+            TIME1 + interval => series2,
+        )
+    end
     return Deterministic(; name = name, data = startup_data, resolution = Hour(1))
 end
 
-"Each of `incrs_x`, `incrs_y` is a 3-tuple consisting of a tranche increment plus the same `res_incr` and `interval_incr` as above"
+"""
+Each of `incrs_x`, `incrs_y` is a 3-tuple consisting of a tranche increment plus the same `res_incr` and `interval_incr` as above.
+`tranche_incr`: increment between tranche breakpoints.
+`res_incr`: increment within the forecast horizon window.
+`interval_incr`: increment in baseline, between horizon windows.
+"""
 function _make_deterministic_ts(
     name,
     ini_val::PiecewiseStepData,
@@ -107,92 +126,17 @@ function _make_deterministic_ts(
     ys1 = [ys1 .+ i * res_incr_y for i in 0:(horizon - 1)]
     ys2 = [ys2 .+ i * res_incr_y .+ interval_incr_y for i in 1:horizon]
 
-    if !isnothing(override_min_x)
-        for sub_x in xs1
-            sub_x[1] = override_min_x
-        end
-        for sub_x in xs2
-            sub_x[1] = override_min_x
-        end
-    end
-
-    if create_extra_tranches
-        # Split the first tranche of the first timestep (xs1, ys1) into two; split the last tranche of the last timestep of (xs2, ys2) into three
-        xs1[1] = [xs1[1][1], (xs1[1][1] + xs1[1][2]) / 2, xs1[1][2:end]...]
-        ys1[1] = [ys1[1][1], ys1[1][1], ys1[1][2:end]...]
-
-        xs2[end] = [
-            xs2[end][1:(end - 1)]...,
-            (2 * xs2[end][end - 1] + xs2[end][end]) / 3,
-            (xs2[end][end - 1] + 2 * xs2[end][end]) / 3,
-            xs2[end][end],
-        ]
-        ys2[end] = [ys2[end][1:(end - 1)]..., ys2[end][end], ys2[end][end], ys2[end][end]]
-    end
-
-    startup_data = OrderedDict(
-        TIME1 => PiecewiseStepData.(xs1, ys1),
-        TIME1 + interval => PiecewiseStepData.(xs2, ys2),
-    )
-    return Deterministic(; name = name, data = startup_data, resolution = Hour(1))
-end
-
-"""
-Add startup and shutdown time series to a certain component. `with_increments`: whether the
-elements should be increasing over time or constant. Version A: designed for
-`c_fixed_market_bid_cost`.
-"""
-function add_startup_shutdown_ts_a!(sys::System, with_increments::Bool)
-    res_incr = with_increments ? 0.05 : 0.0
-    interval_incr = with_increments ? 0.01 : 0.0
-    unit1 = get_component(ThermalStandard, sys, "Test Unit1")
-    @assert get_operation_cost(unit1) isa MarketBidCost
-    startup_ts_1 = _make_deterministic_ts(
-        "start_up",
-        (1.0, 1.5, 2.0),
-        res_incr,
-        interval_incr,
-        5,
-        Hour(1),
-    )
-    set_start_up!(sys, unit1, startup_ts_1)
-    shutdown_ts_1 =
-        _make_deterministic_ts("shut_down", 0.5, res_incr, interval_incr, 5, Hour(1))
-    set_shut_down!(sys, unit1, shutdown_ts_1)
-    return startup_ts_1, shutdown_ts_1
-end
-
-"""
-Add startup and shutdown time series to a certain component. `with_increments`: whether the
-elements should be increasing over time or constant. Version B: designed for `c_sys5_pglib`.
-"""
-function add_startup_shutdown_ts_b!(sys::System, with_increments::Bool)
-    res_incr = with_increments ? 0.05 : 0.0
-    interval_incr = with_increments ? 0.01 : 0.0
-    unit1 = get_component(ThermalMultiStart, sys, "115_STEAM_1")
-    base_startup = Tuple(get_start_up(get_operation_cost(unit1)))
-    base_shutdown = get_shut_down(get_operation_cost(unit1))
-    @assert get_operation_cost(unit1) isa MarketBidCost
-    startup_ts_1 = _make_deterministic_ts(
-        "start_up",
-        base_startup,
-        res_incr,
-        interval_incr,
-        24,
-        Day(1),
-    )
-    set_start_up!(sys, unit1, startup_ts_1)
-    shutdown_ts_1 =
-        _make_deterministic_ts(
-            "shut_down",
-            base_shutdown,
-            res_incr,
-            interval_incr,
-            24,
-            Day(1),
+    if interval == zero(DateTime)
+        startup_data = OrderedDict(
+            TIME1 => PiecewiseStepData.(xs1, ys1),
         )
-    set_shut_down!(sys, unit1, shutdown_ts_1)
-    return startup_ts_1, shutdown_ts_1
+    else
+        startup_data = OrderedDict(
+            TIME1 => PiecewiseStepData.(xs1, ys1),
+            TIME1 + interval => PiecewiseStepData.(xs2, ys2),
+        )
+    end
+    return Deterministic(; name = name, data = startup_data, resolution = Hour(1))
 end
 
 # Layer of indirection to upgrade problem results to look like simulation results
@@ -271,46 +215,15 @@ function build_sys_incr(
     variable_cost_names_vary = false,
 )
     sys = load_sys_incr()
-    @assert !isempty(get_components(active_components, sys)) "No components selected"
-    for comp in get_components(active_components, sys)
-        op_cost = get_operation_cost(comp)
-        cost_curve = get_incremental_offer_curves(op_cost)::CostCurve
-        baseline = get_value_curve(cost_curve)::PiecewiseIncrementalCurve
-        baseline_initial = get_initial_input(baseline)
-        baseline_pwl = get_function_data(baseline)
-        !isnothing(modify_baseline_pwl) &&
-            (baseline_pwl = modify_baseline_pwl(baseline_pwl))
-        min_power = with_units_base(sys, UnitSystem.NATURAL_UNITS) do
-            get_active_power_limits(comp).min
-        end
-
-        # primes for easier attribution
-        incr_initial = initial_varies ? (0.11, 0.05) : (0.0, 0.0)
-        incr_x = breakpoints_vary ? (0.02, 0.07, 0.03) : (0.0, 0.0, 0.0)
-        incr_y = slopes_vary ? (0.02, 0.07, 0.03) : (0.0, 0.0, 0.0)
-
-        name_modifier = "_$(replace(get_name(comp), " " => "_"))_"
-        my_initial_ts = _make_deterministic_ts(
-            "initial_input" * (initial_input_names_vary ? name_modifier : ""),
-            baseline_initial,
-            incr_initial...,
-            5,
-            Hour(1),
-        )
-        my_pwl_ts = _make_deterministic_ts(
-            "variable_cost" * (variable_cost_names_vary ? name_modifier : ""),
-            baseline_pwl,
-            incr_x,
-            incr_y,
-            5,
-            Hour(1);
-            override_min_x = do_override_min_x ? min_power : nothing,
-            create_extra_tranches = create_extra_tranches,
-        )
-
-        set_incremental_initial_input!(sys, comp, my_initial_ts)
-        set_variable_cost!(sys, comp, my_pwl_ts, get_power_units(cost_curve))
-    end
+    extend_mbc!(
+        sys,
+        active_components;
+        initial_varies = initial_varies,
+        breakpoints_vary = breakpoints_vary,
+        slopes_vary = slopes_vary,
+        initial_input_names_vary = initial_input_names_vary,
+        variable_cost_names_vary = variable_cost_names_vary,
+    )
     return sys
 end
 
@@ -323,22 +236,25 @@ _read_one_value(res, var_name, gentype, unit_name) =
         1,
     ]
 
-function build_generic_mbc_model(sys::System; multistart::Bool = false)
+function build_generic_mbc_model(sys::System;
+    multistart::Bool = false,
+    device_to_model::Dict{Type{<:PSY.Device}, Type{<:PSI.AbstractDeviceFormulation}} =
+    Dict{Type{<:PSY.Device}, Type{<:PSI.AbstractDeviceFormulation}}(),
+)
     template = ProblemTemplate(
         NetworkModel(
             CopperPlatePowerModel;
             duals = [CopperPlateBalanceConstraint],
         ),
     )
-    device_to_model = Dict{Type{<:PSY.Device}, Type{<:PSI.AbstractDeviceFormulation}}(
-        ThermalStandard => ThermalBasicUnitCommitment,
-        ThermalMultiStart => ThermalMultiStartUnitCommitment,
-        PowerLoad => StaticPowerLoad,
-        RenewableDispatch => RenewableFullDispatch,
-        HydroDispatch => HydroCommitmentRunOfRiver,
-    )
     for (device, model) in device_to_model
         if !isempty(get_components(device, sys))
+            set_device_model!(template, device, model)
+        end
+    end
+    for (device, model) in DEFAULT_DEVICE_TO_MODEL
+        if !haskey(device_to_model, device) &&
+           !isempty(get_components(device, sys))
             set_device_model!(template, device, model)
         end
     end
@@ -353,8 +269,16 @@ function build_generic_mbc_model(sys::System; multistart::Bool = false)
     return model
 end
 
-function run_generic_mbc_prob(sys::System; multistart::Bool = false, test_success = true)
-    model = build_generic_mbc_model(sys; multistart = multistart)
+function run_generic_mbc_prob(sys::System;
+    device_to_model = Dict{Type{<:PSY.Device}, Type{<:PSI.AbstractDeviceFormulation}}(),
+    multistart::Bool = false,
+    test_success = true,
+)
+    model = build_generic_mbc_model(
+        sys;
+        device_to_model = device_to_model,
+        multistart = multistart,
+    )
     build_result = build!(model; output_dir = test_path)
     test_success && @test build_result == PSI.ModelBuildStatus.BUILT
     solve_result = solve!(model)
@@ -363,8 +287,15 @@ function run_generic_mbc_prob(sys::System; multistart::Bool = false, test_succes
     return model, res
 end
 
-function run_generic_mbc_sim(sys::System; multistart::Bool = false)
-    model = build_generic_mbc_model(sys; multistart = multistart)
+function run_generic_mbc_sim(sys::System;
+    device_to_model = Dict{Type{<:PSY.Device}, Type{<:PSI.AbstractDeviceFormulation}}(),
+    multistart::Bool = false,
+)
+    model = build_generic_mbc_model(
+        sys;
+        device_to_model = device_to_model,
+        multistart = multistart,
+    )
     models = SimulationModels(;
         decision_models = [
             model,
@@ -628,29 +559,6 @@ function tweak_system!(sys::System, load_pow_mult, therm_pow_mult, therm_price_m
     end
 end
 
-function create_multistart_sys(with_increments::Bool, load_mult, therm_mult; add_ts = true)
-    @assert add_ts || !with_increments
-    c_sys5_pglib = load_and_fix_system(PSITestSystems, "c_sys5_pglib")
-    tweak_system!(c_sys5_pglib, load_mult, 1.0, therm_mult)
-    ms_comp = get_component(SEL_MULTISTART, c_sys5_pglib)
-    old_op = get_operation_cost(ms_comp)
-    old_ic = IncrementalCurve(get_value_curve(get_variable(old_op)))
-    new_ii = get_initial_input(old_ic) + get_fixed(old_op)
-    new_ic = IncrementalCurve(get_function_data(old_ic), new_ii, nothing)
-    set_operation_cost!(
-        ms_comp,
-        MarketBidCost(;
-            no_load_cost = nothing,
-            start_up = (hot = 300.0, warm = 450.0, cold = 500.0),
-            shut_down = 100.0,
-            incremental_offer_curves = CostCurve(new_ic),
-        ),
-    )
-
-    add_ts && add_startup_shutdown_ts_b!(c_sys5_pglib, with_increments)
-    return c_sys5_pglib
-end
-
 # See run_startup_shutdown_obj_fun_test for explanation
 function _obj_fun_test_helper(ground_truth_1, ground_truth_2, res1, res2)
     @assert all(keys(ground_truth_1) .== keys(ground_truth_2))
@@ -753,7 +661,7 @@ approx_geq_1(x; kwargs...) = (x >= 1.0) || isapprox(x, 1.0; kwargs...)
 
 # end copy-paste from PSI's test_market_bid_cost.jl
 
-function replace_with_hydro!(
+function replace_with_hydro_dispatch!(
     sys::PSY.System,
     unit1::PSY.Generator;
     magnitude::Float64 = 1.0,
@@ -803,18 +711,143 @@ function replace_with_hydro!(
     return hydro
 end
 
-@testset "MarketBidCost thermal" begin
-    sys_no_ts = load_sys_incr()
-    sys_constant_ts = build_sys_incr(false, false, false)
-    test_generic_mbc_equivalence(sys_no_ts, sys_constant_ts)
+function replace_with_hydro_turbine!(
+    sys::PSY.System,
+    unit1::PSY.Generator;
+    magnitude::Float64 = 1.0,
+    random_variation::Float64 = 0.1,
+)
+    hydro = PSY.HydroTurbine(;
+        name = "HT1",
+        available = true,
+        bus = get_bus(unit1),
+        active_power = get_active_power(unit1),
+        reactive_power = get_reactive_power(unit1),
+        rating = get_rating(unit1),
+        active_power_limits = get_active_power_limits(unit1),
+        reactive_power_limits = get_reactive_power_limits(unit1),
+        base_power = get_base_power(unit1),
+        operation_cost = get_operation_cost(unit1),
+        powerhouse_elevation = 100.0,
+    )
+    add_component!(sys, hydro)
+    transfer_mbc_time_series!(hydro, unit1, sys)
+    remove_component!(sys, unit1)
+
+    reservoir = PSY.HydroReservoir(;
+        name = "R1",
+        available = true,
+        storage_level_limits = (min = 0.0, max = 100.0),
+        initial_level = 50.0,
+        inflow = 5.0,
+    )
+    reservoirs = get_reservoirs(hydro)
+    push!(reservoirs, PSY.ReservoirRef("R1"))
+    # add a max_active_power time series to the component
+    load = first(PSY.get_components(PSY.PowerLoad, sys))
+    load_ts = get_time_series(Deterministic, load, "max_active_power")
+    num_windows = length(get_data(load_ts))
+    num_forecast_steps =
+        floor(Int, get_horizon(load_ts) / get_interval(load_ts))
+    total_steps = num_windows + num_forecast_steps - 1
+    dates = range(
+        get_initial_timestamp(load_ts);
+        step = get_interval(load_ts),
+        length = total_steps,
+    )
+    hydro_data = magnitude .* ones(total_steps) .+ random_variation .* rand(total_steps)
+    hydro_ts = SingleTimeSeries("max_active_power", TimeArray(dates, hydro_data))
+    add_time_series!(sys, hydro, hydro_ts)
+    transform_single_time_series!(
+        sys,
+        get_horizon(load_ts),
+        get_interval(load_ts),
+    )
+
+    # add a reservoir to the hydro turbine
+    res_capacity = 10.0 * magnitude
+    reservoir = PSY.Reservoir(;
+        name = "R1",
+        max_storage = res_capacity,
+        min_storage = 0.0,
+        initial_storage = 0.5 * res_capacity,
+        max_inflow = 2.0 * magnitude,
+    )
 end
 
-@testset "MarketBidCost incremental HydroDispatch, no time series versus constant time series" begin
+@testset "MBC HydroDispatch: no time series versus constant time series" begin
     sys_no_ts = load_sys_incr()
     sys_constant_ts = build_sys_incr(false, false, false)
     for sys in (sys_no_ts, sys_constant_ts)
         unit1 = get_component(SEL_INCR, sys)
-        replace_with_hydro!(sys, unit1; magnitude = 2.0, random_variation = 0.2)
+        replace_with_hydro_dispatch!(sys, unit1; magnitude = 2.0, random_variation = 0.2)
     end
     test_generic_mbc_equivalence(sys_no_ts, sys_constant_ts)
+end
+
+function copy_inflow_time_series!(sys)
+    for turb in get_components(HydroTurbine, sys)
+        res = only(turb.reservoirs)
+        name_map = Dict((PSY.get_name(turb), "inflow") => "inflow")
+        copy_time_series!(res, turb; name_mapping = name_map)
+    end
+end
+
+@testset "MBC HydroTurbine: no time series" begin
+    device_to_model = Dict{Type{<:PSY.Device}, Type{<:PSI.AbstractDeviceFormulation}}(
+        PSY.HydroTurbine => HydroTurbineEnergyCommitment,
+        PSY.HydroReservoir => HydroEnergyModelReservoir,
+    )
+    sys = build_system(PSITestSystems, "test_RTS_GMLC_sys")
+    # replace cost data at HydroTurbine with MarketBidCost
+    ht1 = first(get_components(PSY.HydroTurbine, sys))
+    incr_slopes = [0.3, 0.5, 0.7]
+    x_coords = [0.1, 0.3, 0.6, 1.0]
+    val_at_zero = 0.1
+    initial_input = 0.2
+    incr_curve = CostCurve(
+        PiecewiseIncrementalCurve(val_at_zero, initial_input, x_coords, incr_slopes),
+    )
+    set_operation_cost!(
+        ht1,
+        MarketBidCost(;
+            no_load_cost = 0.0,
+            start_up = (hot = 0.0, warm = 0.0, cold = 0.0),
+            shut_down = 0.0,
+            incremental_offer_curves = incr_curve,
+        ),
+    )
+    # RTS GMLC has the inflow time series attached to the HydroTurbine, but we need it on the reservoir.
+    copy_inflow_time_series!(sys)
+    # this takes about a minute, rather long for a test case.. is there a smaller system that works?
+    run_generic_mbc_prob(sys; device_to_model = device_to_model)
+end
+
+@testset "MBC HydroTurbine: no time series versus constant time series" begin
+    device_to_model = Dict{Type{<:PSY.Device}, Type{<:PSI.AbstractDeviceFormulation}}(
+        PSY.HydroTurbine => HydroTurbineEnergyCommitment,
+    )
+    # option 1: use this system, and figure out how to add time series for reservoir and hydro unit.
+    # option 2: use RTS GMLC system, and figure out how to add time-varying MarketBidCost to hydro unit.
+
+    sys = build_system(PSITestSystems, "test_RTS_GMLC_sys")
+    copy_inflow_time_series!(sys)
+    # easier to first attach a single MBC
+    ht1 = first(get_components(PSY.HydroTurbine, sys))
+    selector = make_selector(PSY.HydroTurbine, get_name(ht1))
+    add_mbc!(sys,
+        selector,
+    )
+    extend_mbc!(
+        sys,
+        selector;
+        initial_varies = false,
+        breakpoints_vary = false,
+        slopes_vary = false,
+        initial_input_names_vary = false,
+        variable_cost_names_vary = false,
+    )
+    # can't run simulation bc interval is 0: only 1 day of data.
+    # run_generic_mbc_sim(sys; device_to_model = device_to_model)
+    run_generic_mbc_prob(sys; device_to_model = device_to_model)
 end

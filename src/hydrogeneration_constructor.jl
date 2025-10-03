@@ -745,7 +745,6 @@ function PSI.construct_device!(
         HydroDispatchReservoirBudget(),
     )
     PSI.add_parameters!(container, EnergyBudgetTimeSeriesParameter, devices, model)
-    PSI.process_market_bid_parameters!(container, devices, model)
 
     PSI.add_expressions!(container, PSI.ProductionCostExpression, devices, model)
     if PSI.has_service_model(model)
@@ -894,7 +893,6 @@ function PSI.construct_device!(
     )
     PSI.add_parameters!(container, EnergyTargetTimeSeriesParameter, devices, model)
     PSI.add_parameters!(container, InflowTimeSeriesParameter, devices, model)
-    PSI.process_market_bid_parameters!(container, devices, model)
 
     PSI.add_expressions!(container, PSI.ProductionCostExpression, devices, model)
     if PSI.has_service_model(model)
@@ -1075,7 +1073,6 @@ function PSI.construct_device!(
 
     PSI.add_parameters!(container, EnergyTargetTimeSeriesParameter, devices, model)
     PSI.add_parameters!(container, InflowTimeSeriesParameter, devices, model)
-    PSI.process_market_bid_parameters!(container, devices, model)
 
     PSI.add_expressions!(container, PSI.ProductionCostExpression, devices, model)
     if PSI.has_service_model(model)
@@ -1207,7 +1204,6 @@ function PSI.construct_device!(
     )
 
     PSI.add_parameters!(container, EnergyBudgetTimeSeriesParameter, devices, model)
-    PSI.process_market_bid_parameters!(container, devices, model)
 
     PSI.add_expressions!(container, PSI.ProductionCostExpression, devices, model)
     if PSI.has_service_model(model)
@@ -1329,7 +1325,6 @@ function PSI.construct_device!(
     )
 
     PSI.add_parameters!(container, EnergyBudgetTimeSeriesParameter, devices, model)
-    PSI.process_market_bid_parameters!(container, devices, model)
 
     PSI.add_expressions!(container, PSI.ProductionCostExpression, devices, model)
     if PSI.has_service_model(model)
@@ -1496,7 +1491,6 @@ function PSI.construct_device!(
 
     PSI.add_parameters!(container, EnergyTargetTimeSeriesParameter, devices, model)
     PSI.add_parameters!(container, InflowTimeSeriesParameter, devices, model)
-    PSI.process_market_bid_parameters!(container, devices, model)
 
     PSI.add_expressions!(container, PSI.ProductionCostExpression, devices, model)
     if PSI.has_service_model(model)
@@ -1686,7 +1680,6 @@ function PSI.construct_device!(
     )
     PSI.add_parameters!(container, EnergyTargetTimeSeriesParameter, devices, model)
     PSI.add_parameters!(container, InflowTimeSeriesParameter, devices, model)
-    PSI.process_market_bid_parameters!(container, devices, model)
 
     PSI.add_expressions!(container, PSI.ProductionCostExpression, devices, model)
     if PSI.has_service_model(model)
@@ -2125,6 +2118,7 @@ function PSI.construct_device!(
     )
 
     PSI.add_expressions!(container, PSI.ProductionCostExpression, devices, model)
+    PSI.process_market_bid_parameters!(container, devices, model)
 
     if PSI.has_service_model(model)
         PSI.add_expressions!(container, HydroServedReserveUpExpression, devices, model)
@@ -2245,6 +2239,7 @@ function PSI.construct_device!(
     )
 
     PSI.add_expressions!(container, PSI.ProductionCostExpression, devices, model)
+    PSI.process_market_bid_parameters!(container, devices, model)
 
     if PSI.has_service_model(model)
         PSI.add_expressions!(container, HydroServedReserveUpExpression, devices, model)
@@ -2371,6 +2366,7 @@ function PSI.construct_device!(
     )
 
     PSI.add_expressions!(container, PSI.ProductionCostExpression, devices, model)
+    PSI.process_market_bid_parameters!(container, devices, model)
 
     if PSI.has_service_model(model)
         PSI.add_expressions!(container, HydroServedReserveUpExpression, devices, model)
@@ -2492,6 +2488,7 @@ function PSI.construct_device!(
     )
 
     PSI.add_expressions!(container, PSI.ProductionCostExpression, devices, model)
+    PSI.process_market_bid_parameters!(container, devices, model)
 
     if PSI.has_service_model(model)
         PSI.add_expressions!(container, HydroServedReserveUpExpression, devices, model)
@@ -2700,6 +2697,7 @@ function PSI.construct_device!(
         model,
         network_model,
     )
+    PSI.process_market_bid_parameters!(container, devices, model)
 
     PSI.add_expressions!(container, PSI.ProductionCostExpression, devices, model)
     if PSI.has_service_model(model)
@@ -2929,6 +2927,7 @@ function PSI.construct_device!(
         network_model,
     )
 
+    PSI.process_market_bid_parameters!(container, devices, model)
     if PSI.has_service_model(model)
         error("$D does not support service models yet")
         PSI.add_expressions!(container, HydroServedReserveUpExpression, devices, model)
@@ -3046,6 +3045,7 @@ function PSI.construct_device!(
         PSI.add_variables!(container, HydroEnergySurplusVariable, devices, D())
     end
 
+    PSI.process_market_bid_parameters!(container, devices, model)
     PSI.add_to_expression!(
         container,
         PSI.ActivePowerRangeExpressionLB,
@@ -3127,6 +3127,7 @@ function PSI.construct_device!(
         PSI.add_variables!(container, HydroEnergySurplusVariable, devices, D())
     end
 
+    PSI.process_market_bid_parameters!(container, devices, model)
     PSI.add_to_expression!(
         container,
         PSI.ActivePowerRangeExpressionLB,
