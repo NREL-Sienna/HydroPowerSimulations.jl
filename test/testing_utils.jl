@@ -150,7 +150,6 @@ end
 function get_deterministic_ts(sys::PSY.System)
     for device in get_components(PSY.Device, sys)
         if has_time_series(device, Union{DeterministicSingleTimeSeries, Deterministic})
-            println("yes keys")
             for key in PSY.get_time_series_keys(device)
                 ts = get_time_series(device, key)
                 if ts isa DeterministicSingleTimeSeries || ts isa Deterministic
