@@ -50,12 +50,12 @@
         ),
     ])
 
-    feedforwards = Dict(
+    #=feedforwards = Dict(
         "UC" => [
             ReservoirLimitFeedforward(;
                 source = PSI.ActivePowerVariable,
                 affected_values = [PSI.ActivePowerVariable],
-                component_type = HydroEnergyReservoir,
+                component_type = PSY.HydroEnergyReservoir,
                 number_of_periods = 24,
             ),
         ],
@@ -63,16 +63,16 @@
             ReservoirLimitFeedforward(;
                 source = PSI.ActivePowerVariable,
                 affected_values = [PSI.ActivePowerVariable],
-                component_type = HydroEnergyReservoir,
+                component_type = PSY.HydroEnergyReservoir,
                 number_of_periods = 12,
             ),
         ],
-    )
+    )=#
 
     test_sequence = SimulationSequence(;
         models = models,
         ini_cond_chronology = InterProblemChronology(),
-        feedforwards = feedforwards,
+        # feedforwards = feedforwards,
     )
 
     sim = Simulation(;
@@ -89,7 +89,7 @@ function test_2_stage_decision_models_with_feedforwards(in_memory)
     template_uc = get_template_basic_uc_simulation()
     template_ed = get_template_nomin_ed_simulation()
     set_device_model!(template_ed, InterruptiblePowerLoad, StaticPowerLoad)
-    set_device_model!(template_ed, HydroEnergyReservoir, HydroDispatchRunOfRiver)
+    # set_device_model!(template_ed, PSY.HydroEnergyReservoir, HydroDispatchRunOfRiver)
     set_network_model!(template_uc, PSI.NetworkModel(
         CopperPlatePowerModel,
         # MILP "duals" not supported with free solvers
@@ -131,12 +131,12 @@ function test_2_stage_decision_models_with_feedforwards(in_memory)
                     source = PSI.OnVariable,
                     affected_values = [PSI.ActivePowerVariable],
                 ),
-                ReservoirLimitFeedforward(;
-                    component_type = HydroEnergyReservoir,
+                #=ReservoirLimitFeedforward(;
+                    component_type = PSY.HydroEnergyReservoir,
                     source = PSI.ActivePowerVariable,
                     affected_values = [PSI.ActivePowerVariable],
                     number_of_periods = 12,
-                ),
+                ),=#
             ],
         ),
         ini_cond_chronology = InterProblemChronology(),

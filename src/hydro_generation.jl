@@ -197,6 +197,9 @@ PSI.get_multiplier_value(::InflowTimeSeriesParameter, d::PSY.HydroReservoir, ::H
 PSI.get_multiplier_value(::InflowTimeSeriesParameter, d::PSY.HydroReservoir, ::HydroEnergyBlockOptimization) = PSY.get_inflow(d)
 PSI.get_multiplier_value(::PSI.TimeSeriesParameter, d::PSY.HydroGen, ::AbstractHydroFormulation) = PSY.get_max_active_power(d)
 PSI.get_multiplier_value(::PSI.TimeSeriesParameter, d::PSY.HydroGen, ::PSI.FixedOutput) = PSY.get_max_active_power(d)
+# next 2 needed to avoid ambiguity errors
+PSI.get_multiplier_value(::PSI.AbstractPiecewiseLinearBreakpointParameter, d::PSY.HydroGen, ::PSI.FixedOutput) = PSY.get_max_active_power(d)
+PSI.get_multiplier_value(::PSI.AbstractPiecewiseLinearBreakpointParameter, d::PSY.HydroGen, ::AbstractHydroFormulation) = PSY.get_max_active_power(d)
 PSI.get_multiplier_value(::PSI.ActivePowerTimeSeriesParameter, d::PSY.HydroPumpTurbine, ::HydroPumpEnergyDispatch) = PSY.get_active_power_limits(d).max
 PSI.get_multiplier_value(::EnergyCapacityTimeSeriesParameter, d::PSY.HydroPumpTurbine, ::HydroPumpEnergyDispatch) = PSY.get_storage_level_limits(d.head_reservoir).max / PSY.get_system_base_power(d)
 
@@ -237,6 +240,7 @@ end
 PSI.initial_condition_variable(::InitialReservoirVolume, d::PSY.HydroReservoir, ::AbstractHydroFormulation) = HydroReservoirVolumeVariable()
 
 ########################Objective Function##################################################
+# FIXME: why is this first one (cost, gen, variable, formulation), when all others have variable 2nd and gen 3rd?
 PSI.proportional_cost(cost::Nothing, ::PSY.HydroGen, ::PSI.ActivePowerVariable, ::AbstractHydroFormulation)=0.0
 PSI.proportional_cost(cost::PSY.OperationalCost, ::PSI.OnVariable, ::PSY.HydroGen, ::AbstractHydroFormulation)=PSY.get_fixed(cost)
 PSI.proportional_cost(cost::PSY.OperationalCost, ::HydroEnergySurplusVariable, ::PSY.HydroGen, ::AbstractHydroReservoirFormulation)=0.0
@@ -1891,6 +1895,90 @@ function PSI.objective_function!(
     PSI.add_proportional_cost!(container, PSI.OnVariable(), devices, U())
     return
 end
+
+# MarketBidCost proportional_cost args: (container, cost, variable, device, formulation, time)
+# HydroGenerationCost proportional_cost args: (cost, variable, device, formulation)
+# this ties the two together by ignoring the container and time args
+PSI.proportional_cost(
+    ::PSI.OptimizationContainer,
+    cost::PSY.HydroGenerationCost,
+    ::U,
+    comp::PSY.HydroGen,
+    ::V,
+    ::Int,
+) where {U <: PSI.OnVariable, V <: AbstractHydroUnitCommitment} =
+    PSI.proportional_cost(cost, U(), comp, V())
+
+# copy-paste from PSI, just with types changed (HydroFoo => ThermalFoo):
+PSI.is_time_variant_term(
+    ::PSI.OptimizationContainer,
+    ::PSY.HydroGenerationCost,
+    ::PSI.OnVariable,
+    ::PSY.HydroGen,
+    ::AbstractHydroFormulation,
+    t::Int,
+) = false
+
+function PSI.add_proportional_cost!(
+    container::PSI.OptimizationContainer,
+    ::U,
+    devices::IS.FlattenIteratorWrapper{T},
+    ::V,
+) where {T <: PSY.HydroGen, U <: PSI.OnVariable, V <: AbstractHydroUnitCommitment}
+    multiplier = PSI.objective_function_multiplier(U(), V())
+    for d in devices
+        op_cost_data = PSY.get_operation_cost(d)
+        for t in PSI.get_time_steps(container)
+            cost_term = PSI.proportional_cost(container, op_cost_data, U(), d, V(), t)
+            add_as_time_variant =
+                PSI.is_time_variant_term(container, op_cost_data, U(), d, V(), t)
+            iszero(cost_term) && continue
+            cost_term *= multiplier
+            exp = if d isa PSY.HydroPumpTurbine && PSY.get_must_run(d)
+                cost_term  # note we do not add this to the objective function
+            else
+                PSI._add_proportional_term_maybe_variant!(
+                    Val(add_as_time_variant), container, U(), d, cost_term, t)
+            end
+            PSI.add_to_expression!(container, PSI.ProductionCostExpression, exp, d, t)
+        end
+    end
+    return
+end
+
+PSI.proportional_cost(
+    container::PSI.OptimizationContainer,
+    cost::PSY.MarketBidCost,
+    ::PSI.OnVariable,
+    comp::PSY.HydroGen,
+    ::AbstractHydroUnitCommitment,
+    t::Int,
+) =
+    PSI._lookup_maybe_time_variant_param(container, comp, t,
+        Val(PSI.is_time_variant(PSY.get_incremental_initial_input(cost))),
+        PSY.get_initial_input ∘ PSY.get_incremental_offer_curves ∘ PSY.get_operation_cost,
+        PSI.IncrementalCostAtMinParameter())
+
+PSI.is_time_variant_term(
+    ::PSI.OptimizationContainer,
+    cost::PSY.MarketBidCost,
+    ::PSI.OnVariable,
+    ::PSY.HydroGen,
+    ::AbstractHydroUnitCommitment,
+    t::Int,
+) =
+    PSI.is_time_variant(PSY.get_incremental_initial_input(cost))
+
+# end copy-paste
+
+PSI._include_min_gen_power_in_constraint(
+    ::PSY.EnergyReservoirStorage,
+    ::PSI.ActivePowerInVariable,
+) = false
+PSI._include_min_gen_power_in_constraint(
+    ::PSY.EnergyReservoirStorage,
+    ::PSI.ActivePowerOutVariable,
+) = false
 
 function PSI.objective_function!(
     container::PSI.OptimizationContainer,

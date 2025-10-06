@@ -185,6 +185,7 @@ end
 end
 
 @testset "Test Reserves from Hydro with RunOfRiver" begin
+    # this errors at the following line, saying "contributing devices for service Reserve5 is empty"
     template = ProblemTemplate(CopperPlatePowerModel)
     set_device_model!(template, PowerLoad, StaticPowerLoad)
     # set_device_model!(template, HydroEnergyReservoir, HydroDispatchRunOfRiver)
@@ -392,8 +393,9 @@ end
           IS.Simulation.RunStatus.SUCCESSFULLY_FINALIZED
 
     res = OptimizationProblemResults(model)
+    df = read_variable(res, "ActivePowerVariable__HydroDispatch")
     hydro_power_sum =
-        sum(read_variable(res, "ActivePowerVariable__HydroDispatch")[!, :HydroDispatch])
+        sum(df[!, :value])
 
     @test abs(hydro_power_sum - hydro_budget) <= eps
 end
@@ -602,14 +604,14 @@ end
         read_parameters(res, [(InflowTimeSeriesParameter, HydroReservoir)])["InflowTimeSeriesParameter__HydroReservoir"]
 
     total_inflow = sum(values(hydro_inflow_ts))
-    total_outflow = sum(df_outflow[!, "Water_Turbine"])
-    total_spillage = sum(hydro_spillage_df[!, "Water_Reservoir"])
+    total_outflow = sum(df_outflow[!, :value])
+    total_spillage = sum(hydro_spillage_df[!, :value])
 
     calculated_vf =
-        (hydro_vol_df[1, "Water_Reservoir"]) +
+        (hydro_vol_df[1, :value]) +
         ((total_inflow - total_outflow - total_spillage) * 3600 * 1e-9)
 
-    @test abs(calculated_vf - hydro_vol_df[end, "Water_Reservoir"]) <= 1e-4
+    @test abs(calculated_vf - hydro_vol_df[end, :value]) <= 1e-4
 
     psi_checksolve_test(
         model,
