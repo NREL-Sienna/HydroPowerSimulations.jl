@@ -107,25 +107,25 @@
     r_uc = get_decision_problem_results(results, "UC")
 
     uc_p_hy =
-        read_realized_variable(r_uc, "ActivePowerVariable__HydroDispatch")[!, 2]
+        read_realized_variable(r_uc, "ActivePowerVariable__HydroDispatch")[!, :value]
     uc_energy_hy =
-        read_realized_aux_variable(r_uc, "HydroEnergyOutput__HydroDispatch")[!, 2]
+        read_realized_aux_variable(r_uc, "HydroEnergyOutput__HydroDispatch")[!, :value]
     uc_hy_regup = read_realized_variable(
         r_uc,
         "ActivePowerReserveVariable__VariableReserve__ReserveUp__Reserve5",
     )[
         !,
-        2,
+        :value,
     ]
     uc_hy_regdn = read_realized_variable(
         r_uc,
         "ActivePowerReserveVariable__VariableReserve__ReserveDown__Reserve6",
     )[
         !,
-        2,
+        :value,
     ]
     ed_energy_hy =
-        read_realized_aux_variable(r_ed, "HydroEnergyOutput__HydroDispatch")[!, 2]
+        read_realized_aux_variable(r_ed, "HydroEnergyOutput__HydroDispatch")[!, :value]
     # Test HydroUsage match with the AuxVar
     @test isapprox(uc_energy_hy * 100.0, uc_p_hy + 0.4 * uc_hy_regup - 0.3 * uc_hy_regdn)
     # Test HydroUsage in ED is bounded by UC
@@ -243,26 +243,27 @@ end
     r_uc = get_decision_problem_results(results, "UC")
 
     uc_p_hy =
-        read_realized_variable(r_uc, "ActivePowerVariable__HydroTurbine")[!, 2]
+        read_realized_variable(r_uc, "ActivePowerVariable__HydroTurbine")[!, :value]
     uc_energy_hy =
-        read_realized_aux_variable(r_uc, "HydroEnergyOutput__HydroTurbine")[!, 2]
+        read_realized_aux_variable(r_uc, "HydroEnergyOutput__HydroTurbine")[!, :value]
     uc_hy_regup = read_realized_variable(
         r_uc,
         "ActivePowerReserveVariable__VariableReserve__ReserveUp__Reserve5",
     )[
         !,
-        2,
+        :value,
     ]
     uc_hy_regdn = read_realized_variable(
         r_uc,
         "ActivePowerReserveVariable__VariableReserve__ReserveDown__Reserve6",
     )[
         !,
-        2,
+        :value,
     ]
     ed_energy_hy =
-        read_realized_aux_variable(r_ed, "HydroEnergyOutput__HydroTurbine")[!, 2]
+        read_realized_aux_variable(r_ed, "HydroEnergyOutput__HydroTurbine")[!, :value]
     # Test HydroUsage match with the AuxVar
+
     @test isapprox(uc_energy_hy * 100.0, uc_p_hy + 0.4 * uc_hy_regup - 0.3 * uc_hy_regdn)
     # Test HydroUsage in ED is bounded by UC
     @test cumsum(ed_energy_hy)[end] <= cumsum(uc_energy_hy)[end]

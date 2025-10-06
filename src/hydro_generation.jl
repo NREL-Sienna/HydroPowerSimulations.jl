@@ -240,6 +240,7 @@ end
 PSI.initial_condition_variable(::InitialReservoirVolume, d::PSY.HydroReservoir, ::AbstractHydroFormulation) = HydroReservoirVolumeVariable()
 
 ########################Objective Function##################################################
+# FIXME: why is this first one (cost, gen, variable, formulation), when all others have variable 2nd and gen 3rd?
 PSI.proportional_cost(cost::Nothing, ::PSY.HydroGen, ::PSI.ActivePowerVariable, ::AbstractHydroFormulation)=0.0
 PSI.proportional_cost(cost::PSY.OperationalCost, ::PSI.OnVariable, ::PSY.HydroGen, ::AbstractHydroFormulation)=PSY.get_fixed(cost)
 PSI.proportional_cost(cost::PSY.OperationalCost, ::HydroEnergySurplusVariable, ::PSY.HydroGen, ::AbstractHydroReservoirFormulation)=0.0
@@ -1891,14 +1892,32 @@ function PSI.objective_function!(
     ::Type{<:PM.AbstractPowerModel},
 ) where {T <: PSY.HydroGen, U <: AbstractHydroUnitCommitment}
     PSI.add_variable_cost!(container, PSI.ActivePowerVariable(), devices, U())
-    # this is erroring if there's a market bid cost.
-    # need to write define proportional_cost of MBC for hydros, similar to line 100
-    # of thermal_generation.jl in PSI.
     PSI.add_proportional_cost!(container, PSI.OnVariable(), devices, U())
     return
 end
 
-# copy-paste from PSI, just with types changed:
+# MarketBidCost proportional_cost args: (container, cost, variable, device, formulation, time)
+# HydroGenerationCost proportional_cost args: (cost, variable, device, formulation)
+# this ties the two together by ignoring the container and time args
+PSI.proportional_cost(
+    ::PSI.OptimizationContainer,
+    cost::PSY.HydroGenerationCost,
+    ::U,
+    comp::PSY.HydroGen,
+    ::V,
+    ::Int,
+) where {U <: PSI.OnVariable, V <: AbstractHydroUnitCommitment} =
+    PSI.proportional_cost(cost, U(), comp, V())
+
+# copy-paste from PSI, just with types changed (HydroFoo => ThermalFoo):
+PSI.is_time_variant_term(
+    ::PSI.OptimizationContainer,
+    ::PSY.HydroGenerationCost,
+    ::PSI.OnVariable,
+    ::PSY.HydroGen,
+    ::AbstractHydroFormulation,
+    t::Int,
+) = false
 
 function PSI.add_proportional_cost!(
     container::PSI.OptimizationContainer,
@@ -1951,6 +1970,15 @@ PSI.is_time_variant_term(
     PSI.is_time_variant(PSY.get_incremental_initial_input(cost))
 
 # end copy-paste
+
+PSI._include_min_gen_power_in_constraint(
+    ::PSY.EnergyReservoirStorage,
+    ::PSI.ActivePowerInVariable,
+) = false
+PSI._include_min_gen_power_in_constraint(
+    ::PSY.EnergyReservoirStorage,
+    ::PSI.ActivePowerOutVariable,
+) = false
 
 function PSI.objective_function!(
     container::PSI.OptimizationContainer,
