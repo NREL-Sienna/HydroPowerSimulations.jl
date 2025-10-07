@@ -18,8 +18,10 @@ Hydro generation formulations define the optimization models that describe hydro
  4. [`HydroCommitmentRunOfRiver`](#HydroCommitmentRunOfRiver)
  5. [`HydroCommitmentReservoirBudget`](#HydroCommitmentReservoirBudget)
  6. [`HydroCommitmentReservoirStorage`](#HydroCommitmentReservoirStorage)
+ 7. [`HydroEnergyBlockOptimization`](#HydroEnergyBlockOptimization)
 
 ## `HydroDispatchRunOfRiver`
+Formulation type to constrain hydropower production with an energy block optimization representation of the energy storage capacity and water inflow time series of a reservoir for [`PowerSystems.HydroGen`]
 
 ```@docs; canonical=false
 HydroDispatchRunOfRiver
@@ -30,27 +32,27 @@ HydroDispatchRunOfRiver
   - [`PowerSimulations.ActivePowerVariable`](@extref):
     
       + Bounds: [0.0, ]
-      + Symbol: ``p^\text{hy}``
+      + Symbol: $p^\text{hy}$
 
   - [`PowerSimulations.ReactivePowerVariable`](@extref):
     
       + Bounds: [0.0, ]
-      + Symbol: ``q^\text{hy}``
-
+      + Symbol: $q^\text{hy}$
+      
 **Auxiliary Variables:**
 
   - [`HydroEnergyOutput`](@ref):
     
-      + Symbol: ``E^\text{hy,out}``
+      + Symbol: $E^\text{hy,out}$
 
-The [`HydroEnergyOutput`](@ref) is computed as the energy used at each time step from the hydro, computed simply as ``E^\text{hy,out} \cdot \Delta T``, where ``\Delta T`` is the duration (in hours) of each time step.
+The [`HydroEnergyOutput`](@ref) is computed as the energy used at each time step from the hydro, computed simply as $E^\text{hy,out} \cdot \Delta T$, where $\Delta T$ is the duration (in hours) of each time step.
 
 **Static Parameters:**
 
-  - ``P^\text{hy,min}`` = `PowerSystems.get_active_power_limits(device).min`
-  - ``P^\text{hy,max}`` = `PowerSystems.get_active_power_limits(device).max`
-  - ``Q^\text{hy,min}`` = `PowerSystems.get_reactive_power_limits(device).min`
-  - ``Q^\text{hy,max}`` = `PowerSystems.get_reactive_power_limits(device).max`
+  - $P^\text{hy,min}$ = `PowerSystems.get_active_power_limits(device).min`
+  - $P^\text{hy,max}$ = `PowerSystems.get_active_power_limits(device).max`
+  - $Q^\text{hy,min}$ = `PowerSystems.get_reactive_power_limits(device).min`
+  - $Q^\text{hy,max}$ = `PowerSystems.get_reactive_power_limits(device).max`
 
 **Time Series Parameters:**
 
@@ -62,7 +64,7 @@ Add a cost to the objective function depending on the defined cost structure of 
 
 **Expressions:**
 
-Adds ``p^\text{hy}`` to the `PowerSimulations.ActivePowerBalance` expression and ``q^\text{hy}`` to the `PowerSimulations.ReactivePowerBalance`, to be used in the supply-balance constraint depending on the network model used.
+Adds $p^\text{hy}$ to the `PowerSimulations.ActivePowerBalance` expression and $q^\text{hy}$ to the `PowerSimulations.ReactivePowerBalance`, to be used in the supply-balance constraint depending on the network model used.
 
 **Constraints:**
 
@@ -88,12 +90,12 @@ HydroDispatchReservoirBudget
   - [`PowerSimulations.ActivePowerVariable`](@extref):
     
       + Bounds: [0.0, ]
-      + Symbol: ``p^\text{hy}``
+      + Symbol: $p^\text{hy}$
 
   - [`PowerSimulations.ReactivePowerVariable`](@extref):
     
       + Bounds: [0.0, ]
-      + Symbol: ``q^\text{hy}``
+      + Symbol: $q^\text{hy}$
 
 **Auxiliary Variables:**
 
@@ -476,3 +478,6 @@ For each hydro turbine creates the range constraints for its active and reactive
 &  Q^\text{hy,min} \le q^\text{hy}_t \le Q^\text{hy,max}, \quad \forall t\in \{1, \dots, T\} 
 \end{align*}
 ```
+
+## `HydroEnergyBlockOptimization`
+Formulation type to add commitment and injection variables constrained by a maximum injection time series for [`PowerSystems.HydroGen`]
