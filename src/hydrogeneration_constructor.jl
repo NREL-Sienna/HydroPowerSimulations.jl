@@ -2038,6 +2038,28 @@ function PSI.construct_device!(
         HydroEnergyModelReservoir(),
         PSI.InitialEnergyLevel(),
     )
+    # Update expressions that depend on turbine variables
+    PSI.add_expressions!(
+        container,
+        TotalHydroPowerReservoirIn,
+        devices,
+        model,
+    )
+
+    PSI.add_expressions!(
+        container,
+        TotalHydroPowerReservoirOut,
+        devices,
+        model,
+    )
+
+    PSI.add_expressions!(
+        container,
+        TotalSpillagePowerReservoirIn,
+        devices,
+        model,
+    )
+
     # Energy Balance Constraint
     PSI.add_constraints!(
         container,

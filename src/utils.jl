@@ -14,3 +14,17 @@ function get_available_reservoirs(sys::System)
         sys,
     )
 end
+
+function get_available_turbines(
+    d::HydroReservoir,
+    ::Type{U},
+) where {U <: TotalHydroPowerReservoirIn}
+    return filter(PSY.get_available, PSY.get_upstream_turbines(d))
+end
+
+function get_available_turbines(
+    d::HydroReservoir,
+    ::Type{U},
+) where {U <: TotalHydroPowerReservoirOut}
+    return filter(PSY.get_available, PSY.get_downstream_turbines(d))
+end

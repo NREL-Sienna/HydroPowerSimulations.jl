@@ -703,67 +703,6 @@ end
 
 ######################## Energy balance constraints ############################
 
-#=
-"""
-This function defines the constraints for the water level (or state of charge)
-for the [`PowerSystems.HydroEnergyReservoir`](@extref).
-"""
-function PSI.add_constraints!(
-    container::PSI.OptimizationContainer,
-    ::Type{PSI.EnergyBalanceConstraint},
-    devices::IS.FlattenIteratorWrapper{V},
-    model::PSI.DeviceModel{V, W},
-    ::PSI.NetworkModel{X},
-) where {
-    V <: PSY.HydroEnergyReservoir,
-    W <: AbstractHydroReservoirFormulation,
-    X <: PM.AbstractPowerModel,
-}
-    time_steps = PSI.get_time_steps(container)
-    resolution = PSI.get_resolution(container)
-    fraction_of_hour = Dates.value(Dates.Minute(resolution)) / PSI.MINUTES_IN_HOUR
-    names = [PSY.get_name(x) for x in devices]
-    initial_conditions = PSI.get_initial_condition(container, PSI.InitialEnergyLevel(), V)
-    energy_var = PSI.get_variable(container, PSI.EnergyVariable(), V)
-    power_var = PSI.get_variable(container, PSI.ActivePowerVariable(), V)
-    spillage_var = PSI.get_variable(container, WaterSpillageVariable(), V)
-
-    constraint = PSI.add_constraints_container!(
-        container,
-        PSI.EnergyBalanceConstraint(),
-        V,
-        names,
-        time_steps,
-    )
-    param_container = PSI.get_parameter(container, InflowTimeSeriesParameter(), V)
-    multiplier =
-        PSI.get_parameter_multiplier_array(container, InflowTimeSeriesParameter(), V)
-
-    for ic in initial_conditions
-        device = PSI.get_component(ic)
-        name = PSY.get_name(device)
-        param = PSI.get_parameter_column_values(param_container, name)
-        constraint[name, 1] = JuMP.@constraint(
-            container.JuMPmodel,
-            energy_var[name, 1] ==
-            PSI.get_value(ic) - power_var[name, 1] * fraction_of_hour -
-            spillage_var[name, 1] * fraction_of_hour + param[1] * multiplier[name, 1]
-        )
-
-        for t in time_steps[2:end]
-            constraint[name, t] = JuMP.@constraint(
-                container.JuMPmodel,
-                energy_var[name, t] ==
-                energy_var[name, t - 1] + param[t] * multiplier[name, t] -
-                power_var[name, t] * fraction_of_hour -
-                spillage_var[name, t] * fraction_of_hour
-            )
-        end
-    end
-    return
-end
-=#
-
 """
 This function defines the constraints for the energy level for the
 [`PowerSystems.HydroReservoir`](@extref) using the [`HydroEnergyModelReservoir`](@ref) formulation.
@@ -788,6 +727,10 @@ function PSI.add_constraints!(
     energy_var = PSI.get_variable(container, PSI.EnergyVariable(), V)
     power_var = PSI.get_variable(container, PSI.ActivePowerVariable(), HydroTurbine)
     spillage_var = PSI.get_variable(container, WaterSpillageVariable(), V)
+    power_in_from_turbines = PSI.get_expression(container, TotalHydroPowerReservoirIn(), V)
+    power_out_to_turbines = PSI.get_expression(container, TotalHydroPowerReservoirOut(), V)
+    spillage_in_from_reservoirs =
+        PSI.get_expression(container, TotalSpillagePowerReservoirIn(), V)
 
     constraint = PSI.add_constraints_container!(
         container,
@@ -803,28 +746,26 @@ function PSI.add_constraints!(
     for ic in initial_conditions
         device = PSI.get_component(ic)
         name = PSY.get_name(device)
-        turbines = get_connected_devices(sys, device)
-        if length(turbines) != 1
-            error(
-                "HydroReservoir $(name) must be connected to exactly one turbine, but found $(length(turbines)) turbines.",
-            )
-        end
-        turbine_name = PSY.get_name(only(turbines))
         param = PSI.get_parameter_column_values(param_container, name)
         constraint[name, 1] = JuMP.@constraint(
             container.JuMPmodel,
             energy_var[name, 1] ==
-            PSI.get_value(ic) - power_var[turbine_name, 1] * fraction_of_hour -
-            spillage_var[name, 1] * fraction_of_hour + param[1] * multiplier[name, 1]
+            PSI.get_value(ic) +
+            (power_in_from_turbines[name, 1] - power_out_to_turbines[name, 1]) *
+            fraction_of_hour +
+            (spillage_in_from_reservoirs[name, 1] - spillage_var[name, 1]) *
+            fraction_of_hour + param[1] * multiplier[name, 1]
         )
 
         for t in time_steps[2:end]
             constraint[name, t] = JuMP.@constraint(
                 container.JuMPmodel,
                 energy_var[name, t] ==
-                energy_var[name, t - 1] + param[t] * multiplier[name, t] -
-                power_var[turbine_name, t] * fraction_of_hour -
-                spillage_var[name, t] * fraction_of_hour
+                energy_var[name, t - 1] + param[t] * multiplier[name, t] +
+                (power_in_from_turbines[name, t] - power_out_to_turbines[name, t]) *
+                fraction_of_hour +
+                (spillage_in_from_reservoirs[name, t] - spillage_var[name, t]) *
+                fraction_of_hour
             )
         end
     end
@@ -912,7 +853,7 @@ function PSI.add_constraints!(
         EnergyTargetConstraint(),
         V,
         set_name,
-        time_steps,
+        [time_steps[end]],
     )
 
     e_var = PSI.get_variable(container, PSI.EnergyVariable(), V)
@@ -924,17 +865,10 @@ function PSI.add_constraints!(
 
     for d in devices
         name = PSY.get_name(d)
-        @warn("TODO Operation Cost for Reservoir")
-        #cost_data = PSY.get_operation_cost(d)
-        #if isa(cost_data, PSY.StorageCost)
-        #    shortage_cost = PSY.get_energy_shortage_cost(cost_data)
-        #else
-        #    @debug "Data for device $name doesn't contain shortage costs"
-        #    shortage_cost = 0.0
-        #end
-        shortage_cost = 0.0
+        cost_data = PSY.get_operation_cost(d)
+        shortage_cost = PSY.get_level_shortage_cost(cost_data)
 
-        if shortage_cost == 0.0
+        if iszero(shortage_cost)
             @warn(
                 "Device $name has energy shortage cost set to 0.0, as a result the model will turnoff the EnergyShortageVariable to avoid infeasible/unbounded problem."
             )
@@ -942,13 +876,12 @@ function PSI.add_constraints!(
             JuMP.set_upper_bound.(shortage_var[name, :], 0.0)
         end
         param = PSI.get_parameter_column_values(param_container, name)
-        for t in time_steps
-            constraint[name, t] = JuMP.@constraint(
-                container.JuMPmodel,
-                e_var[name, t] + shortage_var[name, t] + surplus_var[name, t] ==
-                multiplier[name, t] * param[t]
-            )
-        end
+        t_end = time_steps[end]
+        constraint[name, t_end] = JuMP.@constraint(
+            container.JuMPmodel,
+            e_var[name, t_end] + shortage_var[name, t_end] + surplus_var[name, t_end] ==
+            multiplier[name, t_end] * param[t_end]
+        )
     end
     return
 end
@@ -1245,23 +1178,16 @@ function PSI.add_constraints!(
     constraint =
         PSI.add_constraints_container!(container, EnergyBudgetConstraint(), V, set_name)
 
-    variable_out = PSI.get_variable(container, PSI.ActivePowerVariable(), PSY.HydroTurbine)
+    total_power_out = PSI.get_expression(container, TotalHydroPowerReservoirOut(), V)
     param_container = PSI.get_parameter(container, EnergyBudgetTimeSeriesParameter(), V)
     multiplier = PSI.get_multiplier_array(param_container)
 
     for d in devices
         name = PSY.get_name(d)
-        turbines = get_connected_devices(sys, d)
-        if length(turbines) != 1
-            error(
-                "HydroReservoir $(name) must be connected to exactly one turbine, but found $(length(turbines)) turbines.",
-            )
-        end
-        turbine_name = PSY.get_name(only(turbines))
         param = PSI.get_parameter_column_values(param_container, name)
         constraint[name] = JuMP.@constraint(
             container.JuMPmodel,
-            sum([variable_out[turbine_name, t] for t in time_steps]) <=
+            sum([total_power_out[name, t] for t in time_steps]) <=
             sum([multiplier[name, t] * param[t] for t in time_steps])
         )
     end
@@ -1674,6 +1600,74 @@ function PSI.add_expressions!(
         for t in time_steps
             expression[name, t] =
                 sum(variable[name, reservoir_name, t] for reservoir_name in reservoir_names)
+        end
+    end
+end
+
+function PSI.add_expressions!(
+    container::PSI.OptimizationContainer,
+    ::Type{U},
+    devices::IS.FlattenIteratorWrapper{V},
+    model::PSI.DeviceModel{V, W},
+) where {
+    U <: Union{TotalHydroPowerReservoirIn, TotalHydroPowerReservoirOut},
+    V <: PSY.HydroReservoir,
+    W <: HydroEnergyModelReservoir,
+}
+    time_steps = PSI.get_time_steps(container)
+    expression = PSI.add_expression_container!(
+        container,
+        U(),
+        V,
+        [PSY.get_name(d) for d in devices],
+        time_steps,
+    )
+
+    variable = PSI.get_variable(container, PSI.ActivePowerVariable(), PSY.HydroTurbine)
+    # TODO: Enable capability for TurbinePump
+    # variable_pump = PSI.get_variable(container, PSI.ActivePowerVariable(), PSY.HydroPumpTurbine)
+
+    for d in devices
+        turbines = get_available_turbines(d, U)
+        isempty(turbines) && continue
+        turbine_names = PSY.get_name.(turbines)
+        reservoir_name = PSY.get_name(d)
+        for t in time_steps
+            expression[reservoir_name, t] =
+                sum(variable[name, t] for name in turbine_names)
+        end
+    end
+end
+
+function PSI.add_expressions!(
+    container::PSI.OptimizationContainer,
+    ::Type{U},
+    devices::IS.FlattenIteratorWrapper{V},
+    model::PSI.DeviceModel{V, W},
+) where {
+    U <: TotalSpillagePowerReservoirIn,
+    V <: PSY.HydroReservoir,
+    W <: HydroEnergyModelReservoir,
+}
+    time_steps = PSI.get_time_steps(container)
+    expression = PSI.add_expression_container!(
+        container,
+        U(),
+        V,
+        [PSY.get_name(d) for d in devices],
+        time_steps,
+    )
+
+    variable = PSI.get_variable(container, WaterSpillageVariable(), PSY.HydroReservoir)
+
+    for d in devices
+        upstream_reservoirs = filter(PSY.get_available, get_upstream_reservoirs(d))
+        isempty(upstream_reservoirs) && continue
+        upstream_reservoir_names = PSY.get_name.(upstream_reservoirs)
+        reservoir_name = PSY.get_name(d)
+        for t in time_steps
+            expression[reservoir_name, t] =
+                sum(variable[name, t] for name in upstream_reservoir_names)
         end
     end
 end
