@@ -191,9 +191,9 @@ PSI.get_multiplier_value(::EnergyTargetTimeSeriesParameter, d::PSY.HydroGen, ::A
 PSI.get_multiplier_value(::EnergyTargetTimeSeriesParameter, d::PSY.HydroReservoir, ::HydroEnergyModelReservoir) = PSY.get_level_targets(d) * PSY.get_storage_level_limits(d).max / PSY.get_system_base_power(d)
 PSI.get_multiplier_value(::InflowTimeSeriesParameter, d::PSY.HydroGen, ::AbstractHydroFormulation) = PSY.get_inflow(d) * PSY.get_conversion_factor(d)
 PSI.get_multiplier_value(::OutflowTimeSeriesParameter, d::PSY.HydroGen, ::AbstractHydroFormulation) = PSY.get_outflow(d) * PSY.get_conversion_factor(d)
-PSI.get_multiplier_value(::InflowTimeSeriesParameter, d::PSY.HydroReservoir, ::AbstractHydroFormulation) = 1.0
-PSI.get_multiplier_value(::OutflowTimeSeriesParameter, d::PSY.HydroReservoir, ::AbstractHydroFormulation) = 1.0
-PSI.get_multiplier_value(::InflowTimeSeriesParameter, d::PSY.HydroReservoir, ::HydroEnergyModelReservoir) = PSY.get_inflow(d)
+PSI.get_multiplier_value(::InflowTimeSeriesParameter, d::PSY.HydroReservoir, ::AbstractHydroFormulation) = 1.0 # Data already in m3/s
+PSI.get_multiplier_value(::OutflowTimeSeriesParameter, d::PSY.HydroReservoir, ::AbstractHydroFormulation) = 1.0 # Data already in m3/s
+PSI.get_multiplier_value(::InflowTimeSeriesParameter, d::PSY.HydroReservoir, ::HydroEnergyModelReservoir) = PSY.get_inflow(d) # Data normalized
 PSI.get_multiplier_value(::InflowTimeSeriesParameter, d::PSY.HydroReservoir, ::HydroEnergyBlockOptimization) = PSY.get_inflow(d)
 PSI.get_multiplier_value(::PSI.TimeSeriesParameter, d::PSY.HydroGen, ::AbstractHydroFormulation) = PSY.get_max_active_power(d)
 PSI.get_multiplier_value(::PSI.TimeSeriesParameter, d::PSY.HydroGen, ::PSI.FixedOutput) = PSY.get_max_active_power(d)
@@ -1317,10 +1317,13 @@ function PSI.add_constraints!(
             names,
             time_steps,
         )
+    turbine_in = PSI.get_expression(container, TotalHydroFlowRateReservoirIn(), V)
     turbine_out = PSI.get_expression(container, TotalHydroFlowRateReservoirOut(), V)
     volume = PSI.get_variable(container, HydroReservoirVolumeVariable(), V)
     spillage_var = PSI.get_variable(container, WaterSpillageVariable(), V)
+    spillage_in = PSI.get_expression(container, TotalSpillageFlowRateReservoirIn(), V)
     param_container = PSI.get_parameter(container, InflowTimeSeriesParameter(), V)
+    param_container_outflow = PSI.get_parameter(container, OutflowTimeSeriesParameter(), V)
 
     initial_conditions = PSI.get_initial_condition(
         container,
@@ -1338,7 +1341,10 @@ function PSI.add_constraints!(
             volume[name, 1] ==
             PSI.get_value(ic) -
             hourly_resolution * SECONDS_IN_HOUR *
-            (spillage_var[name, 1] + turbine_out[name, 1] - inflow[1])
+            (
+                spillage_var[name, 1] - spillage_in[name, 1] + turbine_out[name, 1] -
+                turbine_in[name, 1] - inflow[1]
+            )
             * M3_TO_KM3
         )
         for t in time_steps[2:end]
@@ -1348,7 +1354,10 @@ function PSI.add_constraints!(
                 volume[name, t - 1] -
                 (
                     hourly_resolution * SECONDS_IN_HOUR *
-                    (spillage_var[name, t] + turbine_out[name, t] - inflow[t])
+                    (
+                        spillage_var[name, t] - spillage_in[name, t] +
+                        turbine_out[name, t] - turbine_in[name, t] - inflow[t]
+                    )
                 ) * M3_TO_KM3
             )
         end
@@ -1492,6 +1501,7 @@ This function define the relationship between turbined flow and power produced
 """
 function PSI.add_constraints!(
     container::PSI.OptimizationContainer,
+    sys::PSY.System,
     ::Type{TurbinePowerOutputConstraint},
     devices::IS.FlattenIteratorWrapper{V},
     model::PSI.DeviceModel{V, W},
@@ -1518,7 +1528,7 @@ function PSI.add_constraints!(
     for d in devices
         name = PSY.get_name(d)
         conversion_factor = PSY.get_conversion_factor(d)
-        reservoirs = PSY.get_reservoirs(d)
+        reservoirs = filter(PSY.get_available, PSY.get_connected_head_reservoirs(sys, d))
         powerhouse_elevation = PSY.get_powerhouse_elevation(d)
         for t in time_steps
             constraint[name, t] = JuMP.@constraint(
@@ -1543,18 +1553,18 @@ end
 
 function PSI.add_expressions!(
     container::PSI.OptimizationContainer,
-    sys::PSY.System,
-    ::Type{TotalHydroFlowRateReservoirOut},
+    ::Type{U},
     devices::IS.FlattenIteratorWrapper{V},
     model::PSI.DeviceModel{V, W},
 ) where {
+    U <: Union{TotalHydroFlowRateReservoirIn, TotalHydroFlowRateReservoirOut},
     V <: PSY.HydroReservoir,
     W <: AbstractHydroFormulation,
 }
     time_steps = PSI.get_time_steps(container)
     expression = PSI.add_expression_container!(
         container,
-        TotalHydroFlowRateReservoirOut(),
+        U(),
         V,
         [PSY.get_name(d) for d in devices],
         time_steps,
@@ -1563,7 +1573,8 @@ function PSI.add_expressions!(
     variable = PSI.get_variable(container, HydroTurbineFlowRateVariable(), PSY.HydroTurbine)
 
     for d in devices
-        turbines = PSY.get_connected_devices(sys, d)
+        turbines = get_available_turbines(d, U)
+        isempty(turbines) && continue
         turbine_names = PSY.get_name.(turbines)
         reservoir_name = PSY.get_name(d)
         for t in time_steps
@@ -1575,6 +1586,7 @@ end
 
 function PSI.add_expressions!(
     container::PSI.OptimizationContainer,
+    sys::PSY.System,
     ::Type{TotalHydroFlowRateTurbineOut},
     devices::IS.FlattenIteratorWrapper{V},
     model::PSI.DeviceModel{V, W},
@@ -1594,7 +1606,7 @@ function PSI.add_expressions!(
     variable = PSI.get_variable(container, HydroTurbineFlowRateVariable(), PSY.HydroTurbine)
 
     for d in devices
-        reservoirs = PSY.get_reservoirs(d)
+        reservoirs = filter(PSY.get_available, PSY.get_connected_head_reservoirs(sys, d))
         reservoir_names = PSY.get_name.(reservoirs)
         name = PSY.get_name(d)
         for t in time_steps
@@ -1645,7 +1657,7 @@ function PSI.add_expressions!(
     devices::IS.FlattenIteratorWrapper{V},
     model::PSI.DeviceModel{V, W},
 ) where {
-    U <: TotalSpillagePowerReservoirIn,
+    U <: Union{TotalSpillagePowerReservoirIn, TotalSpillageFlowRateReservoirIn},
     V <: PSY.HydroReservoir,
     W <: HydroEnergyModelReservoir,
 }

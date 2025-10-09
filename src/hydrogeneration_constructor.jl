@@ -2829,6 +2829,7 @@ function PSI.construct_device!(
     )
 
     PSI.add_parameters!(container, InflowTimeSeriesParameter, devices, model)
+    PSI.add_parameters!(container, OutflowTimeSeriesParameter, devices, model)
     PSI.add_feedforward_arguments!(container, model, devices)
     return
 end
@@ -2844,8 +2845,21 @@ function PSI.construct_device!(
 
     PSI.add_expressions!(
         container,
-        sys,
         TotalHydroFlowRateReservoirOut,
+        devices,
+        model,
+    )
+
+    PSI.add_expressions!(
+        container,
+        TotalHydroFlowRateReservoirIn,
+        devices,
+        model,
+    )
+
+    PSI.add_expressions!(
+        container,
+        TotalSpillageFlowRateReservoirIn,
         devices,
         model,
     )
@@ -2977,6 +2991,7 @@ function PSI.construct_device!(
 
     PSI.add_expressions!(
         container,
+        sys,
         TotalHydroFlowRateTurbineOut,
         devices,
         model,
@@ -3021,6 +3036,7 @@ function PSI.construct_device!(
 
     PSI.add_constraints!(
         container,
+        sys,
         TurbinePowerOutputConstraint,
         devices,
         model,
