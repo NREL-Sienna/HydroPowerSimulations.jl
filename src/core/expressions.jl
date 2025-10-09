@@ -41,16 +41,16 @@ of total water turbined for a reservoir, from all the downstream turbines connec
 struct TotalHydroFlowRateReservoirOut <: PSI.ExpressionType end
 
 """
-Expression for [`PowerSystems.HydroGen`](@extref) that keep track
-of total water turbined for a turbine, coming from multiple reservoirs
-"""
-struct TotalHydroFlowRateTurbineOut <: PSI.ExpressionType end
-
-"""
 Expression for [`PowerSystems.HydroReservoir](@extref) that keep track
 of total spillage water flow rate into a reservoir, from all the upstream reservoirs connected to it
 """
 struct TotalSpillageFlowRateReservoirIn <: PSI.ExpressionType end
+
+"""
+Expression for [`PowerSystems.HydroGen`](@extref) that keep track
+of total water turbined for a turbine, coming from multiple reservoirs
+"""
+struct TotalHydroFlowRateTurbineOut <: PSI.ExpressionType end
 
 """
 Expression for [`PowerSystems.System`](@extref) that keep track

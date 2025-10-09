@@ -1,14 +1,6 @@
 module HydroPowerSimulations
 
 #################################################################################
-# Exports
-# export HydroEnergyCascade
-# export HydroDispatchCascade
-# export HydroDispatchReservoirCascade
-# export HydroDispatchRunOfRiverCascade
-# export HydroDispatchReservoirBudgetUpperBound
-# export HydroDispatchRunOfRiverLowerBound
-# export HydroDispatchReservoirBudgetLowerUpperBound
 
 ###### Hydro Decision Models #######
 export MediumTermHydroPlanning
@@ -68,6 +60,17 @@ export ReservoirTargetFeedforward
 export ReservoirLimitFeedforward
 export HydroUsageLimitFeedforward
 export WaterLevelBudgetFeedforward
+
+####### Hydro Expressions ########
+export HydroServedReserveUpExpression
+export HydroServedReserveDownExpression
+export TotalHydroPowerReservoirIn
+export TotalHydroPowerReservoirOut
+export TotalSpillagePowerReservoirIn
+export TotalHydroFlowRateReservoirIn
+export TotalHydroFlowRateReservoirOut
+export TotalSpillageFlowRateReservoirIn
+export TotalHydroFlowRateTurbineOut
 
 #################################################################################
 # Imports
