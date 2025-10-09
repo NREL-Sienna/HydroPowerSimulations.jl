@@ -1659,7 +1659,7 @@ function PSI.add_expressions!(
 ) where {
     U <: Union{TotalSpillagePowerReservoirIn, TotalSpillageFlowRateReservoirIn},
     V <: PSY.HydroReservoir,
-    W <: HydroEnergyModelReservoir,
+    W <: AbstractHydroReservoirFormulation,
 }
     time_steps = PSI.get_time_steps(container)
     expression = PSI.add_expression_container!(
