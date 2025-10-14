@@ -25,13 +25,13 @@ end
 function get_available_turbines(
     d::HydroReservoir,
     ::Type{U},
-) where {U <: Union{TotalHydroPowerReservoirIn, TotalHydroFlowRateReservoirIn}}
+) where {U <: Union{TotalHydroPowerReservoirIncoming, TotalHydroFlowRateReservoirIncoming}}
     return filter(PSY.get_available, PSY.get_upstream_turbines(d))
 end
 
 function get_available_turbines(
     d::HydroReservoir,
     ::Type{U},
-) where {U <: Union{TotalHydroPowerReservoirOut, TotalHydroFlowRateReservoirOut}}
+) where {U <: Union{TotalHydroPowerReservoirOutgoing, TotalHydroFlowRateReservoirOutgoing}}
     return filter(PSY.get_available, PSY.get_downstream_turbines(d))
 end

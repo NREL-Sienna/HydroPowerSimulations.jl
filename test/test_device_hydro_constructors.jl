@@ -593,7 +593,7 @@ end
     moi_tests(model, 240, 0, 168, 168, 72, false)
     psi_checkobjfun_test(model, AffExpr)
 
-    df_outflow = read_expression(res, "TotalHydroFlowRateTurbineOut__HydroTurbine")
+    df_outflow = read_expression(res, "TotalHydroFlowRateTurbineOutgoing__HydroTurbine")
     hydro_vol_df =
         read_variables(res, [(HydroReservoirVolumeVariable, HydroReservoir)])["HydroReservoirVolumeVariable__HydroReservoir"]
     hydro_head_df =

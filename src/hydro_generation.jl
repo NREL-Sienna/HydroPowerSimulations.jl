@@ -727,10 +727,10 @@ function PSI.add_constraints!(
     energy_var = PSI.get_variable(container, PSI.EnergyVariable(), V)
     power_var = PSI.get_variable(container, PSI.ActivePowerVariable(), HydroTurbine)
     spillage_var = PSI.get_variable(container, WaterSpillageVariable(), V)
-    power_in_from_turbines = PSI.get_expression(container, TotalHydroPowerReservoirIn(), V)
-    power_out_to_turbines = PSI.get_expression(container, TotalHydroPowerReservoirOut(), V)
+    power_in_from_turbines = PSI.get_expression(container, TotalHydroPowerReservoirIncoming(), V)
+    power_out_to_turbines = PSI.get_expression(container, TotalHydroPowerReservoirOutgoing(), V)
     spillage_in_from_reservoirs =
-        PSI.get_expression(container, TotalSpillagePowerReservoirIn(), V)
+        PSI.get_expression(container, TotalSpillagePowerReservoirIncoming(), V)
 
     constraint = PSI.add_constraints_container!(
         container,
@@ -1178,7 +1178,7 @@ function PSI.add_constraints!(
     constraint =
         PSI.add_constraints_container!(container, EnergyBudgetConstraint(), V, set_name)
 
-    total_power_out = PSI.get_expression(container, TotalHydroPowerReservoirOut(), V)
+    total_power_out = PSI.get_expression(container, TotalHydroPowerReservoirOutgoing(), V)
     param_container = PSI.get_parameter(container, EnergyBudgetTimeSeriesParameter(), V)
     multiplier = PSI.get_multiplier_array(param_container)
 
@@ -1317,11 +1317,11 @@ function PSI.add_constraints!(
             names,
             time_steps,
         )
-    turbine_in = PSI.get_expression(container, TotalHydroFlowRateReservoirIn(), V)
-    turbine_out = PSI.get_expression(container, TotalHydroFlowRateReservoirOut(), V)
+    turbine_in = PSI.get_expression(container, TotalHydroFlowRateReservoirIncoming(), V)
+    turbine_out = PSI.get_expression(container, TotalHydroFlowRateReservoirOutgoing(), V)
     volume = PSI.get_variable(container, HydroReservoirVolumeVariable(), V)
     spillage_var = PSI.get_variable(container, WaterSpillageVariable(), V)
-    spillage_in = PSI.get_expression(container, TotalSpillageFlowRateReservoirIn(), V)
+    spillage_in = PSI.get_expression(container, TotalSpillageFlowRateReservoirIncoming(), V)
     param_container = PSI.get_parameter(container, InflowTimeSeriesParameter(), V)
     param_container_outflow = PSI.get_parameter(container, OutflowTimeSeriesParameter(), V)
 
@@ -1557,7 +1557,7 @@ function PSI.add_expressions!(
     devices::IS.FlattenIteratorWrapper{V},
     model::PSI.DeviceModel{V, W},
 ) where {
-    U <: Union{TotalHydroFlowRateReservoirIn, TotalHydroFlowRateReservoirOut},
+    U <: Union{TotalHydroFlowRateReservoirIncoming, TotalHydroFlowRateReservoirOutgoing},
     V <: PSY.HydroReservoir,
     W <: AbstractHydroFormulation,
 }
@@ -1587,7 +1587,7 @@ end
 function PSI.add_expressions!(
     container::PSI.OptimizationContainer,
     sys::PSY.System,
-    ::Type{TotalHydroFlowRateTurbineOut},
+    ::Type{TotalHydroFlowRateTurbineOutgoing},
     devices::IS.FlattenIteratorWrapper{V},
     model::PSI.DeviceModel{V, W},
 ) where {
@@ -1597,7 +1597,7 @@ function PSI.add_expressions!(
     time_steps = PSI.get_time_steps(container)
     expression = PSI.add_expression_container!(
         container,
-        TotalHydroFlowRateTurbineOut(),
+        TotalHydroFlowRateTurbineOutgoing(),
         V,
         [PSY.get_name(d) for d in devices],
         time_steps,
@@ -1622,7 +1622,7 @@ function PSI.add_expressions!(
     devices::IS.FlattenIteratorWrapper{V},
     model::PSI.DeviceModel{V, W},
 ) where {
-    U <: Union{TotalHydroPowerReservoirIn, TotalHydroPowerReservoirOut},
+    U <: Union{TotalHydroPowerReservoirIncoming, TotalHydroPowerReservoirOutgoing},
     V <: PSY.HydroReservoir,
     W <: HydroEnergyModelReservoir,
 }
@@ -1657,7 +1657,7 @@ function PSI.add_expressions!(
     devices::IS.FlattenIteratorWrapper{V},
     model::PSI.DeviceModel{V, W},
 ) where {
-    U <: Union{TotalSpillagePowerReservoirIn, TotalSpillageFlowRateReservoirIn},
+    U <: Union{TotalSpillagePowerReservoirIncoming, TotalSpillageFlowRateReservoirIncoming},
     V <: PSY.HydroReservoir,
     W <: AbstractHydroReservoirFormulation,
 }
@@ -2678,7 +2678,7 @@ function PSI._add_parameters!(
     fraction_of_hour = Dates.value(Dates.Minute(resolution)) / PSI.MINUTES_IN_HOUR
     HOURS_IN_DAY = 24
     mult = fraction_of_hour * length(time_steps) / HOURS_IN_DAY
-    key = PSI.ExpressionKey{TotalHydroFlowRateReservoirOut, D}("")
+    key = PSI.ExpressionKey{TotalHydroFlowRateReservoirOutgoing, D}("")
     parameter_container =
         PSI.add_param_container!(container, T(), D, key, names, time_steps)
     jump_model = PSI.get_jump_model(container)

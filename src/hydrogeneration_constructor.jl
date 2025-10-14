@@ -2041,21 +2041,21 @@ function PSI.construct_device!(
     # Update expressions that depend on turbine variables
     PSI.add_expressions!(
         container,
-        TotalHydroPowerReservoirIn,
+        TotalHydroPowerReservoirIncoming,
         devices,
         model,
     )
 
     PSI.add_expressions!(
         container,
-        TotalHydroPowerReservoirOut,
+        TotalHydroPowerReservoirOutgoing,
         devices,
         model,
     )
 
     PSI.add_expressions!(
         container,
-        TotalSpillagePowerReservoirIn,
+        TotalSpillagePowerReservoirIncoming,
         devices,
         model,
     )
@@ -2845,21 +2845,21 @@ function PSI.construct_device!(
 
     PSI.add_expressions!(
         container,
-        TotalHydroFlowRateReservoirOut,
+        TotalHydroFlowRateReservoirOutgoing,
         devices,
         model,
     )
 
     PSI.add_expressions!(
         container,
-        TotalHydroFlowRateReservoirIn,
+        TotalHydroFlowRateReservoirIncoming,
         devices,
         model,
     )
 
     PSI.add_expressions!(
         container,
-        TotalSpillageFlowRateReservoirIn,
+        TotalSpillageFlowRateReservoirIncoming,
         devices,
         model,
     )
@@ -2992,7 +2992,7 @@ function PSI.construct_device!(
     PSI.add_expressions!(
         container,
         sys,
-        TotalHydroFlowRateTurbineOut,
+        TotalHydroFlowRateTurbineOutgoing,
         devices,
         model,
     )

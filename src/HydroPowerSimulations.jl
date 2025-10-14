@@ -64,13 +64,13 @@ export WaterLevelBudgetFeedforward
 ####### Hydro Expressions ########
 export HydroServedReserveUpExpression
 export HydroServedReserveDownExpression
-export TotalHydroPowerReservoirIn
-export TotalHydroPowerReservoirOut
-export TotalSpillagePowerReservoirIn
-export TotalHydroFlowRateReservoirIn
-export TotalHydroFlowRateReservoirOut
-export TotalSpillageFlowRateReservoirIn
-export TotalHydroFlowRateTurbineOut
+export TotalHydroPowerReservoirIncoming
+export TotalHydroPowerReservoirOutgoing
+export TotalSpillagePowerReservoirIncoming
+export TotalHydroFlowRateReservoirIncoming
+export TotalHydroFlowRateReservoirOutgoing
+export TotalSpillageFlowRateReservoirIncoming
+export TotalHydroFlowRateTurbineOutgoing
 
 #################################################################################
 # Imports
