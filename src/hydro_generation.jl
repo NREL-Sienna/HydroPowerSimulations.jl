@@ -727,8 +727,10 @@ function PSI.add_constraints!(
     energy_var = PSI.get_variable(container, PSI.EnergyVariable(), V)
     power_var = PSI.get_variable(container, PSI.ActivePowerVariable(), HydroTurbine)
     spillage_var = PSI.get_variable(container, WaterSpillageVariable(), V)
-    power_in_from_turbines = PSI.get_expression(container, TotalHydroPowerReservoirIncoming(), V)
-    power_out_to_turbines = PSI.get_expression(container, TotalHydroPowerReservoirOutgoing(), V)
+    power_in_from_turbines =
+        PSI.get_expression(container, TotalHydroPowerReservoirIncoming(), V)
+    power_out_to_turbines =
+        PSI.get_expression(container, TotalHydroPowerReservoirOutgoing(), V)
     spillage_in_from_reservoirs =
         PSI.get_expression(container, TotalSpillagePowerReservoirIncoming(), V)
 
