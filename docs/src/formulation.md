@@ -2,11 +2,9 @@
 
 Hydro generation formulations define the optimization models that describe hydro units mathematical model in different operational settings, such as economic dispatch and unit commitment.
 
-!!! note
     
     The use of reactive power variables and constraints will depend on the network model used, i.e., whether it uses (or does not use) reactive power. If the network model is purely active power-based,  reactive power variables and related constraints are not created.
 
-!!! note
     
     Reserve variables for services are not included in the formulation, albeit their inclusion change the variables, expressions, constraints and objective functions created. A detailed description of the implications in the optimization models is described in the [Service formulation](https://nrel-sienna.github.io/PowerSimulations.jl/latest/formulation_library/Service/) in the [PowerSimulations documentation](https://nrel-sienna.github.io/PowerSimulations.jl/latest/).
 
@@ -21,7 +19,8 @@ Hydro generation formulations define the optimization models that describe hydro
  7. [`HydroEnergyBlockOptimization`](#HydroEnergyBlockOptimization)
 
 ## `HydroDispatchRunOfRiver`
-Formulation type to constrain hydropower production with an energy block optimization representation of the energy storage capacity and water inflow time series of a reservoir for [`PowerSystems.HydroGen`]
+Formulation type to add injection variables constrained by a maximum injection time series for [`PowerSystems.HydroGen`](@extref)
+
 
 ```@docs; canonical=false
 HydroDispatchRunOfRiver
@@ -56,7 +55,7 @@ The [`HydroEnergyOutput`](@ref) is computed as the energy used at each time step
 
 **Time Series Parameters:**
 
-Uses the `max_active_power` timeseries parameter to limit the available active power at each time-step. If the timeseries parameter is not included, the power is limited by ``P^\text{th,max}``.
+Uses the `max_active_power` timeseries parameter to limit the available active power at each time-step. If the timeseries parameter is not included, the power is limited by $P^\text{th,max}$.
 
 **Objective:**
 
@@ -65,6 +64,8 @@ Add a cost to the objective function depending on the defined cost structure of 
 **Expressions:**
 
 Adds $p^\text{hy}$ to the `PowerSimulations.ActivePowerBalance` expression and $q^\text{hy}$ to the `PowerSimulations.ReactivePowerBalance`, to be used in the supply-balance constraint depending on the network model used.
+
+Adds $p^\text{hy}$ to `HydroServedReserveUpExpression`/`HydroServedReserveDownExpression` expressions to keep track of served reserve up/down for energy calculations. 
 
 **Constraints:**
 
@@ -480,4 +481,28 @@ For each hydro turbine creates the range constraints for its active and reactive
 ```
 
 ## `HydroEnergyBlockOptimization`
-Formulation type to add commitment and injection variables constrained by a maximum injection time series for [`PowerSystems.HydroGen`]
+Formulation type to constrain hydropower production with an energy block optimization representation of the energy storage capacity and water inflow time series of a reservoir for [`PowerSystems.HydroGen`]
+
+```@docs; canonical=false
+HydroEnergyBlockOptimization
+```
+
+**Variables:**
+
+**Auxiliary Variables:**
+
+**Static Parameters:**
+
+**Time Series Parameters:**
+
+Uses the `InflowTimeSeriesParameter` and `OutflowTimeSeriesParameter` for track the water inflow and outflow at each time-step.  
+
+**Objective:**
+
+Add a cost to the objective function depending on the defined cost structure of the hydro unit by adding it to its `ProductionCostExpression`.
+
+**Expressions:**
+
+**Constraints:**
+
+* * *
