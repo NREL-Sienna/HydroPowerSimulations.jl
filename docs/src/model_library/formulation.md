@@ -487,11 +487,18 @@ Formulation type to constrain hydropower production with an energy block optimiz
 HydroEnergyBlockOptimization
 ```
 
+**Initial Conditions:**
+
 **Variables:**
 
 **Auxiliary Variables:**
 
 **Static Parameters:**
+  - $\eta$:  Turbine efficiency
+  - $\rho$:  water density = $1000 kg/m^3$
+  - $g$: Gravitional constant = $9.81 m/s^2$
+  - $K$: Energy block constant =  $\eta \rho g$
+  - $h2v$: Head to volume conversion factor. 
 
 **Time Series Parameters:**
 
@@ -504,5 +511,7 @@ Add a cost to the objective function depending on the defined cost structure of 
 **Expressions:**
 
 **Constraints:**
+- $p^\text{hy}_1 = K \times f^{out}_{hy, 1} (h2v \times v_{res, 0} + H^{elevation}_{hy}), \quad \forall hy, t >1$
+- $p^\text{hy}_t = K \times f^{out}_{hy, t} (0.5 \times h2v (v_{res, t-1} + v_{res, t} + H^{elevation}_{hy}), \quad \forall hy, t >1$
 
 * * *
