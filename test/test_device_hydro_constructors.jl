@@ -110,7 +110,7 @@ end
     model = DecisionModel(MockOperationProblem, DCPPowerModel, c_sys5_hyd)
     mock_construct_device!(model, turbine_model)
     mock_construct_device!(model, reservoir_model)
-    moi_tests(model, 120, 0, 24, 24, 48, false)
+    moi_tests(model, 120, 0, 24, 24, 25, false)
     psi_checkobjfun_test(model, GAEVF)
 end
 
@@ -131,7 +131,7 @@ end
     model = DecisionModel(MockOperationProblem, ACPPowerModel, c_sys5_hyd)
     mock_construct_device!(model, turbine_model)
     mock_construct_device!(model, reservoir_model)
-    moi_tests(model, 144, 0, 48, 48, 48, false)
+    moi_tests(model, 144, 0, 48, 48, 25, false)
     psi_checkobjfun_test(model, GAEVF)
 end
 
@@ -185,10 +185,9 @@ end
 end
 
 @testset "Test Reserves from Hydro with RunOfRiver" begin
-    # this errors at the following line, saying "contributing devices for service Reserve5 is empty"
     template = ProblemTemplate(CopperPlatePowerModel)
     set_device_model!(template, PowerLoad, StaticPowerLoad)
-    # set_device_model!(template, HydroEnergyReservoir, HydroDispatchRunOfRiver)
+    set_device_model!(template, HydroTurbine, HydroDispatchRunOfRiver)
     set_service_model!(
         template,
         ServiceModel(VariableReserve{ReserveUp}, RangeReserve, "Reserve5"),
@@ -202,7 +201,12 @@ end
         ServiceModel(ReserveDemandCurve{ReserveUp}, StepwiseCostReserve, "ORDC1"),
     )
 
-    c_sys5_hyd = PSB.build_system(PSITestSystems, "c_sys5_hyd"; add_reserves = true)
+    c_sys5_hyd = PSB.build_system(
+        PSITestSystems,
+        "c_sys5_hyd";
+        add_reserves = true,
+        force_build = true,
+    )
     model = DecisionModel(template, c_sys5_hyd)
     @test build!(model; output_dir = mktempdir(; cleanup = true)) ==
           PSI.ModelBuildStatus.BUILT
@@ -336,7 +340,6 @@ end
         attributes = Dict("hydro_budget_interval" => Hour(24)))
 
     sys = PSB.build_system(PSITestSystems, "c_sys5_hy")
-
     hy = only(get_components(HydroDispatch, sys))
     max_power = get_max_active_power(hy)
     resolution = Dates.Hour(1)
@@ -344,6 +347,7 @@ end
     data = ones(length(tstamp)) / (get_base_power(sys) * max_power)
     ts = SingleTimeSeries("hydro_budget", TimeArray(tstamp, data))
     add_time_series!(sys, hy, ts)
+    remove_time_series!(sys, Deterministic)
     transform_single_time_series!(sys, Hour(24), Hour(24))
 
     model = DecisionModel(MockOperationProblem, CopperPlatePowerModel, sys)
@@ -367,6 +371,7 @@ end
     data = ones(length(tstamp)) / (get_base_power(c_sys5_hy) * max_power)
     ts = SingleTimeSeries("hydro_budget", TimeArray(tstamp, data))
     add_time_series!(c_sys5_hy, first(get_components(HydroDispatch, c_sys5_hy)), ts)
+    remove_time_series!(c_sys5_hy, Deterministic)
     transform_single_time_series!(c_sys5_hy, Hour(24), Hour(24))
 
     template_uc = ProblemTemplate()
@@ -442,6 +447,7 @@ end
         hy_pump,
         PSY.SingleTimeSeries("capacity", tarray_cap),
     )
+    remove_time_series!(c_sys5_bat, Deterministic)
     transform_single_time_series!(c_sys5_bat, Hour(24), Hour(24))
 
     model = DecisionModel(MockOperationProblem, CopperPlatePowerModel, c_sys5_bat)
@@ -482,6 +488,7 @@ end
         hy_pump,
         PSY.SingleTimeSeries("capacity", tarray_cap),
     )
+    remove_time_series!(c_sys5_bat, Deterministic)
     transform_single_time_series!(c_sys5_bat, Hour(24), Hour(24))
 
     template_uc = ProblemTemplate()
@@ -619,4 +626,70 @@ end
         158187.86,
         1000,
     )
+end
+
+#####################################################
+######## HydroWaterModelReservoir Cascading #########
+#####################################################
+
+@testset "Solve Cascading HydroWaterModelReservoir" begin
+    output_dir = mktempdir(; cleanup = true)
+
+    c_sys5_hy = PSB.build_system(PSITestSystems, "c_sys5_hy_cascading_turbine_head")
+
+    template = ProblemTemplate()
+    set_device_model!(template, HydroTurbine, HydroTurbineBilinearDispatch)
+    set_device_model!(template, HydroReservoir, HydroWaterModelReservoir)
+
+    set_device_model!(template, ThermalStandard, ThermalDispatchNoMin)
+    set_device_model!(template, PowerLoad, StaticPowerLoad)
+
+    model = DecisionModel(
+        template,
+        c_sys5_hy;
+        optimizer = Ipopt_optimizer,
+        store_variable_names = true,
+    )
+
+    @test build!(model; output_dir = output_dir) ==
+          PSI.ModelBuildStatus.BUILT
+
+    @test solve!(model; output_dir = output_dir) ==
+          IS.Simulation.RunStatus.SUCCESSFULLY_FINALIZED
+
+    res = OptimizationProblemResults(model)
+
+    moi_tests(model, 408, 0, 216, 216, 120, false)
+    psi_checkobjfun_test(model, AffExpr)
+end
+
+@testset "Solve Cascading HydroEnergyModelReservoir" begin
+    output_dir = mktempdir(; cleanup = true)
+
+    c_sys5_hy = PSB.build_system(PSITestSystems, "c_sys5_hy_cascading_turbine_head")
+
+    template = ProblemTemplate()
+    set_device_model!(template, HydroTurbine, HydroTurbineEnergyDispatch)
+    set_device_model!(template, HydroReservoir, HydroEnergyModelReservoir)
+
+    set_device_model!(template, ThermalStandard, ThermalDispatchNoMin)
+    set_device_model!(template, PowerLoad, StaticPowerLoad)
+
+    model = DecisionModel(
+        template,
+        c_sys5_hy;
+        optimizer = HiGHS_optimizer,
+        store_variable_names = true,
+    )
+
+    @test build!(model; output_dir = output_dir) ==
+          PSI.ModelBuildStatus.BUILT
+
+    @test solve!(model; output_dir = output_dir) ==
+          IS.Simulation.RunStatus.SUCCESSFULLY_FINALIZED
+
+    res = OptimizationProblemResults(model)
+
+    moi_tests(model, 360, 0, 168, 168, 72, false)
+    psi_checkobjfun_test(model, AffExpr)
 end
