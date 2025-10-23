@@ -584,7 +584,7 @@ end
     ) where {T}
 
 Adds a constraint to enforce a maximum usage of hydro level volume based on the source value.
-It is recommended to use the Auxiliary Variable TotalHydroFlowRateReservoirOut as Source, affecting the WaterLevelBudgetParameter.
+It is recommended to use the Auxiliary Variable TotalHydroFlowRateReservoirOutgoing as Source, affecting the WaterLevelBudgetParameter.
 
 # Arguments:
 
@@ -670,7 +670,7 @@ function PSI.add_feedforward_constraints!(
     #resolution = PSI.get_resolution(container)
     #fraction_of_hour = Dates.value(Dates.Minute(resolution)) / PSI.MINUTES_IN_HOUR
     names = [PSY.get_name(d) for d in devices]
-    water_out = PSI.get_expression(container, TotalHydroFlowRateReservoirOut(), D)
+    water_out = PSI.get_expression(container, TotalHydroFlowRateReservoirOutgoing(), D)
     T = FeedForwardWaterLevelBudgetConstraint
     con_reservoir_ff = PSI.add_constraints_container!(container, T(), D, names)
     param_value =
