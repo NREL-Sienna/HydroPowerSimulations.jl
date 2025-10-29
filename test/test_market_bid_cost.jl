@@ -719,7 +719,7 @@ end
 
 function copy_inflow_time_series!(sys)
     for turb in get_components(HydroTurbine, sys)
-        res = only(turb.reservoirs)
+        res = only(get_connected_head_reservoirs(sys, turb))
         name_map = Dict((PSY.get_name(turb), "inflow") => "inflow")
         copy_time_series!(res, turb; name_mapping = name_map)
     end
@@ -730,7 +730,7 @@ end
         PSY.HydroTurbine => HydroTurbineEnergyCommitment,
         PSY.HydroReservoir => HydroEnergyModelReservoir,
     )
-    sys = build_system(PSITestSystems, "test_RTS_GMLC_sys")
+    sys = build_system(PSITestSystems, "test_RTS_GMLC_sys"; force_build = true)
     # replace cost data at HydroTurbine with MarketBidCost
     ht1 = first(get_components(PSY.HydroTurbine, sys))
     incr_slopes = [0.3, 0.5, 0.7]
@@ -762,7 +762,7 @@ end
     # option 1: use this system, and figure out how to add time series for reservoir and hydro unit.
     # option 2: use RTS GMLC system, and figure out how to add time-varying MarketBidCost to hydro unit.
 
-    sys = build_system(PSITestSystems, "test_RTS_GMLC_sys")
+    sys = build_system(PSITestSystems, "test_RTS_GMLC_sys"; force_build = true)
     copy_inflow_time_series!(sys)
     # easier to first attach a single MBC
     ht1 = first(get_components(PSY.HydroTurbine, sys))
