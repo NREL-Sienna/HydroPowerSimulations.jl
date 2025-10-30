@@ -2103,10 +2103,12 @@ PSI.is_time_variant_term(
 PSI._include_min_gen_power_in_constraint(
     ::PSY.EnergyReservoirStorage,
     ::PSI.ActivePowerInVariable,
+    ::PSI.AbstractDeviceFormulation,
 ) = false
 PSI._include_min_gen_power_in_constraint(
     ::PSY.EnergyReservoirStorage,
     ::PSI.ActivePowerOutVariable,
+    ::PSI.AbstractDeviceFormulation,
 ) = false
 
 function PSI.objective_function!(
