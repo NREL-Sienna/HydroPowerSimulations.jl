@@ -48,4 +48,3 @@ var = read_variable(res, "ActivePowerVariable__HydroDispatch")
 ```
 
 ## EnergyBlock Model
-
