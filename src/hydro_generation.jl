@@ -355,27 +355,6 @@ function PSI.get_default_time_series_names(
     )
 end
 
-#=
-function PSI.get_default_time_series_names(
-    ::Type{PSY.HydroEnergyReservoir},
-    ::Type{<:Union{HydroCommitmentReservoirBudget, HydroDispatchReservoirBudget}},
-)
-    return Dict{Type{<:PSI.TimeSeriesParameter}, String}(
-        EnergyBudgetTimeSeriesParameter => "hydro_budget",
-    )
-end
-
-function PSI.get_default_time_series_names(
-    ::Type{PSY.HydroEnergyReservoir},
-    ::Type{<:Union{HydroDispatchReservoirStorage, HydroCommitmentReservoirStorage}},
-)
-    return Dict{Type{<:PSI.TimeSeriesParameter}, String}(
-        EnergyTargetTimeSeriesParameter => "storage_target",
-        InflowTimeSeriesParameter => "inflow",
-    )
-end
-=#
-
 function PSI.get_default_time_series_names(
     ::Type{PSY.HydroReservoir},
     ::Type{<:HydroEnergyBlockOptimization},
