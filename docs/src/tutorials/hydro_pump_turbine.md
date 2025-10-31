@@ -31,7 +31,8 @@ With one or more [`PowerSystems.HydroPumpTurbine`](@extref):
 hy_pump = first(PSY.get_components(HydroPumpTurbine, sys))
 ```
 
-Add time series 
+Add time series
+
 ```
 DayAhead = collect(
     DateTime("1/1/2024  0:00:00", "d/m/y  H:M:S"):Hour(1):DateTime(
@@ -61,6 +62,7 @@ transform_single_time_series!(sys, Hour(24), Hour(24))
 ```
 
 ## Decision Model
+
 ```
 template = ProblemTemplate(CopperPlatePowerModel)
 model = DecisionModel(CopperPlatePowerModel, sys)
