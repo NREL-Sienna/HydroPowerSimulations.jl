@@ -2038,6 +2038,28 @@ function PSI.construct_device!(
         HydroEnergyModelReservoir(),
         PSI.InitialEnergyLevel(),
     )
+    # Update expressions that depend on turbine variables
+    PSI.add_expressions!(
+        container,
+        TotalHydroPowerReservoirIncoming,
+        devices,
+        model,
+    )
+
+    PSI.add_expressions!(
+        container,
+        TotalHydroPowerReservoirOutgoing,
+        devices,
+        model,
+    )
+
+    PSI.add_expressions!(
+        container,
+        TotalSpillagePowerReservoirIncoming,
+        devices,
+        model,
+    )
+
     # Energy Balance Constraint
     PSI.add_constraints!(
         container,
@@ -2760,6 +2782,7 @@ function PSI.construct_device!(
 
     PSI.add_constraints!(
         container,
+        sys,
         HydroPowerConstraint,
         devices,
         model,
@@ -2807,6 +2830,7 @@ function PSI.construct_device!(
     )
 
     PSI.add_parameters!(container, InflowTimeSeriesParameter, devices, model)
+    PSI.add_parameters!(container, OutflowTimeSeriesParameter, devices, model)
     PSI.add_feedforward_arguments!(container, model, devices)
     return
 end
@@ -2822,8 +2846,21 @@ function PSI.construct_device!(
 
     PSI.add_expressions!(
         container,
-        sys,
-        TotalHydroFlowRateReservoirOut,
+        TotalHydroFlowRateReservoirOutgoing,
+        devices,
+        model,
+    )
+
+    PSI.add_expressions!(
+        container,
+        TotalHydroFlowRateReservoirIncoming,
+        devices,
+        model,
+    )
+
+    PSI.add_expressions!(
+        container,
+        TotalSpillageFlowRateReservoirIncoming,
         devices,
         model,
     )
@@ -2955,7 +2992,8 @@ function PSI.construct_device!(
 
     PSI.add_expressions!(
         container,
-        TotalHydroFlowRateTurbineOut,
+        sys,
+        TotalHydroFlowRateTurbineOutgoing,
         devices,
         model,
     )
@@ -2999,6 +3037,7 @@ function PSI.construct_device!(
 
     PSI.add_constraints!(
         container,
+        sys,
         TurbinePowerOutputConstraint,
         devices,
         model,
@@ -3031,8 +3070,8 @@ function PSI.construct_device!(
     devices = PSI.get_available_components(model, sys)
     PSI.add_variables!(container, PSI.ActivePowerVariable, devices, D())
     PSI.add_variables!(container, ActivePowerPumpVariable, devices, D())
-    PSI.add_variables!(container, PSI.EnergyVariable, devices, D())
-    PSI.add_variables!(container, WaterSpillageVariable, devices, D())
+    PSI.add_variables!(container, PSI.EnergyVariable, devices, sys, D())
+    PSI.add_variables!(container, WaterSpillageVariable, devices, sys, D())
 
     PSI.add_variables!(container, PSI.ReactivePowerVariable, devices, D())
 
@@ -3041,8 +3080,8 @@ function PSI.construct_device!(
     end
 
     if PSI.get_attribute(model, "energy_target")
-        PSI.add_variables!(container, HydroEnergyShortageVariable, devices, D())
-        PSI.add_variables!(container, HydroEnergySurplusVariable, devices, D())
+        PSI.add_variables!(container, HydroEnergyShortageVariable, devices, sys, D())
+        PSI.add_variables!(container, HydroEnergySurplusVariable, devices, sys, D())
     end
 
     PSI.process_market_bid_parameters!(container, devices, model)
@@ -3115,16 +3154,16 @@ function PSI.construct_device!(
     devices = PSI.get_available_components(model, sys)
     PSI.add_variables!(container, PSI.ActivePowerVariable, devices, D())
     PSI.add_variables!(container, ActivePowerPumpVariable, devices, D())
-    PSI.add_variables!(container, PSI.EnergyVariable, devices, D())
-    PSI.add_variables!(container, WaterSpillageVariable, devices, D())
+    PSI.add_variables!(container, PSI.EnergyVariable, devices, sys, D())
+    PSI.add_variables!(container, WaterSpillageVariable, devices, sys, D())
 
     if PSI.get_attribute(model, "reservation")
         PSI.add_variables!(container, PSI.ReservationVariable, devices, D())
     end
 
     if PSI.get_attribute(model, "energy_target")
-        PSI.add_variables!(container, HydroEnergyShortageVariable, devices, D())
-        PSI.add_variables!(container, HydroEnergySurplusVariable, devices, D())
+        PSI.add_variables!(container, HydroEnergyShortageVariable, devices, sys, D())
+        PSI.add_variables!(container, HydroEnergySurplusVariable, devices, sys, D())
     end
 
     PSI.process_market_bid_parameters!(container, devices, model)
@@ -3167,6 +3206,7 @@ function PSI.construct_device!(
         PSI.add_parameters!(container, PSI.ActivePowerTimeSeriesParameter, devices, model)
     end
     if haskey(PSI.get_time_series_names(model), EnergyCapacityTimeSeriesParameter)
+        store_energy_capacity_multiplier_in_ext!(sys, devices)
         PSI.add_parameters!(container, EnergyCapacityTimeSeriesParameter, devices, model)
     end
     PSI.process_market_bid_parameters!(container, devices, model)
@@ -3188,6 +3228,7 @@ function PSI.construct_device!(
 }
     devices = PSI.get_available_components(model, sys)
 
+    store_initial_level_for_hydropump!(sys, devices)
     PSI.add_initial_condition!(
         container,
         devices,
@@ -3233,6 +3274,7 @@ function PSI.construct_device!(
     if PSI.get_attribute(model, "energy_target")
         PSI.add_constraints!(
             container,
+            sys,
             EnergyTargetConstraint,
             devices,
             model,

@@ -142,14 +142,14 @@ function PSI.build_impl!(decision_model::PSI.DecisionModel{MediumTermHydroPlanni
     PSI.add_expressions!(
         container,
         sys,
-        TotalHydroFlowRateReservoirOut,
+        TotalHydroFlowRateReservoirOutgoing,
         reservoirs,
         reservoir_model,
     )
 
     PSI.add_expressions!(
         container,
-        TotalHydroFlowRateTurbineOut,
+        TotalHydroFlowRateTurbineOutgoing,
         turbines,
         turbine_model,
     )
