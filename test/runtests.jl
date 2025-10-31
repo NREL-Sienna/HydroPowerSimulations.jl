@@ -12,6 +12,10 @@ using InfrastructureSystems
 using Test
 using Logging
 import OrderedCollections: OrderedDict
+using DataFrames
+using DataFramesMeta
+
+import DataStructures: SortedDict
 
 import Aqua
 Aqua.test_unbound_args(HydroPowerSimulations)
@@ -63,7 +67,10 @@ include(joinpath(PSI_DIR, "test/test_utils/solver_definitions.jl"))
 include(joinpath(PSI_DIR, "test/test_utils/mock_operation_models.jl"))
 include(joinpath(PSI_DIR, "test/test_utils/operations_problem_templates.jl"))
 include(joinpath(PSI_DIR, "test/test_utils/model_checks.jl"))
-include(joinpath(dirname(@__FILE__), "testing_utils.jl"))
+include(joinpath(PSI_DIR, "test/test_utils/add_market_bid_cost.jl"))
+include(joinpath(PSI_DIR, "test/test_utils/mbc_system_utils.jl"))
+include(joinpath(PSI_DIR, "test/test_utils/mbc_simulation_utils.jl"))
+include("testing_utils.jl")
 
 """
 Copied @includetests from https://github.com/ssfrr/TestSetExtensions.jl.
