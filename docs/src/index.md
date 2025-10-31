@@ -6,12 +6,7 @@
 
 * * *
 
-HydroPowerSimulations has been developed as part of the Flexible Linked Analysis of Streamflow and Hydropower (FLASH) and Reliability and Resilience of coordinated water Distribution and power Distribution (R2D2) projects at the U.S. Department of Energy's National Renewable Energy Laboratory ([NREL](https://www.nrel.gov/)) Software Record SWR-23-110.
-
-
-```@meta
-HydroWires-C
-```
+HydroPowerSimulations has been developed as part of the Flexible Linked Analysis of Streamflow and Hydropower (FLASH), Reliability and Resilience of coordinated water Distribution and power Distribution (R2D2) and HydroWires-C projects at the U.S. Department of Energy's National Renewable Energy Laboratory ([NREL](https://www.nrel.gov/)) Software Record SWR-23-110.
 
 
 ## How to Use This Documentation 

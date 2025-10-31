@@ -11,10 +11,24 @@ links = InterLinks(
 pages = OrderedDict(
     "Welcome Page" => "index.md",
     "Quick Start Guide" => "quick_start_guide.md",
-    "Tutorials" => Any["tutorials/single_stage_model.md"],
-    "Formulation Library" => "formulation.md",
-    "Public API Reference" => "api/public.md",
-    "Internal API Reference" => "api/internal.md",
+    "Tutorials" => Any[
+        "Operation problem with HydroDispatchRunOfRiver" => "tutorials/single_stage_model.md",
+        "Energy Hydro Reservoir Operation" => "tutorials/energy_model_hydroturbine_reservoir.md",
+        "Water Hydro Reservoir Operation" => "tutorials/water_model_hydroturbine_reservoir.md",
+        "Hydro Pump Turbine Operation" => "tutorials/hydro_pump_turbine.md",
+    ],
+    "How to..." => Any[
+        "Include input data for Hydro models" => "how_to/format_input_data.md",
+        "Include budget limit and storage targets to Hydro Reservoirs" => "how_to/include_limits_and_targets.md",
+    ],
+    "Explanation" => Any[
+        "Difference between Energy and Water models" => "explanation/difference_between_energy_water_models.md",
+    ],        
+    "Formulation Library" => "model_library/formulation.md",
+    "Reference" => Any[
+        "Public API Reference" => "api/public.md",
+        "Internal API Reference" => "api/internal.md",
+    ]    
 )
 
 makedocs(
