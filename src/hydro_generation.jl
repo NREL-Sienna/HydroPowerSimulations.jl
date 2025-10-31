@@ -314,7 +314,6 @@ function PSI.get_initial_conditions_device_model(
     return PSI.DeviceModel(PSY.HydroDispatch, HydroDispatchRunOfRiver)
 end
 
-# TODO: This method is up for elimination
 function PSI.get_initial_conditions_device_model(
     ::PSI.OperationModel,
     ::PSI.DeviceModel{T, <:AbstractHydroReservoirFormulation},

@@ -265,8 +265,6 @@ function PSI.add_feedforward_constraints!(
     return
 end
 
-# TODO: It also needs the add parameters code
-
 function PSI.update_parameter_values!(
     model::PSI.DecisionModel,
     key::PSI.ParameterKey{T, U},
