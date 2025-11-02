@@ -2100,13 +2100,36 @@ PSI.is_time_variant_term(
 
 # end copy-paste
 
+# These _include_{constant}_min_gen_power functions are needed for MarketBidCost.
+# Commitment has an on/off choice, so add OnVariable * breakpoint1 to power constraint.
+PSI._include_min_gen_power_in_constraint(
+    ::PSY.HydroGen,
+    ::PSI.ActivePowerVariable,
+    ::HydroCommitmentRunOfRiver,
+) = true
+# Dispatch with ActivePower (not PowerAboveMinimum) means generator is on,
+# so add constant breakpoint1 to power constraint.
+PSI._include_min_gen_power_in_constraint(
+    ::PSY.HydroGen,
+    ::PSI.ActivePowerVariable,
+    ::HydroDispatchRunOfRiver,
+) = false
+
+PSI._include_constant_min_gen_power_in_constraint(
+    ::PSY.HydroGen,
+    ::PSI.ActivePowerVariable,
+    ::HydroDispatchRunOfRiver,
+) = true
+
 PSI._include_min_gen_power_in_constraint(
     ::PSY.EnergyReservoirStorage,
     ::PSI.ActivePowerInVariable,
+    ::PSI.AbstractDeviceFormulation,
 ) = false
 PSI._include_min_gen_power_in_constraint(
     ::PSY.EnergyReservoirStorage,
     ::PSI.ActivePowerOutVariable,
+    ::PSI.AbstractDeviceFormulation,
 ) = false
 
 function PSI.objective_function!(
