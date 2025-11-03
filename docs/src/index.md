@@ -13,6 +13,7 @@ HydroPowerSimulations has been developed as part of the Flexible Linked Analysis
 
 There are five main sections containing different information:
 
+  - **Quick Guide** - Intro for getting started.
   - **Tutorials** - Detailed walk-throughs to help you *learn* how to use
     `HydroPowerSimulations.jl`
   - **How to...** - Directions to help *guide* your work for a particular task
@@ -24,14 +25,6 @@ There are five main sections containing different information:
 
 `HydroPowerSimulations.jl` strives to follow the [Diataxis](https://diataxis.fr/) documentation
 framework.
-
-## Getting Started
-
-If you are new to `HydroPowerSimulations.jl`, here's how we suggest getting started:
-
- 1. [Install](@ref install)
-
- ## Tutotrials
  
 
 
