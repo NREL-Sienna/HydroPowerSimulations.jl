@@ -45,6 +45,11 @@ Formulation type to add injection variables for a HydroTurbine connected to rese
 struct HydroTurbineBilinearDispatch <: AbstractHydroDispatchFormulation end
 
 """
+Formulation type to add injection variables for a HydroTurbine connected to reservoirs using a linear model (with water flow variables and constant head) [`PowerSystems.HydroGen`](@extref)
+"""
+struct HydroTurbineWaterLinearDispatch <: AbstractHydroDispatchFormulation end
+
+"""
 Formulation type to add injection variables for a [`PowerSystems.HydroTurbine`](@extref) only using energy variables (no water flow variables)
 """
 struct HydroTurbineEnergyDispatch <: AbstractHydroDispatchFormulation end

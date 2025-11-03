@@ -487,7 +487,7 @@ function PSI.add_variables!(
     T <: HydroTurbineFlowRateVariable,
     U <: Union{Vector{D}, IS.FlattenIteratorWrapper{D}},
     W <: Union{Vector{E}, IS.FlattenIteratorWrapper{E}},
-    X <: HydroTurbineBilinearDispatch,
+    X <: Union{HydroTurbineBilinearDispatch, HydroTurbineWaterLinearDispatch},
 } where {
     D <: PSY.HydroTurbine,
     E <: PSY.HydroReservoir,
@@ -1661,6 +1661,56 @@ function PSI.add_constraints!(
                 sum(
                     (
                         head[PSY.get_name(res), t] + PSY.get_intake_elevation(res) -
+                        powerhouse_elevation
+                    ) * flow[name, PSY.get_name(res), t] for res in reservoirs
+                ) / (1e6 * base_power)
+            )
+        end
+    end
+    return
+end
+
+"""
+This function define the relationship between turbined flow and power produced with constant head
+"""
+function PSI.add_constraints!(
+    container::PSI.OptimizationContainer,
+    sys::PSY.System,
+    ::Type{TurbinePowerOutputConstraint},
+    devices::IS.FlattenIteratorWrapper{V},
+    model::PSI.DeviceModel{V, W},
+    ::PSI.NetworkModel{X},
+) where {
+    V <: PSY.HydroTurbine,
+    W <: HydroTurbineWaterLinearDispatch,
+    X <: PM.AbstractPowerModel,
+}
+    time_steps = PSI.get_time_steps(container)
+    base_power = PSI.get_base_power(container)
+    names = PSY.get_name.(devices)
+    constraint =
+        PSI.add_constraints_container!(
+            container,
+            TurbinePowerOutputConstraint(),
+            V,
+            names,
+            time_steps,
+        )
+    power = PSI.get_variable(container, PSI.ActivePowerVariable(), V)
+    flow = PSI.get_variable(container, HydroTurbineFlowRateVariable(), V)
+    for d in devices
+        name = PSY.get_name(d)
+        conversion_factor = PSY.get_conversion_factor(d)
+        reservoirs = filter(PSY.get_available, PSY.get_connected_head_reservoirs(sys, d))
+        powerhouse_elevation = PSY.get_powerhouse_elevation(d)
+        for t in time_steps
+            constraint[name, t] = JuMP.@constraint(
+                container.JuMPmodel,
+                power[name, t] ==
+                GRAVITATIONAL_CONSTANT * WATER_DENSITY * conversion_factor *
+                sum(
+                    (
+                        0.2 * PSY.get_intake_elevation(res) + PSY.get_intake_elevation(res) -
                         powerhouse_elevation
                     ) * flow[name, PSY.get_name(res), t] for res in reservoirs
                 ) / (1e6 * base_power)
