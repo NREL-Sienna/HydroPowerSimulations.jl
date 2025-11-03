@@ -1710,7 +1710,8 @@ function PSI.add_constraints!(
                 GRAVITATIONAL_CONSTANT * WATER_DENSITY * conversion_factor *
                 sum(
                     (
-                        0.2 * PSY.get_intake_elevation(res) + PSY.get_intake_elevation(res) -
+                        0.2 * PSY.get_intake_elevation(res) +
+                        PSY.get_intake_elevation(res) -
                         powerhouse_elevation
                     ) * flow[name, PSY.get_name(res), t] for res in reservoirs
                 ) / (1e6 * base_power)
