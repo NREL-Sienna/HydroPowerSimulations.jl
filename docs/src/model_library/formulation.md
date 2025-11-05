@@ -13,7 +13,7 @@ Hydro generation formulations define the optimization models that describe hydro
  2. [`HydroDispatchRunOfRiverBudget`](#HydroDispatchRunOfRiverBudget)
  3. [`HydroCommitmentRunOfRiver`](#HydroCommitmentRunOfRiver)
  4. [`HydroTurbineEnergyDispatch`](#HydroTurbineEnergyDispatch)
- 4. [`HydroEnergyBlockOptimization`](#HydroEnergyBlockOptimization)
+ 5. [`HydroEnergyBlockOptimization`](#HydroEnergyBlockOptimization)
 
 ## `HydroDispatchRunOfRiver`
 

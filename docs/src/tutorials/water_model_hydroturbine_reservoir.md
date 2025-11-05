@@ -56,7 +56,7 @@ set_device_model!(template, HydroTurbine, HydroTurbineBilinearDispatch)
 
 This is a nonlinear model that to compute its output power requires the bilinear term `head` times `water flow`. For that purpose the non-convex Ipopt solver will be used to solve this problem.
 
-In addition, we need to use the water model for the HydroReservoir via [`HydroWaterModelReservoir`](@ref). 
+In addition, we need to use the water model for the HydroReservoir via [`HydroWaterModelReservoir`](@ref).
 
 ```@repl op_problem
 set_device_model!(template, HydroReservoir, HydroWaterModelReservoir)
@@ -81,18 +81,28 @@ res = OptimizationProblemResults(model)
 Use [`read_variable`](@extref InfrastructureSystems.Optimization.read_variable) to read in the dispatch variable results for the hydro:
 
 ```@repl op_problem
-var = read_variable(res, "ActivePowerVariable__HydroTurbine"; table_format = TableFormat.WIDE)
+var =
+    read_variable(res, "ActivePowerVariable__HydroTurbine"; table_format = TableFormat.WIDE)
 ```
 
 or the water flowing through the turbine (in m³/s):
 
 ```@repl op_problem
-var = read_expression(res, "TotalHydroFlowRateTurbineOutgoing__HydroTurbine"; table_format = TableFormat.WIDE)
+var = read_expression(
+    res,
+    "TotalHydroFlowRateTurbineOutgoing__HydroTurbine";
+    table_format = TableFormat.WIDE,
+)
 ```
 
 and the head level of the reservoir:
+
 ```@repl op_problem
-hydraulic_head = read_variable(res, "HydroReservoirHeadVariable__HydroReservoir"; table_format = TableFormat.WIDE)
+hydraulic_head = read_variable(
+    res,
+    "HydroReservoirHeadVariable__HydroReservoir";
+    table_format = TableFormat.WIDE,
+)
 ```
 
 Note that since the water outflow limit of the turbine is limited on 30 m³/s, the optimal solution decides to flow as much water as possible producing power around 190 MW with that flow and hydraulic head.

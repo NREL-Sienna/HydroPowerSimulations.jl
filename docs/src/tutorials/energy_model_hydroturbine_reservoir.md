@@ -87,11 +87,15 @@ res = OptimizationProblemResults(model)
 Use [`read_variable`](@extref InfrastructureSystems.Optimization.read_variable) to read in the dispatch variable results for the hydro:
 
 ```@repl op_problem
-var = read_variable(res, "ActivePowerVariable__HydroTurbine"; table_format = TableFormat.WIDE)
+var =
+    read_variable(res, "ActivePowerVariable__HydroTurbine"; table_format = TableFormat.WIDE)
 ```
 
 or the energy capacity of the reservoir
+
 ```@repl op_problem
-energy = read_variable(res, "EnergyVariable__HydroReservoir"; table_format = TableFormat.WIDE)
+energy =
+    read_variable(res, "EnergyVariable__HydroReservoir"; table_format = TableFormat.WIDE)
 ```
+
 Note that since we have ignored the energy targets in the reservoir model, the optimal solution decides to deplete the reservoir.
