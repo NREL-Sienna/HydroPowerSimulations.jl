@@ -13,7 +13,6 @@ HydroPowerSimulations has been developed as part of the Flexible Linked Analysis
 
 There are five main sections containing different information:
 
-  - **Quick Guide** - Intro for getting started.
   - **Tutorials** - Detailed walk-throughs to help you *learn* how to use
     `HydroPowerSimulations.jl`
   - **How to...** - Directions to help *guide* your work for a particular task
@@ -25,7 +24,11 @@ There are five main sections containing different information:
 
 `HydroPowerSimulations.jl` strives to follow the [Diataxis](https://diataxis.fr/) documentation
 framework.
- 
+
+## Installing Sienna
+
+- [Sienna Installation Page](https://nrel-sienna.github.io/Sienna/SiennaDocs/docs/build/how-to/install/) on how to install the different packages.
+- Visit [PowerSimulations.jl](https://nrel-sienna.github.io/PowerSimulations.jl/latest/)  provides the basic models for operation that are used with hydro models in HydroPowerSimulations.jl.
 
 
 

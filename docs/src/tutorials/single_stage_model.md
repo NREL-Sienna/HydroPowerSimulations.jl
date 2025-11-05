@@ -64,7 +64,7 @@ Results can be explored using:
 res = OptimizationProblemResults(model)
 ```
 
-Use [`read_variable`](@ref InfrastructureSystems.Optimization.read_variable) to read in the dispatch variable results for the hydro:
+Use [`read_variable`](@extref InfrastructureSystems.Optimization.read_variable) to read in the dispatch variable results for the hydro:
 
 ```@repl op_problem
 var = read_variable(res, "ActivePowerVariable__HydroDispatch")
