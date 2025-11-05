@@ -990,7 +990,7 @@ end
 ##################################### Energy Block Optimization ############################
 """
 This function defines the constraint for the hydro power generation
-for the [`HydroEnergyBlockOptimization`](@extref).
+for the [`HydroEnergyBlockOptimization`](@ref).
 """
 function PSI.add_constraints!(
     container::PSI.OptimizationContainer,
@@ -1076,7 +1076,7 @@ end
 
 """
 This function defines the constraints for the water level (or state of charge)
-for the [`HydroEnergyBlockOptimization`](@extref).
+for the [`HydroEnergyBlockOptimization`](@ref).
 """
 function PSI.add_constraints!(
     container::PSI.OptimizationContainer,
