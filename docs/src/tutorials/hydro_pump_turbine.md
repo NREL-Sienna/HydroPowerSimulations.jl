@@ -1,4 +1,4 @@
-# HydroPumpTurbine
+# HydroPumpTurbine with Energy Model
 
 !!! note
     
@@ -22,50 +22,65 @@ using HiGHS # solver
     For more details visit [PowerSystemCaseBuilder README](https://github.com/NREL-Sienna/PowerSystemCaseBuilder.jl/blob/main/README.md)
 
 ```@repl op_problem
-sys = PSB.build_system(PSITestSystems, "c_sys5_hydro_pump_energy"; add_reserves = true)
+sys = build_system(PSITestSystems, "c_sys5_hydro_pump_energy")
 ```
 
-With one or more [`PowerSystems.HydroPumpTurbine`](@extref):
+With a single [`PowerSystems.HydroPumpTurbine`](@extref) connected to two [`PowerSystems.HydroReservoir`](@extref) (head and tail reservoirs of the turbine):
 
 ```@repl op_problem
-hy_pump = first(PSY.get_components(HydroPumpTurbine, sys))
+hy = only(get_components(HydroTurbine, sys))
 ```
 
-Add time series
-
+```@repl op_problem
+res_head = get_component(HydroReservoir, sys, "Bat_head_reservoir")
+res_tail = get_component(HydroReservoir, sys, "Bat_tail_reservoir")
 ```
-DayAhead = collect(
-    DateTime("1/1/2024  0:00:00", "d/m/y  H:M:S"):Hour(1):DateTime(
-        "1/1/2024  23:00:00",
-        "d/m/y  H:M:S",
-    ),
-)
 
-hydro_max_power = 0.8 * ones(48)
-hydro_max_cap = 0.9 * ones(48)
-tstamps = vcat(DayAhead, DayAhead .+ Day(1))
-tarray_power = TimeArray(tstamps, hydro_max_power)
-tarray_cap = TimeArray(tstamps, hydro_max_cap)
-
-PSY.add_time_series!(
-    sys,
-    hy_pump,
-    PSY.SingleTimeSeries("max_active_power", tarray_power),
-)
-PSY.add_time_series!(
-    sys,
-    hy_pump,
-    PSY.SingleTimeSeries("capacity", tarray_cap),
-)
-remove_time_series!(sys, Deterministic)
-transform_single_time_series!(sys, Hour(24), Hour(24))
-```
+Note that the reservoirs has a `level_data_type` of `ENERGY`, that implies its storage level limits data are in MWh. That means that the available capacity of the head reservoir is between 5.0 and 400 MWh, while the tail reservoir is set to zero, implying an infinite tail reservoir.
 
 ## Decision Model
 
+Setting up the formulations based on [`PowerSimulations.jl`](https://nrel-sienna.github.io/PowerSimulations.jl/latest/formulation_library/Introduction/):
+
+```@repl op_problem
+template = ProblemTemplate(PTDFPowerModel)
+set_device_model!(template, ThermalStandard, ThermalBasicDispatch)
+set_device_model!(template, PowerLoad, StaticPowerLoad)
+set_device_model!(template, Line, StaticBranch)
 ```
-template = ProblemTemplate(CopperPlatePowerModel)
-model = DecisionModel(CopperPlatePowerModel, sys)
+
+but, now we also include the HydroTurbine using [`HydroPumpEnergyDispatch`](@ref):
+
+```@repl op_problem
+pump_model = DeviceModel(
+    HydroPumpTurbine,
+    HydroPumpEnergyDispatch;
+    attributes = Dict{String, Any}(
+        "reservation" => true,
+        "energy_target" => false,
+    ),
+    time_series_names = Dict(),
+)
+set_device_model!(template, pump_model)
+```
+
+The `HydroPumpEnergyDispatch`(@ref) is a closed model for turbine and must be connected to independent reservoirs (not connected with other `HydroTurbine`). For that reason it is not needed to include a model of [`HydroEnergyModelReservoir`](@ref). When the attribute `reservation` is set-up to `true` it does not allow to simultaneously use the pump and turbine, forcing one of those variables to zero. The `energy_target` attributes allow to include a final target for the head reservoir based on its `level_targets` field.
+
+In addition, the `time_series_names` is set-up to an empty dictionary. By default, the `HydroPumpEnergyDispatch`(@ref) model allows to include limits on the `capacity` and `max_active_power` at each time step if the user need it by properly setting up those time series (similar to a [`HydroDispatchRunOfRiver`](@ref) model)
+
+```julia
+time_series_names = Dict(
+    ActivePowerTimeSeriesParameter => "max_active_power",
+    EnergyCapacityTimeSeriesParameter => "capacity",
+)
+```
+
+With the template properly set-up, we construct, build and solve the optimization problem:
+
+```@repl op_problem
+model = DecisionModel(template, sys; optimizer = HiGHS.Optimizer)
+build!(model; output_dir = mktempdir())
+solve!(model)
 ```
 
 ## Exploring Results
@@ -74,4 +89,31 @@ Results can be explored using:
 
 ```@repl op_problem
 res = OptimizationProblemResults(model)
+```
+
+Use [`read_variable`](@extref InfrastructureSystems.Optimization.read_variable) to read in the dispatch variable results for the hydro:
+
+```@repl op_problem
+var = read_variable(
+    res,
+    "ActivePowerVariable__HydroPumpTurbine";
+    table_format = TableFormat.WIDE,
+)
+```
+
+its pump usage
+
+```@repl op_problem
+var = read_variable(
+    res,
+    "ActivePowerPumpVariable__HydroPumpTurbine";
+    table_format = TableFormat.WIDE,
+)
+```
+
+and stored energy:
+
+```@repl op_problem
+var =
+    read_variable(res, "EnergyVariable__HydroPumpTurbine"; table_format = TableFormat.WIDE)
 ```
