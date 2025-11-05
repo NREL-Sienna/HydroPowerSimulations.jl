@@ -10,7 +10,6 @@ links = InterLinks(
 
 pages = OrderedDict(
     "Welcome Page" => "index.md",
-    "Quick Start Guide" => "quick_start_guide.md",
     "Tutorials" => Any[
         "Operation problem with HydroDispatchRunOfRiver" => "tutorials/single_stage_model.md",
         "Energy Hydro Reservoir Operation" => "tutorials/energy_model_hydroturbine_reservoir.md",
