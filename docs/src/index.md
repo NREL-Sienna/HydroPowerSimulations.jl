@@ -4,11 +4,6 @@
 
 `HydroPowerSimulations.jl` is a [`Julia`](http://www.julialang.org) package that extends [`PowerSimulations.jl`](https://nrel-sienna.github.io/PowerSimulations.jl/stable/) for modeling of hydro generation technology in operational simulations.
 
-* * *
-
-HydroPowerSimulations has been developed as part of the Flexible Linked Analysis of Streamflow and Hydropower (FLASH), Reliability and Resilience of coordinated water Distribution and power Distribution (R2D2) and HydroWires-C projects at the U.S. Department of Energy's National Renewable Energy Laboratory ([NREL](https://www.nrel.gov/)) Software Record SWR-23-110.
-
-
 ## How to Use This Documentation 
 
 There are five main sections containing different information:
@@ -30,5 +25,8 @@ framework.
 - [Sienna Installation Page](https://nrel-sienna.github.io/Sienna/SiennaDocs/docs/build/how-to/install/) on how to install the different packages.
 - Visit [PowerSimulations.jl](https://nrel-sienna.github.io/PowerSimulations.jl/latest/)  provides the basic models for operation that are used with hydro models in HydroPowerSimulations.jl.
 
+* * *
+
+HydroPowerSimulations has been developed as part of the Flexible Linked Analysis of Streamflow and Hydropower (FLASH), Reliability and Resilience of coordinated water Distribution and power Distribution (R2D2) and HydroWires-C projects at the U.S. Department of Energy's National Renewable Energy Laboratory ([NREL](https://www.nrel.gov/)) Software Record SWR-23-110.
 
 
