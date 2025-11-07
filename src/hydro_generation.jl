@@ -314,7 +314,6 @@ function PSI.get_initial_conditions_device_model(
     return PSI.DeviceModel(PSY.HydroDispatch, HydroDispatchRunOfRiver)
 end
 
-# TODO: This method is up for elimination
 function PSI.get_initial_conditions_device_model(
     ::PSI.OperationModel,
     ::PSI.DeviceModel{T, <:AbstractHydroReservoirFormulation},
@@ -355,27 +354,6 @@ function PSI.get_default_time_series_names(
         EnergyBudgetTimeSeriesParameter => "hydro_budget",
     )
 end
-
-#=
-function PSI.get_default_time_series_names(
-    ::Type{PSY.HydroEnergyReservoir},
-    ::Type{<:Union{HydroCommitmentReservoirBudget, HydroDispatchReservoirBudget}},
-)
-    return Dict{Type{<:PSI.TimeSeriesParameter}, String}(
-        EnergyBudgetTimeSeriesParameter => "hydro_budget",
-    )
-end
-
-function PSI.get_default_time_series_names(
-    ::Type{PSY.HydroEnergyReservoir},
-    ::Type{<:Union{HydroDispatchReservoirStorage, HydroCommitmentReservoirStorage}},
-)
-    return Dict{Type{<:PSI.TimeSeriesParameter}, String}(
-        EnergyTargetTimeSeriesParameter => "storage_target",
-        InflowTimeSeriesParameter => "inflow",
-    )
-end
-=#
 
 function PSI.get_default_time_series_names(
     ::Type{PSY.HydroReservoir},
@@ -1012,7 +990,7 @@ end
 ##################################### Energy Block Optimization ############################
 """
 This function defines the constraint for the hydro power generation
-for the [`HydroEnergyBlockOptimization`](@extref).
+for the [`HydroEnergyBlockOptimization`](@ref).
 """
 function PSI.add_constraints!(
     container::PSI.OptimizationContainer,
@@ -1098,7 +1076,7 @@ end
 
 """
 This function defines the constraints for the water level (or state of charge)
-for the [`HydroEnergyBlockOptimization`](@extref).
+for the [`HydroEnergyBlockOptimization`](@ref).
 """
 function PSI.add_constraints!(
     container::PSI.OptimizationContainer,

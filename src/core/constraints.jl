@@ -117,32 +117,40 @@ struct TurbineFlowLimitConstraint <: PSI.ConstraintType end
 """
 Struct to model turbine power output as a function of head
 
-TODO
+```math
+p_{t} = \\eta \\rho g h_{t} f^{Tu}_{t},
+```
 """
 struct TurbinePowerOutputConstraint <: PSI.ConstraintType end
 
 """
 Struct to model reservoir stored volume/head limits
 
-TODO
+```math
+h_{t}^{min} \\le h_{t} \\le h_{t}^{max},
+```
 """
 struct ReservoirLevelLimitConstraint <: PSI.ConstraintType end
 
 """
 Struct to model the final (target) volume/head storage constraint
 
-TODO
+```math
+v_{T} = V^\\text{target},
+```
 """
 struct ReservoirLevelTargetConstraint <: PSI.ConstraintType end
 
 """
 Struct to model the transformation from head to volume constraint
 
-TODO
+```math
+v_{t} = h_{t} \\text{head_to_volume},
+```
 """
 struct ReservoirHeadToVolumeConstraint <: PSI.ConstraintType end
 
 """
-TODO
+Feedforward constraint to limit the water level budget for reservoir formulations.
 """
 struct FeedForwardWaterLevelBudgetConstraint <: PSI.ConstraintType end
