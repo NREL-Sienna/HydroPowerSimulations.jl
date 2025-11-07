@@ -30,12 +30,12 @@ Formulation type to add commitment and injection variables constrained by a maxi
 struct HydroCommitmentRunOfRiver <: AbstractHydroUnitCommitment end
 
 """
-Formulation type to add reservoir methods with hydro turbines using water flow variables for [`PowerSystems.HydroGen`](@extref)
+Formulation type to add reservoir methods with hydro turbines using water flow variables for [`PowerSystems.HydroReservoir`](@extref)
 """
 struct HydroWaterModelReservoir <: AbstractHydroReservoirFormulation end
 
 """
-Formulation type to add reservoir methods with hydro turbines using only energy inflow/outflow variables (no water flow variables) for [`PowerSystems.HydroGen`](@extref)
+Formulation type to add reservoir methods with hydro turbines using only energy inflow/outflow variables (no water flow variables) for [`PowerSystems.HydroReservoir`](@extref)
 """
 struct HydroEnergyModelReservoir <: AbstractHydroReservoirFormulation end
 
