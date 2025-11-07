@@ -17,8 +17,8 @@ pages = OrderedDict(
         "Hydro Pump Turbine Operation" => "tutorials/hydro_pump_turbine.md",
     ],
     "How to..." => Any[
-        "Include input data for Hydro models" => "how_to/format_input_data.md",
-        "Include budget limit and storage targets to Hydro Reservoirs" => "how_to/include_limits_and_targets.md",
+        "...format input data for Hydro models" => "how_to/format_input_data.md",
+        "...include budget limit and storage targets to Hydro models" => "how_to/include_limits_and_targets.md",
     ],
     "Explanation" => Any[
         "Difference between Energy and Water models" => "explanation/difference_between_energy_water_models.md",
