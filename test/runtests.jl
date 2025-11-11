@@ -6,10 +6,16 @@ using PowerNetworkMatrices
 using HydroPowerSimulations
 using DataFrames
 using CSV
+using TimeSeries
 using Dates
 using InfrastructureSystems
 using Test
 using Logging
+import OrderedCollections: OrderedDict
+using DataFrames
+using DataFramesMeta
+
+import DataStructures: SortedDict
 
 import Aqua
 Aqua.test_unbound_args(HydroPowerSimulations)
@@ -32,10 +38,12 @@ const PSB = PowerSystemCaseBuilder
 const IS = InfrastructureSystems
 const PM = PSI.PM
 const PNM = PowerNetworkMatrices
+const HPS = HydroPowerSimulations
 
 # Test Utils
 using JuMP
 using HiGHS
+using Ipopt
 
 HiGHS_optimizer = JuMP.optimizer_with_attributes(
     HiGHS.Optimizer,
@@ -43,6 +51,12 @@ HiGHS_optimizer = JuMP.optimizer_with_attributes(
     "log_to_console" => false,
     "mip_abs_gap" => 1e-1,
     "mip_rel_gap" => 1e-1,
+)
+
+Ipopt_optimizer = JuMP.optimizer_with_attributes(
+    Ipopt.Optimizer,
+    "max_cpu_time" => 300.0,
+    "print_level" => 0,
 )
 
 ENV["RUNNING_PSI_TESTS"] = "true"
@@ -53,6 +67,10 @@ include(joinpath(PSI_DIR, "test/test_utils/solver_definitions.jl"))
 include(joinpath(PSI_DIR, "test/test_utils/mock_operation_models.jl"))
 include(joinpath(PSI_DIR, "test/test_utils/operations_problem_templates.jl"))
 include(joinpath(PSI_DIR, "test/test_utils/model_checks.jl"))
+include(joinpath(PSI_DIR, "test/test_utils/add_market_bid_cost.jl"))
+include(joinpath(PSI_DIR, "test/test_utils/mbc_system_utils.jl"))
+include(joinpath(PSI_DIR, "test/test_utils/mbc_simulation_utils.jl"))
+include("testing_utils.jl")
 
 """
 Copied @includetests from https://github.com/ssfrr/TestSetExtensions.jl.

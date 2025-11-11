@@ -1,30 +1,30 @@
 module HydroPowerSimulations
 
 #################################################################################
-# Exports
-# export HydroEnergyCascade
-# export HydroDispatchCascade
-# export HydroDispatchReservoirCascade
-# export HydroDispatchRunOfRiverCascade
-# export HydroDispatchReservoirBudgetUpperBound
-# export HydroDispatchRunOfRiverLowerBound
-# export HydroDispatchReservoirBudgetLowerUpperBound
+
+###### Hydro Decision Models #######
+export MediumTermHydroPlanning
 
 ######## Hydro Formulations ########
-export HydroDispatchReservoirBudget
-export HydroDispatchReservoirStorage
-export HydroCommitmentReservoirBudget
-export HydroCommitmentReservoirStorage
-export HydroDispatchPumpedStorage
 export HydroDispatchRunOfRiver
+export HydroDispatchRunOfRiverBudget
 export HydroCommitmentRunOfRiver
+export HydroEnergyBlockOptimization
+export HydroWaterModelReservoir
+export HydroTurbineBilinearDispatch
+export HydroEnergyModelReservoir
+export HydroTurbineEnergyDispatch
+export HydroTurbineEnergyCommitment
+export HydroPumpEnergyDispatch
 
 ######## Hydro Variables ########
-export HydroEnergyVariableUp
-export HydroEnergyVariableDown
 export WaterSpillageVariable
 export HydroEnergyShortageVariable
 export HydroEnergySurplusVariable
+export HydroReservoirHeadVariable
+export HydroReservoirVolumeVariable
+export HydroTurbineFlowRateVariable
+export ActivePowerPumpVariable
 
 ######## Hydro Aux Variables ########
 export HydroEnergyOutput
@@ -37,25 +37,40 @@ export OutflowTimeSeriesParameter
 export ReservoirTargetParameter
 export ReservoirLimitParameter
 export HydroUsageLimitParameter
+export WaterLevelBudgetParameter
 
 ######## Hydro Initial Conditions #######
-export InitialHydroEnergyLevelUp
-export InitialHydroEnergyLevelDown
+export InitialReservoirVolume
 
 ######## Hydro Constraints #######
 export EnergyTargetConstraint
-export EnergyCapacityDownConstraint
-export EnergyCapacityUpConstraint
+export ActivePowerPumpReservationConstraint
+export ActivePowerPumpVariableLimitsConstraint
+export EnergyCapacityTimeSeriesLimitsConstraint
 export EnergyBudgetConstraint
+export ReservoirLevelLimitConstraint
+export ReservoirLevelTargetConstraint
+export TurbinePowerOutputConstraint
+export ReservoirHeadToVolumeConstraint
+export ReservoirInventoryConstraint
+export FeedForwardWaterLevelBudgetConstraint
 
 ######## Hydro feedforwards #######
 export ReservoirTargetFeedforward
 export ReservoirLimitFeedforward
 export HydroUsageLimitFeedforward
+export WaterLevelBudgetFeedforward
 
-######## Hydro Expressions #######
-export ReserveRangeExpressionLB
-export ReserveRangeExpressionUB
+####### Hydro Expressions ########
+export HydroServedReserveUpExpression
+export HydroServedReserveDownExpression
+export TotalHydroPowerReservoirIncoming
+export TotalHydroPowerReservoirOutgoing
+export TotalSpillagePowerReservoirIncoming
+export TotalHydroFlowRateReservoirIncoming
+export TotalHydroFlowRateReservoirOutgoing
+export TotalSpillageFlowRateReservoirIncoming
+export TotalHydroFlowRateTurbineOutgoing
 
 #################################################################################
 # Imports
@@ -81,16 +96,22 @@ const PM = PowerSimulations.PM
 #################################################################################
 # Includes
 # Core includes
+include("core/definitions.jl")
 include("core/formulations.jl")
 include("core/variables.jl")
 include("core/constraints.jl")
 include("core/expressions.jl")
 include("core/parameters.jl")
 include("core/initial_conditions.jl")
+include("core/decision_models.jl")
 
 # Models
 include("hydro_generation.jl")
 include("hydrogeneration_constructor.jl")
+include("hydro_decision_model.jl")
 include("feedforwards.jl")
+
+# Utils
+include("utils.jl")
 
 end # module

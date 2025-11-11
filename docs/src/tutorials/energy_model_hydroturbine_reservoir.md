@@ -1,4 +1,4 @@
-# [Operation Problem with `HydroPowerSimulations.jl`](@id op_problem)
+# HydroTurbine + Reservoir for EnergyModel
 
 !!! note
     
@@ -22,14 +22,20 @@ using HiGHS # solver
     For more details visit [PowerSystemCaseBuilder README](https://github.com/NREL-Sienna/PowerSystemCaseBuilder.jl/blob/main/README.md)
 
 ```@repl op_problem
-sys = build_system(PSITestSystems, "c_sys5_hy")
+sys = build_system(PSITestSystems, "c_sys5_hy_turbine_energy")
 ```
 
-With a single [`PowerSystems.HydroDispatch`](@extref):
+With a single [`PowerSystems.HydroTurbine`](@extref) connected downstream to a [`PowerSystems.HydroReservoir`](@extref):
 
 ```@repl op_problem
-hy = only(get_components(HydroDispatch, sys))
+hy = only(get_components(HydroTurbine, sys))
 ```
+
+```@repl op_problem
+res = only(get_components(HydroReservoir, sys))
+```
+
+Note that the reservoir has a `level_data_type` of `ENERGY`, that implies its storage level limits data are in MWh. That means that its maximum capacity is 5000 MWh, and its initial energy capacity is ``0.5 \cdot 5000 = 2500`` MWh.
 
 ## Decision Model
 
@@ -42,10 +48,24 @@ set_device_model!(template, PowerLoad, StaticPowerLoad)
 set_device_model!(template, Line, StaticBranch)
 ```
 
-but, now we also include the hydro using [`HydroDispatchRunOfRiver`](@ref):
+but, now we also include the HydroTurbine using [`HydroTurbineEnergyDispatch`](@ref):
 
 ```@repl op_problem
-set_device_model!(template, HydroDispatch, HydroDispatchRunOfRiver)
+set_device_model!(template, HydroTurbine, HydroTurbineEnergyDispatch)
+```
+
+and we need to use the energy model for the HydroReservoir via [`HydroEnergyModelReservoir`](@ref). For this example we will ignore end targets of hydro budgets, but they can be included by setting up the attributes to `true`. It is not recommended to set both `energy_target` and `hydro_budget` to `true` simultaneously since it may create an infeasible problem:
+
+```@repl op_problem
+reservoir_model = DeviceModel(
+    HydroReservoir,
+    HydroEnergyModelReservoir;
+    attributes = Dict{String, Any}(
+        "energy_target" => false,
+        "hydro_budget" => false,
+    ),
+)
+set_device_model!(template, reservoir_model)
 ```
 
 With the template properly set-up, we construct, build and solve the optimization problem:
@@ -67,5 +87,15 @@ res = OptimizationProblemResults(model)
 Use [`read_variable`](@extref InfrastructureSystems.Optimization.read_variable) to read in the dispatch variable results for the hydro:
 
 ```@repl op_problem
-var = read_variable(res, "ActivePowerVariable__HydroDispatch")
+var =
+    read_variable(res, "ActivePowerVariable__HydroTurbine"; table_format = TableFormat.WIDE)
 ```
+
+or the energy capacity of the reservoir
+
+```@repl op_problem
+energy =
+    read_variable(res, "EnergyVariable__HydroReservoir"; table_format = TableFormat.WIDE)
+```
+
+Note that since we have ignored the energy targets in the reservoir model, the optimal solution decides to deplete the reservoir.
