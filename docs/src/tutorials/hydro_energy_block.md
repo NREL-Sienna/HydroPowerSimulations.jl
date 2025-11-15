@@ -87,7 +87,7 @@ power =
     )
 ```
 
-or the volume capacity of the reservoir
+or the volume level of the reservoir
 
 ```@repl op_problem
 volume =
