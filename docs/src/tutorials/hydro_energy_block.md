@@ -48,7 +48,7 @@ set_level_targets!(reservoir, 0.9)
 Setting up the formulations based on [`PowerSimulations.jl`](https://nrel-sienna.github.io/PowerSimulations.jl/latest/formulation_library/Introduction/):
 
 ```@repl op_problem
-template = ProblemTemplate(PTDFPowerModel)
+template = ProblemTemplate(CopperPlatePowerModel)
 set_device_model!(template, ThermalStandard, ThermalBasicDispatch)
 set_device_model!(template, PowerLoad, StaticPowerLoad)
 ```
