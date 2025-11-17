@@ -1,4 +1,4 @@
-# HydroEnergyBlock
+# HydroEnergyBlock model tutorial
 
 !!! note
     
