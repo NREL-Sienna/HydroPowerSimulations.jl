@@ -408,8 +408,8 @@ For each hydro reservoir creates the constraints to track the energy storage.
 ```math
 \begin{align*}
 & e_{t}^\text{hy} = e_{t-1}^\text{hy} + \Delta T \left(p^\text{hy,in}_t + s^\text{in}_t + \text{InflowTimeSeriesParameter}_t - p^\text{hy,out} - s^\text{hy}\right), \quad \forall t\in \{1, \dots, T\} \\
-& e_T^\text{hy} + e^\text{shortage} + e^\text{surplus} = \text{EnergyTargetTimeSeriesParameter}_T, \quad \text{ if storage_target true} \\
-& \sum_{t=1}^T p^\text{hy}_t \le \sum_{t=1}^T \text{EnergyBudgetTimeSeriesParameter}_t, \quad \text{ if hydro_budget true}
+& e_T^\text{hy} + e^\text{shortage} + e^\text{surplus} = \text{EnergyTargetTimeSeriesParameter}_T, \quad \text{ if storage\_target true} \\
+& \sum_{t=1}^T p^\text{hy}_t \le \sum_{t=1}^T \text{EnergyBudgetTimeSeriesParameter}_t, \quad \text{ if hydro\_budget true}
 \end{align*}
 ```
 
@@ -496,43 +496,131 @@ For each hydro reservoir creates the constraints to track the energy storage.
 
 ## `HydroEnergyBlockOptimization`
 
-Formulation type to constrain hydropower production with an energy block optimization representation of the energy storage capacity and water inflow time series of a reservoir for [`PowerSystems.HydroGen`]
+Formulation type to constrain hydropower production with an energy block optimization representation of the energy storage capacity and water inflow time series of a reservoir for [`PowerSystems.HydroReservoir`](@extref) and [`PowerSystems.HydroTurbine`](@extref). This model operates with water levels (volumes) and uses a bilinear power production relationship that accounts for the hydraulic head variation with reservoir level.
+
+The formulation models the relationship between turbine flow rate, reservoir water level, and power production, allowing for more accurate representation of hydro operations when water level significantly affects power output.
 
 ```@docs; canonical=false
 HydroEnergyBlockOptimization
 ```
 
-**Initial Conditions:**
-
 **Variables:**
+
+  - [`HydroReservoirVolumeVariable`](@ref):
+    
+      + Bounds: ``[L^\text{min}, L^\text{max}]``
+      + Symbol: ``v^\text{hy}``
+      + Description: Volume stored in the hydro reservoir (in ``m^3``)
+
+  - [`WaterSpillageVariable`](@ref):
+    
+      + Bounds: ``[S^\text{min}, S^\text{max}]``
+      + Symbol: ``s``
+      + Description: Water spillage from the reservoir (in ``m^3/s``)
+  - [`PowerSimulations.ActivePowerVariable`](@extref):
+    
+      + Bounds: ``[P^\text{min}, P^\text{max}]``
+      + Symbol: ``p^\text{hy}``
+      + Description: Active power output from the hydro turbine
+  - [`PowerSimulations.ReactivePowerVariable`](@extref):
+    
+      + Bounds: ``[Q^\text{min}, Q^\text{max}]``
+      + Symbol: ``q^\text{hy}``
+      + Description: Reactive power output from the hydro turbine (only if network model includes reactive power)
+  - [`HydroTurbineFlowRateVariable`](@ref):
+    
+      + Bounds: ``[F^\text{min}, F^\text{max}]``
+      + Symbol: ``f^\text{hy}``
+      + Description: Water flow rate through the turbine (in ``m^3/s``)
 
 **Auxiliary Variables:**
 
+  - [`HydroEnergyOutput`](@ref):
+    
+      + Symbol: ``E^\text{hy,out}``
+      + Description: Energy output from the turbine computed as ``E^\text{hy,out} = p^\text{hy} \cdot \Delta T``
+
 **Static Parameters:**
 
-  - ``\eta``:  Turbine efficiency
-  - ``\rho``:  water density = ``1000 kg/m^3``
-  - ``g``: Gravitational constant = ``9.81 m/s^2``
-  - ``K``: Energy block constant =  ``\eta \rho g``
-  - ``h2v``: Head to volume conversion factor.
+  - ``L^\text{max}`` = `PowerSystems.get_storage_level_limits(device).max`
+  - ``L^\text{min}`` = `PowerSystems.get_storage_level_limits(device).min`
+  - ``L^\text{init}`` = `PowerSystems.get_initial_level(device)`
+  - ``S^\text{max}`` = `PowerSystems.get_spillage_limits(device).max`
+  - ``S^\text{min}`` = `PowerSystems.get_spillage_limits(device).min`
+  - ``P^\text{min}`` = `PowerSystems.get_active_power_limits(device).min`
+  - ``P^\text{max}`` = `PowerSystems.get_active_power_limits(device).max`
+  - ``Q^\text{min}`` = `PowerSystems.get_reactive_power_limits(device).min`
+  - ``Q^\text{max}`` = `PowerSystems.get_reactive_power_limits(device).max`
+  - ``F^\text{min}`` = `PowerSystems.get_outflow_limits(device).min`
+  - ``F^\text{max}`` = `PowerSystems.get_outflow_limits(device).max`
+  - ``\eta`` = `PowerSystems.get_efficiency(device)`: Turbine efficiency
+  - ``H^\text{elev}`` = `PowerSystems.get_intake_elevation(device)` - `PowerSystems.get_powerhouse_elevation(device)`: Elevation head (in ``m``)
+  - ``\text{h2v}`` = `PowerSystems.PowerSystems.get_head_to_volume_factor(device)`: Head to volume conversion factor
+  - ``\rho`` = ``1000 kg/m^3``: Water density
+  - ``g`` = ``9.81 m/s^2``: Gravitational constant
+  - ``K`` = ``\eta \rho g``: Energy block constant
+
+**Initial Conditions:**
+
+The [`InitialReservoirVolume`](@ref): ``v_0^\text{hy} = L^\text{init}`` is used as the initial condition for the volume level of the reservoir.
 
 **Time Series Parameters:**
 
-Uses the `InflowTimeSeriesParameter` and `OutflowTimeSeriesParameter` for track the water inflow and outflow at each time-step.
+Uses the [`InflowTimeSeriesParameter`](@ref) to track the water inflow to the reservoir at each time-step (in ``m^3/s``).
+
+**Expressions:**
+
+Adds ``p^\text{hy}`` to the `PowerSimulations.ActivePowerBalance` expression and ``q^\text{hy}`` to the `PowerSimulations.ReactivePowerBalance`, to be used in the supply-balance constraint depending on the network model used.
+
+If service models are included, adds ``p^\text{hy}`` to [`HydroServedReserveUpExpression`](@ref) and [`HydroServedReserveDownExpression`](@ref) expressions to track served reserves for energy calculations.
 
 **Objective:**
 
 Add a cost to the objective function depending on the defined cost structure of the hydro unit by adding it to its `ProductionCostExpression`.
 
-**Expressions:**
-
 **Constraints:**
+
+For each hydro reservoir, the reservoir inventory constraint tracks the water volume balance at every time step, based on volume balance in the previous time step, sum of water flows into the conencted downstream turbines, and the water spillage.
 
 ```math
 \begin{align*}
-  p^\text{hy}_1 = K \times f^\text{out}_{hy, 1} (h2v \times v_{res, 0} + H^\text{elevation}_{hy}), \quad \\
-  p^\text{hy}_t = K \times f^\text{out}_{hy, t} (0.5 \times h2v (v_{res, t-1} + v_{res, t} + H^\text{elevation}_{hy}), \quad \forall t \in \{1, \dots T\}
+& v_{t}^\text{hy} = v_{t-1}^\text{hy} + 3600 \cdot \Delta T \left(\text{InflowTimeSeriesParameter}_t - \sum_{i \in \mathcal{R}} f_{i,t}^\text{hy} - s_t \right), \quad \forall t\in \{2, \dots, T\} \\
+& v_{1}^\text{hy} = L^\text{init} + 3600 \cdot \Delta T \left(\text{InflowTimeSeriesParameter}_1 - \sum_{i \in \mathcal{R}} f_{i,1}^\text{hy} - s_1 \right)\\
+& v_t^\text{hy} = \text{h2v} \cdot  h_t^\text{hy}, \quad \forall t\in \{1, \dots, T\}  
 \end{align*}
 ```
+
+where ``\mathcal{R}`` is the set of downstream turbines connected to the reservoir, ``f_i^\text{hy}`` is the turbine flow rate for turbine ``i``, and ``\Delta T`` is the duration (in hours) of each time step. The factor ``3600`` converts hours to seconds.
+
+An optional reservoir level target constraint can be added to enforce a target level at the end of the simulation horizon:
+
+```math
+v_T^\text{hy} \ge L^\text{target}
+```
+
+where ``L^\text{target}`` = `PowerSystems.get_level_targets(device)` ``\times`` `PowerSystems.get_storage_level_limits(device).max`.
+
+For each hydro turbine, the hydro power constraint relates the power output to the water flow rate and hydraulic head. The power production is calculated using a bilinear formulation that accounts for the variation in hydraulic head as the reservoir level changes:
+
+```math
+\begin{align*}
+& p^\text{hy}_1 = \frac{\Delta T}{P^\text{base}} \cdot K \cdot f^\text{hy}_1 \cdot \left(0.5 \cdot \text{h2v} \cdot (v^\text{hy}_1 + L^\text{init}) + H^\text{elev} \right), \\
+& p^\text{hy}_t = \frac{\Delta T}{P^\text{base}} \cdot K \cdot f^\text{hy}_t \cdot \left(0.5 \cdot \text{h2v} \cdot (v^\text{hy}_t + v^\text{hy}_{t-1}) + H^\text{elev} \right), \quad \forall t\in \{2, \dots, T\}
+\end{align*}
+```
+
+where ``P^\text{base}`` is the system base power, and the hydraulic head is approximated using the average reservoir volume between consecutive time steps. The first time step uses the average of the initial volume and the volume at time ``t=1``.
+
+For each hydro turbine creates the range constraints for its active, reactive power and water flow depending on its static parameters:
+
+```math
+\begin{align*}
+& P^\text{min} \le p^\text{hy}_t \le P^\text{max}, \quad \forall t\in \{1, \dots, T\} \\
+& Q^\text{min} \le q^\text{hy}_t \le Q^\text{max}, \quad \forall t\in \{1, \dots, T\} \\
+& F^\text{min} \le f^\text{hy}_t \le F^\text{max}, \quad \forall t\in \{1, \dots, T\}
+\end{align*}
+```
+
+**Note:** This formulation does not support piecewise head to volume factor curves. Only linear (proportional) head to volume relationships are supported.
 
 * * *

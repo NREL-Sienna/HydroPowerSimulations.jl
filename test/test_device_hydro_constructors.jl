@@ -528,19 +528,22 @@ end
 
 @testset "Test Hydro Block Optimization Formulation" begin
     output_dir = mktempdir(; cleanup = true)
-    modeling_horizon = 52 * 24 * 1
+    modeling_horizon = 3 * 24 * 1
 
     sys = PSB.build_system(PSITestSystems, "c_sys5_hy_turbine_energy")
     res = first(PSY.get_components(HydroReservoir, sys))
 
     set_head_to_volume_factor!(res, LinearCurve(1.0))
+    set_storage_level_limits!(res, (min = 4000, max = 6000))
+    set_level_targets!(res, 0.9)
     template_ed = ProblemTemplate(
         NetworkModel(
             CopperPlatePowerModel;
         ),
     )
+
+    set_device_model!(template_ed, ThermalStandard, ThermalBasicDispatch)
     set_device_model!(template_ed, PowerLoad, StaticPowerLoad)
-    set_device_model!(template_ed, ThermalStandard, ThermalDispatchNoMin)
     set_device_model!(template_ed, HydroReservoir, HydroEnergyBlockOptimization)
     set_device_model!(template_ed, HydroTurbine, HydroEnergyBlockOptimization)
 
@@ -558,8 +561,26 @@ end
     @test build!(model; output_dir = output_dir) ==
           PSI.ModelBuildStatus.BUILT
 
-    # @test solve!(model; optimizer = Ipopt_optimizer, output_dir = output_dir) ==
-    #       IS.Simulation.RunStatus.SUCCESSFULLY_FINALIZED
+    @test solve!(model; optimizer = Ipopt_optimizer, output_dir = output_dir) ==
+          IS.Simulation.RunStatus.SUCCESSFULLY_FINALIZED
+
+    results = OptimizationProblemResults(model)
+    power_load = read_parameter(results, "ActivePowerTimeSeriesParameter__PowerLoad")
+    reservoir_inflow = read_parameter(results, "InflowTimeSeriesParameter__HydroReservoir")
+
+    water_spillage = read_variable(results, "WaterSpillageVariable__HydroReservoir")
+    thermal_power = read_variable(results, "ActivePowerVariable__ThermalStandard")
+    hydro_power = read_variable(results, "ActivePowerVariable__HydroTurbine")
+
+    turbine_output = read_aux_variable(results, "HydroEnergyOutput__HydroTurbine")
+    reservoir_volume =
+        read_variable(results, "HydroReservoirVolumeVariable__HydroReservoir")
+
+    var = read_variable(
+        results,
+        "HydroReservoirVolumeVariable__HydroReservoir";
+        table_format = TableFormat.WIDE,
+    )
 
     # check the second step is equal to the first step + dispatch
 end
