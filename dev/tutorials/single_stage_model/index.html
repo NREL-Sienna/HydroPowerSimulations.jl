@@ -109,8 +109,8 @@ PowerSimulations Problem Expressions Results
 ┌───────────────────────────────────────────┐
 │ ProductionCostExpression__ThermalStandard │
 │ ActivePowerBalance__System                │
-│ ProductionCostExpression__HydroDispatch   │
 │ ActivePowerBalance__ACBus                 │
+│ ProductionCostExpression__HydroDispatch   │
 └───────────────────────────────────────────┘
 
 PowerSimulations Problem Parameters Results
@@ -122,8 +122,8 @@ PowerSimulations Problem Parameters Results
 PowerSimulations Problem Variables Results
 ┌──────────────────────────────────────┐
 │ FlowActivePowerVariable__Line        │
-│ ActivePowerVariable__ThermalStandard │
 │ ActivePowerVariable__HydroDispatch   │
+│ ActivePowerVariable__ThermalStandard │
 └──────────────────────────────────────┘</span></code></pre><p>Use <a href="https://nrel-sienna.github.io/InfrastructureSystems.jl/stable/InfrastructureSystems/#InfrastructureSystems.Optimization.read_variable-Tuple%7BInfrastructureSystems.Optimization.OptimizationProblemResults%2C%20Vararg%7BAny%7D%7D"><code>read_variable</code></a> to read in the dispatch variable results for the hydro:</p><pre><code class="language-julia-repl hljs" style="display:block;">julia&gt; var = read_variable(res, &quot;ActivePowerVariable__HydroDispatch&quot;)</code><code class="nohighlight hljs ansi" style="display:block;"><span class="sgr1">24×3 DataFrame
  Row │ DateTime             name           value
      │<span class="sgr90"> DateTime             String         Float64
@@ -144,4 +144,4 @@ PowerSimulations Problem Variables Results
   22 │ 2024-01-01T21:00:00  HydroDispatch  427.448
   23 │ 2024-01-01T22:00:00  HydroDispatch  468.593
   24 │ 2024-01-01T23:00:00  HydroDispatch  114.291
-</span><span class="sgr36">                                      9 rows omitted</span></span></code></pre></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../../">« Welcome Page</a><a class="docs-footer-nextpage" href="../energy_model_hydroturbine_reservoir/">Energy Hydro Reservoir Operation »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.16.0 on <span class="colophon-date" title="Monday 17 November 2025 17:59">Monday 17 November 2025</span>. Using Julia version 1.12.1.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+</span><span class="sgr36">                                      9 rows omitted</span></span></code></pre></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../../">« Welcome Page</a><a class="docs-footer-nextpage" href="../energy_model_hydroturbine_reservoir/">Energy Hydro Reservoir Operation »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.16.0 on <span class="colophon-date" title="Monday 17 November 2025 18:00">Monday 17 November 2025</span>. Using Julia version 1.12.1.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
