@@ -16,6 +16,10 @@ pages = OrderedDict(
         "Water Hydro Reservoir Operation" => "tutorials/water_model_hydroturbine_reservoir.md",
         "Hydro Pump Turbine Operation" => "tutorials/hydro_pump_turbine.md",
         "HydroEnergyBlock model usage" => "tutorials/hydro_energy_block.md",
+        "Hydro Unit Commitment" => "tutorials/unit_commitment.md",
+        "Medium-Term Hydro Planning" => "tutorials/medium_term_planning.md",
+        "Feedforward Mechanisms" => "tutorials/feedforward_mechanisms.md",
+        "Multi-Reservoir Cascade Operations" => "tutorials/cascade_reservoirs.md",
     ],
     "How to..." => Any[
         "...format input data for Hydro models" => "how_to/format_input_data.md",

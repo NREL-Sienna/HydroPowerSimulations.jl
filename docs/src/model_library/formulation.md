@@ -12,14 +12,25 @@ Hydro generation formulations define the optimization models that describe hydro
 
 ### Table of Contents
 
+#### Dispatch Formulations
  1. [`HydroDispatchRunOfRiver`](#HydroDispatchRunOfRiver)
  2. [`HydroDispatchRunOfRiverBudget`](#HydroDispatchRunOfRiverBudget)
+
+#### Unit Commitment Formulations
  3. [`HydroCommitmentRunOfRiver`](#HydroCommitmentRunOfRiver)
- 4. [`HydroTurbineEnergyDispatch`](#HydroTurbineEnergyDispatch)
- 5. [`HydroTurbineBilinearDispatch`](#HydroTurbineBilinearDispatch)
- 6. [`HydroEnergyModelReservoir`](#HydroEnergyModelReservoir)
- 7. [`HydroWaterModelReservoir`](#HydroWaterModelReservoir)
- 8. [`HydroEnergyBlockOptimization`](#HydroEnergyBlockOptimization)
+ 4. [`HydroTurbineEnergyCommitment`](#HydroTurbineEnergyCommitment)
+
+#### Turbine Formulations
+ 5. [`HydroTurbineEnergyDispatch`](#HydroTurbineEnergyDispatch)
+ 6. [`HydroTurbineBilinearDispatch`](#HydroTurbineBilinearDispatch)
+
+#### Reservoir Formulations
+ 7. [`HydroEnergyModelReservoir`](#HydroEnergyModelReservoir)
+ 8. [`HydroWaterModelReservoir`](#HydroWaterModelReservoir)
+ 9. [`HydroEnergyBlockOptimization`](#HydroEnergyBlockOptimization)
+
+#### Pump-Turbine Formulations
+ 10. [`HydroPumpEnergyDispatch`](#HydroPumpEnergyDispatch)
 
 ## `HydroDispatchRunOfRiver`
 
@@ -622,5 +633,194 @@ For each hydro turbine creates the range constraints for its active, reactive po
 ```
 
 **Note:** This formulation does not support piecewise head to volume factor curves. Only linear (proportional) head to volume relationships are supported.
+
+* * *
+
+## `HydroTurbineEnergyCommitment`
+
+Formulation type for unit commitment of [`PowerSystems.HydroTurbine`](@extref) devices with binary on/off decisions. This formulation extends [`HydroTurbineEnergyDispatch`](@ref) by adding commitment variables that determine whether the turbine is online at each time step.
+
+```@docs; canonical=false
+HydroTurbineEnergyCommitment
+```
+
+**Variables:**
+
+  - [`PowerSimulations.ActivePowerVariable`](@extref):
+
+      + Bounds: [0.0, ]
+      + Symbol: ``p^\text{hy}``
+
+  - [`PowerSimulations.ReactivePowerVariable`](@extref):
+
+      + Bounds: [0.0, ]
+      + Symbol: ``q^\text{hy}``
+
+  - [`PowerSimulations.OnVariable`](@extref):
+
+      + Bounds: ``\{0, 1\}``
+      + Symbol: ``u^\text{hy}``
+
+**Auxiliary Variables:**
+
+  - [`HydroEnergyOutput`](@ref):
+
+      + Symbol: ``E^\text{hy,out}``
+
+The [`HydroEnergyOutput`](@ref) is computed as the energy used at each time step from the hydro turbine, computed simply as ``E^\text{hy,out} = p^\text{hy} \cdot \Delta T``, where ``\Delta T`` is the duration (in hours) of each time step.
+
+**Static Parameters:**
+
+  - ``P^\text{hy,min}`` = `PowerSystems.get_active_power_limits(device).min`
+  - ``P^\text{hy,max}`` = `PowerSystems.get_active_power_limits(device).max`
+  - ``Q^\text{hy,min}`` = `PowerSystems.get_reactive_power_limits(device).min`
+  - ``Q^\text{hy,max}`` = `PowerSystems.get_reactive_power_limits(device).max`
+
+**Objective:**
+
+Add a cost to the objective function depending on the defined cost structure of the hydro turbine by adding it to its `ProductionCostExpression`. This includes both variable costs (proportional to power output) and fixed costs (when the unit is on).
+
+**Expressions:**
+
+Adds ``p^\text{hy}`` to the `PowerSimulations.ActivePowerBalance` expression and ``q^\text{hy}`` to the `PowerSimulations.ReactivePowerBalance`, to be used in the supply-balance constraint depending on the network model used.
+
+If service models are included, adds ``p^\text{hy}`` to [`HydroServedReserveUpExpression`](@ref) and [`HydroServedReserveDownExpression`](@ref) expressions to track served reserves.
+
+**Constraints:**
+
+For each hydro turbine creates the range constraints for its active and reactive power depending on its static parameters and commitment status. When the unit is off (``u_t^\text{hy} = 0``), the power output is forced to zero.
+
+```math
+\begin{align*}
+&  u_t^\text{hy} P^\text{hy,min} \le p^\text{hy}_t \le u_t^\text{hy} P^\text{hy,max}, \quad \forall t\in \{1, \dots, T\} \\
+&  u_t^\text{hy} Q^\text{hy,min} \le q^\text{hy}_t \le u_t^\text{hy} Q^\text{hy,max}, \quad \forall t\in \{1, \dots, T\}
+\end{align*}
+```
+
+* * *
+
+## `HydroPumpEnergyDispatch`
+
+Formulation type for dispatch of [`PowerSystems.HydroPumpTurbine`](@extref) devices that can operate in both generation (turbine) and pumping modes. This formulation uses energy-based variables to track the storage level of the connected reservoir.
+
+```@docs; canonical=false
+HydroPumpEnergyDispatch
+```
+
+**Variables:**
+
+  - [`PowerSimulations.ActivePowerVariable`](@extref):
+
+      + Bounds: ``[P^\text{min}, P^\text{max}]``
+      + Symbol: ``p^\text{hy}``
+      + Description: Active power output in turbine/generation mode
+
+  - [`ActivePowerPumpVariable`](@ref):
+
+      + Bounds: ``[P^\text{pump,min}, P^\text{pump,max}]``
+      + Symbol: ``p^\text{pump}``
+      + Description: Active power consumption in pump mode (negative contribution to power balance)
+
+  - [`PowerSimulations.EnergyVariable`](@extref):
+
+      + Bounds: ``[E^\text{min}, E^\text{max}]``
+      + Symbol: ``e^\text{hy}``
+      + Description: Energy stored in the connected reservoir
+
+  - [`WaterSpillageVariable`](@ref):
+
+      + Bounds: ``[S^\text{min}, S^\text{max}]``
+      + Symbol: ``s``
+      + Description: Energy spilled from the reservoir
+
+  - [`PowerSimulations.ReactivePowerVariable`](@extref):
+
+      + Bounds: ``[Q^\text{min}, Q^\text{max}]``
+      + Symbol: ``q^\text{hy}``
+      + Description: Reactive power output (only if network model includes reactive power)
+
+  - [`PowerSimulations.ReservationVariable`](@extref) (optional):
+
+      + Bounds: ``\{0, 1\}``
+      + Symbol: ``r^\text{hy}``
+      + Description: Binary variable indicating pump (0) or turbine (1) mode. Only added if `reservation = true` attribute is set.
+
+  - [`HydroEnergyShortageVariable`](@ref) (optional):
+
+      + Bounds: ``[0.0, E^\text{max}]``
+      + Symbol: ``e^\text{shortage}``
+      + Description: Slack variable for below-target energy levels. Only added if `energy_target = true` attribute is set.
+
+  - [`HydroEnergySurplusVariable`](@ref) (optional):
+
+      + Bounds: ``[-E^\text{max}, 0.0]``
+      + Symbol: ``e^\text{surplus}``
+      + Description: Slack variable for above-target energy levels. Only added if `energy_target = true` attribute is set.
+
+**Static Parameters:**
+
+  - ``P^\text{min}`` = `PowerSystems.get_active_power_limits(device).min`
+  - ``P^\text{max}`` = `PowerSystems.get_active_power_limits(device).max`
+  - ``P^\text{pump,min}`` = `PowerSystems.get_active_power_limits_pump(device).min`
+  - ``P^\text{pump,max}`` = `PowerSystems.get_active_power_limits_pump(device).max`
+  - ``Q^\text{min}`` = `PowerSystems.get_reactive_power_limits(device).min`
+  - ``Q^\text{max}`` = `PowerSystems.get_reactive_power_limits(device).max`
+  - ``E^\text{max}`` = Energy capacity from connected head reservoir
+  - ``E^\text{min}`` = Minimum energy level
+  - ``E^\text{init}`` = Initial energy level from connected head reservoir
+
+**Initial Conditions:**
+
+The `PowerSimulations.InitialEnergyLevel`: ``e_0 = E^\text{init}`` is used as the initial condition for the energy level, obtained from the connected head reservoir.
+
+**Time Series Parameters:**
+
+  - `max_active_power` timeseries parameter to limit turbine power at each time-step
+  - [`EnergyCapacityTimeSeriesParameter`](@ref) to set time-varying energy capacity limits
+  - `storage_target` timeseries parameter for energy targets (if `energy_target = true`)
+
+**Attributes:**
+
+During model setup, the following attributes can be configured:
+
+  - `reservation = true`: Adds binary reservation variable to enforce mutual exclusivity between pump and turbine modes
+  - `energy_target = true`: Adds energy target constraint with shortage/surplus slack variables at end of horizon
+
+**Objective:**
+
+Add a cost to the objective function depending on the defined cost structure of the pump-turbine by adding it to its `ProductionCostExpression`. Both turbine generation and pump consumption can have associated costs. If energy targets are enabled, shortage costs are also added.
+
+**Expressions:**
+
+Adds ``p^\text{hy}`` to the `PowerSimulations.ActivePowerBalance` expression (positive contribution) and ``p^\text{pump}`` with a negative multiplier (power consumption), as well as ``q^\text{hy}`` to the `PowerSimulations.ReactivePowerBalance`.
+
+**Constraints:**
+
+For each pump-turbine, creates constraints for power limits, energy balance, and optional mode separation:
+
+```math
+\begin{align*}
+& P^\text{min} \le p^\text{hy}_t \le P^\text{max}, \quad \forall t\in \{1, \dots, T\} \\
+& P^\text{pump,min} \le p^\text{pump}_t \le P^\text{pump,max}, \quad \forall t\in \{1, \dots, T\} \\
+& e_{t}^\text{hy} = e_{t-1}^\text{hy} + \Delta T \left(p^\text{pump}_t - p^\text{hy}_t - s^\text{hy}_t\right), \quad \forall t\in \{1, \dots, T\}
+\end{align*}
+```
+
+If `reservation = true`, the following constraints enforce mutual exclusivity between modes:
+
+```math
+\begin{align*}
+& p^\text{hy}_t \le r_t^\text{hy} \cdot P^\text{max}, \quad \forall t\in \{1, \dots, T\} \\
+& p^\text{pump}_t \le (1 - r_t^\text{hy}) \cdot P^\text{pump,max}, \quad \forall t\in \{1, \dots, T\}
+\end{align*}
+```
+
+If `energy_target = true`, the following constraint is added at the end of the horizon:
+
+```math
+e_T^\text{hy} + e^\text{shortage} + e^\text{surplus} = \text{EnergyTargetTimeSeriesParameter}_T
+```
+
+If time series parameters are provided, additional constraints limit power and energy capacity based on time-varying values.
 
 * * *
