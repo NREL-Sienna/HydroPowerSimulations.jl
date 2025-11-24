@@ -1632,6 +1632,12 @@ function PSI.construct_device!(
 
     PSI.add_parameters!(container, InflowTimeSeriesParameter, devices, model)
     PSI.add_parameters!(container, OutflowTimeSeriesParameter, devices, model)
+    if PSI.get_attribute(model, "hydro_target")
+        PSI.add_parameters!(container, WaterTargetTimeSeriesParameter, devices, model)
+    end
+    if PSI.get_attribute(model, "hydro_budget")
+        PSI.add_parameters!(container, WaterBudgetTimeSeriesParameter, devices, model)
+    end
     PSI.add_feedforward_arguments!(container, model, devices)
     return
 end
@@ -1709,6 +1715,27 @@ function PSI.construct_device!(
         model,
         network_model,
     )
+
+    if PSI.get_attribute(model, "hydro_target")
+        PSI.add_constraints!(
+            container,
+            WaterTargetConstraint,
+            devices,
+            model,
+            network_model,
+        )
+    end
+
+    if PSI.get_attribute(model, "hydro_budget")
+        PSI.add_constraints!(
+            container,
+            sys,
+            WaterBudgetConstraint,
+            devices,
+            model,
+            network_model,
+        )
+    end
 
     PSI.add_feedforward_constraints!(container, model, devices)
 

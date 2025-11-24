@@ -11,6 +11,19 @@ e_t + e^\\text{shortage} + e^\\text{surplus} = \\text{EnergyTargetTimeSeriesPara
 ```
 """
 struct EnergyTargetConstraint <: PSI.ConstraintType end
+
+"""
+Struct to create the constraint that set-up the target for reservoir formulations. It can use head or volume as the storage variable.
+
+For more information check [HydroPowerSimulations Formulations](@ref HydroPowerSimulations-Formulations).
+
+The specified constraint is formulated as:
+
+```math
+l_t + l^\\text{shortage} + l^\\text{surplus} = \\text{WaterTargetTimeSeriesParameter}_t, \\quad \\forall t \\in \\{1,\\dots, T\\}
+```
+"""
+struct WaterTargetConstraint <: PSI.ConstraintType end
 struct EnergyShortageVariableLimitsConstraint <: PSI.ConstraintType end
 
 """
@@ -25,6 +38,18 @@ The specified constraint is formulated as:
 ```
 """
 struct EnergyBudgetConstraint <: PSI.ConstraintType end
+"""
+Struct to create the constraint that limits the budget for reservoir formulations.
+
+For more information check [HydroPowerSimulations Formulations](@ref HydroPowerSimulations-Formulations).
+
+The specified constraint is formulated as:
+
+```math
+\\sum_{t=1}^T f^\\text{hy}_t \\le \\sum_{t=1}^T \\text{WaterBudgetTimeSeriesParameter}_t,
+```
+"""
+struct WaterBudgetConstraint <: PSI.ConstraintType end
 struct EnergyCapacityConstraint <: PSI.ConstraintType end
 
 """

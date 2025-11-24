@@ -182,6 +182,7 @@ end
 PSI.get_multiplier_value(::EnergyBudgetTimeSeriesParameter, d::PSY.HydroGen, ::AbstractHydroFormulation) = PSY.get_max_active_power(d)
 # PSI.get_multiplier_value(::EnergyBudgetTimeSeriesParameter, d::PSY.HydroEnergyReservoir, ::AbstractHydroFormulation) = PSY.get_storage_capacity(d)
 PSI.get_multiplier_value(::EnergyBudgetTimeSeriesParameter, d::PSY.HydroReservoir, ::HydroEnergyModelReservoir) = PSY.get_storage_level_limits(d).max / PSY.get_system_base_power(d)
+PSI.get_multiplier_value(::WaterBudgetTimeSeriesParameter, d::PSY.HydroReservoir, ::HydroWaterModelReservoir) = 1.0 # Data already in m3/s
 PSI.get_multiplier_value(::EnergyTargetTimeSeriesParameter, d::PSY.HydroGen, ::AbstractHydroFormulation) = PSY.get_storage_capacity(d)
 PSI.get_multiplier_value(::EnergyTargetTimeSeriesParameter, d::PSY.HydroReservoir, ::HydroEnergyModelReservoir) = PSY.get_level_targets(d) * PSY.get_storage_level_limits(d).max / PSY.get_system_base_power(d)
 PSI.get_multiplier_value(::InflowTimeSeriesParameter, d::PSY.HydroGen, ::AbstractHydroFormulation) = PSY.get_inflow(d) * PSY.get_conversion_factor(d)
@@ -286,16 +287,6 @@ PSI.variable_cost(cost::PSY.StorageCost, ::PSI.ActivePowerVariable, ::PSY.HydroG
 
 #! format: on
 
-#=
-# These methods are defined in PowerSimulations
-function PSI.get_initial_conditions_device_model(
-    ::PSI.OperationModel,
-    model::PSI.DeviceModel{T, <:AbstractHydroReservoirFormulation},
-) where {T <: PSY.HydroEnergyReservoir}
-    return model
-end
-=#
-
 # These methods are defined in PowerSimulations
 function PSI.get_initial_conditions_device_model(
     ::PSI.OperationModel,
@@ -376,6 +367,8 @@ function PSI.get_default_time_series_names(
     return Dict{Type{<:PSI.TimeSeriesParameter}, String}(
         InflowTimeSeriesParameter => "inflow",
         OutflowTimeSeriesParameter => "outflow",
+        WaterTargetTimeSeriesParameter => "hydro_target",
+        WaterBudgetTimeSeriesParameter => "hydro_budget",
     )
 end
 
@@ -384,7 +377,7 @@ function PSI.get_default_time_series_names(
     ::Type{HydroEnergyModelReservoir},
 )
     return Dict{Type{<:PSI.TimeSeriesParameter}, String}(
-        EnergyTargetTimeSeriesParameter => "storage_target",
+        EnergyTargetTimeSeriesParameter => "energy_target",
         InflowTimeSeriesParameter => "inflow",
         EnergyBudgetTimeSeriesParameter => "hydro_budget",
     )
@@ -430,17 +423,20 @@ end
 
 function PSI.get_default_attributes(
     ::Type{PSY.HydroReservoir},
-    ::Type{HydroWaterModelReservoir},
-)
-    return Dict{String, Any}()
-end
-
-function PSI.get_default_attributes(
-    ::Type{PSY.HydroReservoir},
     ::Type{HydroEnergyModelReservoir},
 )
     return Dict{String, Any}(
         "energy_target" => false,
+        "hydro_budget" => false,
+    )
+end
+
+function PSI.get_default_attributes(
+    ::Type{PSY.HydroReservoir},
+    ::Type{HydroWaterModelReservoir},
+)
+    return Dict{String, Any}(
+        "hydro_target" => false,
         "hydro_budget" => false,
     )
 end
@@ -1299,6 +1295,44 @@ function PSI.add_constraints!(
     return
 end
 
+"""
+This function define the budget constraint for the
+active power budget formulation.
+`` sum(f[t]) <= Budget ``
+"""
+function PSI.add_constraints!(
+    container::PSI.OptimizationContainer,
+    sys::PSY.System,
+    ::Type{WaterBudgetConstraint},
+    devices::IS.FlattenIteratorWrapper{V},
+    model::PSI.DeviceModel{V, W},
+    ::PSI.NetworkModel{X},
+) where {
+    V <: PSY.HydroReservoir,
+    W <: HydroWaterModelReservoir,
+    X <: PM.AbstractPowerModel,
+}
+    time_steps = PSI.get_time_steps(container)
+    set_name = [PSY.get_name(d) for d in devices]
+    constraint =
+        PSI.add_constraints_container!(container, WaterBudgetConstraint(), V, set_name)
+
+    total_flow_out = PSI.get_expression(container, TotalHydroFlowRateReservoirOutgoing(), V)
+    param_container = PSI.get_parameter(container, WaterBudgetTimeSeriesParameter(), V)
+    multiplier = PSI.get_multiplier_array(param_container)
+
+    for d in devices
+        name = PSY.get_name(d)
+        param = PSI.get_parameter_column_values(param_container, name)
+        constraint[name] = JuMP.@constraint(
+            container.JuMPmodel,
+            sum([total_flow_out[name, t] for t in time_steps]) <=
+            sum([multiplier[name, t] * param[t] for t in time_steps])
+        )
+    end
+    return
+end
+
 ############################################################################
 ###################### Medium Term Constraints #############################
 ############################################################################
@@ -1693,7 +1727,6 @@ function PSI.add_constraints!(
                 GRAVITATIONAL_CONSTANT * WATER_DENSITY * conversion_factor *
                 sum(
                     (
-                        0.2 * PSY.get_intake_elevation(res) +
                         PSY.get_intake_elevation(res) -
                         powerhouse_elevation
                     ) * flow[name, PSY.get_name(res), t] for res in reservoirs
