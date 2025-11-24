@@ -17,9 +17,10 @@ Hydro generation formulations define the optimization models that describe hydro
  3. [`HydroCommitmentRunOfRiver`](#HydroCommitmentRunOfRiver)
  4. [`HydroTurbineEnergyDispatch`](#HydroTurbineEnergyDispatch)
  5. [`HydroTurbineBilinearDispatch`](#HydroTurbineBilinearDispatch)
- 6. [`HydroEnergyModelReservoir`](#HydroEnergyModelReservoir)
- 7. [`HydroWaterModelReservoir`](#HydroWaterModelReservoir)
- 8. [`HydroWaterFactorModel`](#HydroWaterFactorModel)
+ 6. [`HydroTurbineWaterLinearDispatch`](#HydroTurbineWaterLinearDispatch)
+ 7. [`HydroEnergyModelReservoir`](#HydroEnergyModelReservoir)
+ 8. [`HydroWaterModelReservoir`](#HydroWaterModelReservoir)
+ 9. [`HydroWaterFactorModel`](#HydroWaterFactorModel)
 
 ## `HydroDispatchRunOfRiver`
 
@@ -331,6 +332,71 @@ For each hydro turbine creates the range constraints for its active, reactive po
 ```
 
 where ``h`` is the effective hydraulic head (above the intake), the ``\text{inH}`` is the intake elevation (in meters above the sea level), ``\text{powH}`` is the powerhouse elevation (in meters above the sea level), ``g = 9.81~ \text{m/s}^2`` is the gravitational constant, and ``\rho = 1000~ \text{kg/m}^3`` is the water density. Finally, the term ``10^{-6} \cdot \text{SysBasePower}^{-1}`` is used to transform the power in Watts into per-unit.
+
+* * *
+
+## `HydroTurbineWaterLinearDispatch`
+
+```@docs; canonical=false
+HydroTurbineWaterLinearDispatch
+```
+
+**Variables:**
+
+  - [`PowerSimulations.ActivePowerVariable`](@extref):
+    
+      + Bounds: [0.0, ]
+      + Symbol: ``p^\text{hy}``
+
+  - [`PowerSimulations.ReactivePowerVariable`](@extref):
+    
+      + Bounds: [0.0, ]
+      + Symbol: ``q^\text{hy}``
+  - [`HydroTurbineFlowRateVariable`](@ref):
+    
+      + Bounds: [0.0, ]
+      + Symbol: ``f^\text{hy}``
+
+**Expressions added:**
+
+  - [`TotalHydroFlowRateTurbineOutgoing`](@ref):
+    
+      + Symbol: ``f^\text{hy,out}``
+
+The [`TotalHydroFlowRateTurbineOutgoing`](@ref) is computed as the total water flow outgoing of a turbine. This is helpful if the turbine is feed by multiple upstream reservoirs.
+
+**Static Parameters:**
+
+  - ``P^\text{hy,min}`` = `PowerSystems.get_active_power_limits(device).min`
+  - ``P^\text{hy,max}`` = `PowerSystems.get_active_power_limits(device).max`
+  - ``Q^\text{hy,min}`` = `PowerSystems.get_reactive_power_limits(device).min`
+  - ``Q^\text{hy,max}`` = `PowerSystems.get_reactive_power_limits(device).max`
+  - ``F^\text{hy, max}`` = `PowerSystems.get_outflow_limits(device).max`
+  - ``F^\text{hy, min}`` = `PowerSystems.get_outflow_limits(device).min`
+  - ``\text{powH}`` = `PowerSystems.get_powerhouse_elevation(device)`
+
+**Objective:**
+
+Add a cost to the objective function depending on the defined cost structure of the hydro turbine by adding it to its `ProductionCostExpression`.
+
+**Expressions:**
+
+Adds $p^\text{hy}$ to the `PowerSimulations.ActivePowerBalance` expression and $q^\text{hy}$ to the `PowerSimulations.ReactivePowerBalance`, to be used in the supply-balance constraint depending on the network model used.
+
+**Constraints:**
+
+For each hydro turbine creates the range constraints for its active, reactive power and water flow depending on its static parameters. By defining the set ``\mathcal{R}^{up}`` as the set of upstream reservoirs connected to the turbine, the turbine power output relationship can be added.
+
+```math
+\begin{align*}
+&  P^\text{hy,min} \le p^\text{hy}_t \le P^\text{hy,max}, \quad \forall t\in \{1, \dots, T\} \\
+&  Q^\text{hy,min} \le q^\text{hy}_t \le Q^\text{hy,max}, \quad \forall t\in \{1, \dots, T\} \\
+&  F^\text{hy,min} \le f^\text{hy}_t \le F^\text{hy,max}, \quad \forall t\in \{1, \dots, T\} \\
+&  p^\text{hy} = 10^{-6} \cdot \text{SysBasePower}^{-1} \cdot \rho g \sum_{r \in \mathcal{R}^{up}} f^\text{hy}_{r,t} \left(\text{inH} - \text{powH} \right) 
+\end{align*}
+```
+
+where  ``\text{inH}`` is the intake elevation (in meters above the sea level), ``\text{powH}`` is the powerhouse elevation (in meters above the sea level), ``g = 9.81~ \text{m/s}^2`` is the gravitational constant, and ``\rho = 1000~ \text{kg/m}^3`` is the water density. Finally, the term ``10^{-6} \cdot \text{SysBasePower}^{-1}`` is used to transform the power in Watts into per-unit. The method assumes that the hydraulic head is always the intake elevation for the power conversion.
 
 * * *
 
