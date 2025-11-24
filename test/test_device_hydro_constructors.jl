@@ -544,8 +544,8 @@ end
 
     set_device_model!(template_ed, ThermalStandard, ThermalBasicDispatch)
     set_device_model!(template_ed, PowerLoad, StaticPowerLoad)
-    set_device_model!(template_ed, HydroReservoir, HydroEnergyBlockOptimization)
-    set_device_model!(template_ed, HydroTurbine, HydroEnergyBlockOptimization)
+    set_device_model!(template_ed, HydroReservoir, HydroWaterFactorModel)
+    set_device_model!(template_ed, HydroTurbine, HydroWaterFactorModel)
 
     model = DecisionModel(
         template_ed,

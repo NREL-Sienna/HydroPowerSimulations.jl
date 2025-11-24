@@ -106,8 +106,8 @@ PSI.get_variable_lower_bound(::HydroTurbineFlowRateVariable, d::PSY.HydroTurbine
 PSI.get_variable_upper_bound(::HydroTurbineFlowRateVariable, d::PSY.HydroTurbine, ::AbstractHydroFormulation) = isnothing(PSY.get_outflow_limits(d)) ? nothing : PSY.get_outflow_limits(d).max
 
 ############## HydroEnergyBlock ####################
-PSI.get_variable_lower_bound(::HydroReservoirVolumeVariable, d::PSY.HydroReservoir, ::HydroEnergyBlockOptimization) = isnothing(PSY.get_storage_level_limits(d)) ? 0.0 : PSY.get_storage_level_limits(d).min
-PSI.get_variable_upper_bound(::HydroReservoirVolumeVariable, d::PSY.HydroReservoir, ::HydroEnergyBlockOptimization) = isnothing(PSY.get_storage_level_limits(d)) ? nothing : PSY.get_storage_level_limits(d).max
+PSI.get_variable_lower_bound(::HydroReservoirVolumeVariable, d::PSY.HydroReservoir, ::HydroWaterFactorModel) = isnothing(PSY.get_storage_level_limits(d)) ? 0.0 : PSY.get_storage_level_limits(d).min
+PSI.get_variable_upper_bound(::HydroReservoirVolumeVariable, d::PSY.HydroReservoir, ::HydroWaterFactorModel) = isnothing(PSY.get_storage_level_limits(d)) ? nothing : PSY.get_storage_level_limits(d).max
 
 ############## HydroPumpTurbine ####################
 PSI.get_variable_binary(::PSI.ReservationVariable, ::Type{<:PSY.HydroPumpTurbine}, ::HydroPumpEnergyDispatch) = true
@@ -189,7 +189,7 @@ PSI.get_multiplier_value(::OutflowTimeSeriesParameter, d::PSY.HydroGen, ::Abstra
 PSI.get_multiplier_value(::InflowTimeSeriesParameter, d::PSY.HydroReservoir, ::AbstractHydroFormulation) = 1.0 # Data already in m3/s
 PSI.get_multiplier_value(::OutflowTimeSeriesParameter, d::PSY.HydroReservoir, ::AbstractHydroFormulation) = 1.0 # Data already in m3/s
 PSI.get_multiplier_value(::InflowTimeSeriesParameter, d::PSY.HydroReservoir, ::HydroEnergyModelReservoir) = PSY.get_inflow(d) # Data normalized
-PSI.get_multiplier_value(::InflowTimeSeriesParameter, d::PSY.HydroReservoir, ::HydroEnergyBlockOptimization) = PSY.get_inflow(d)
+PSI.get_multiplier_value(::InflowTimeSeriesParameter, d::PSY.HydroReservoir, ::HydroWaterFactorModel) = PSY.get_inflow(d)
 PSI.get_multiplier_value(::PSI.TimeSeriesParameter, d::PSY.HydroGen, ::AbstractHydroFormulation) = PSY.get_max_active_power(d)
 PSI.get_multiplier_value(::PSI.TimeSeriesParameter, d::PSY.HydroGen, ::PSI.FixedOutput) = PSY.get_max_active_power(d)
 # next 2 needed to avoid ambiguity errors
@@ -271,7 +271,7 @@ PSI.objective_function_multiplier(::PSI.OnVariable, ::AbstractHydroFormulation)=
 PSI.objective_function_multiplier(::HydroEnergySurplusVariable, ::AbstractHydroReservoirFormulation)=PSI.OBJECTIVE_FUNCTION_NEGATIVE
 PSI.objective_function_multiplier(::HydroEnergyShortageVariable, ::AbstractHydroReservoirFormulation)=PSI.OBJECTIVE_FUNCTION_POSITIVE
 
-# PSI.objective_function_multiplier(::PSI.ActivePowerOutVariable, ::HydroEnergyBlockOptimization)=PSI.OBJECTIVE_FUNCTION_POSITIVE
+# PSI.objective_function_multiplier(::PSI.ActivePowerOutVariable, ::HydroWaterFactorModel)=PSI.OBJECTIVE_FUNCTION_POSITIVE
 
 PSI.sos_status(::PSY.HydroGen, ::AbstractHydroReservoirFormulation)=PSI.SOSStatusVariable.NO_VARIABLE
 PSI.sos_status(::PSY.HydroGen, ::AbstractHydroUnitCommitment)=PSI.SOSStatusVariable.VARIABLE
@@ -361,7 +361,7 @@ end
 
 function PSI.get_default_time_series_names(
     ::Type{PSY.HydroReservoir},
-    ::Type{<:HydroEnergyBlockOptimization},
+    ::Type{<:HydroWaterFactorModel},
 )
     return Dict{Type{<:PSI.TimeSeriesParameter}, String}(
         InflowTimeSeriesParameter => "inflow",
@@ -423,7 +423,7 @@ end
 
 function PSI.get_default_attributes(
     ::Type{PSY.HydroReservoir},
-    ::Type{HydroEnergyBlockOptimization},
+    ::Type{HydroWaterFactorModel},
 )
     return Dict{String, Any}()
 end
@@ -994,7 +994,7 @@ end
 ##################################### Energy Block Optimization ############################
 """
 This function defines the constraint for the hydro power generation
-for the [`HydroEnergyBlockOptimization`](@ref).
+for the [`HydroWaterFactorModel`](@ref).
 """
 function PSI.add_constraints!(
     container::PSI.OptimizationContainer,
@@ -1080,7 +1080,7 @@ end
 
 """
 This function defines the constraints for the water level (or state of charge)
-for the [`HydroEnergyBlockOptimization`](@ref).
+for the [`HydroWaterFactorModel`](@ref).
 """
 function PSI.add_constraints!(
     container::PSI.OptimizationContainer,
@@ -1091,7 +1091,7 @@ function PSI.add_constraints!(
     ::PSI.NetworkModel{X},
 ) where {
     V <: PSY.HydroReservoir,
-    W <: HydroEnergyBlockOptimization,
+    W <: HydroWaterFactorModel,
     X <: PM.AbstractPowerModel,
 }
     time_steps = PSI.get_time_steps(container)
@@ -1523,7 +1523,7 @@ function PSI.add_constraints!(
     ::PSI.NetworkModel{X},
 ) where {
     V <: PSY.HydroReservoir,
-    W <: HydroEnergyBlockOptimization,
+    W <: HydroWaterFactorModel,
     X <: PM.AbstractPowerModel,
 }
     time_steps = PSI.get_time_steps(container)

@@ -9,7 +9,7 @@ export MediumTermHydroPlanning
 export HydroDispatchRunOfRiver
 export HydroDispatchRunOfRiverBudget
 export HydroCommitmentRunOfRiver
-export HydroEnergyBlockOptimization
+export HydroWaterFactorModel
 export HydroWaterModelReservoir
 export HydroTurbineBilinearDispatch
 export HydroEnergyModelReservoir

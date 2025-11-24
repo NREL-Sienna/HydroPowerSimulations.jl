@@ -1401,14 +1401,14 @@ end
 ################################################################################################
 # HydroReservoir
 """
-Construct model for [`PowerSystems.HydroReservoir`](@extref) with [`HydroEnergyBlockOptimization`](@ref) Formulation
+Construct model for [`PowerSystems.HydroReservoir`](@extref) with [`HydroWaterFactorModel`](@ref) Formulation
 with only Active Power
 """
 function PSI.construct_device!(
     container::PSI.OptimizationContainer,
     sys::PSY.System,
     ::PSI.ArgumentConstructStage,
-    model::PSI.DeviceModel{H, HydroEnergyBlockOptimization},
+    model::PSI.DeviceModel{H, HydroWaterFactorModel},
     network_model::PSI.NetworkModel{S},
 ) where {H <: PSY.HydroReservoir, S <: PM.AbstractPowerModel}
     devices = get_available_reservoirs(sys)
@@ -1417,13 +1417,13 @@ function PSI.construct_device!(
         container,
         WaterSpillageVariable,
         devices,
-        HydroEnergyBlockOptimization(),
+        HydroWaterFactorModel(),
     )
     PSI.add_variables!(
         container,
         HydroReservoirVolumeVariable,
         devices,
-        HydroEnergyBlockOptimization(),
+        HydroWaterFactorModel(),
     )
 
     PSI.add_parameters!(container, InflowTimeSeriesParameter, devices, model)
@@ -1435,7 +1435,7 @@ function PSI.construct_device!(
     container::PSI.OptimizationContainer,
     sys::PSY.System,
     ::PSI.ModelConstructStage,
-    model::PSI.DeviceModel{H, HydroEnergyBlockOptimization},
+    model::PSI.DeviceModel{H, HydroWaterFactorModel},
     network_model::PSI.NetworkModel{S},
 ) where {H <: PSY.HydroReservoir, S <: PM.AbstractPowerModel}
     devices = get_available_reservoirs(sys)
@@ -1443,7 +1443,7 @@ function PSI.construct_device!(
     PSI.add_initial_condition!(
         container,
         devices,
-        HydroEnergyBlockOptimization(),
+        HydroWaterFactorModel(),
         InitialReservoirVolume(),
     )
 
@@ -1470,7 +1470,7 @@ function PSI.construct_device!(
 end
 
 """
-Construct model for [`PowerSystems.HydroTurbine`](@extref) with [`HydroEnergyBlockOptimization`](@ref) Formulation
+Construct model for [`PowerSystems.HydroTurbine`](@extref) with [`HydroWaterFactorModel`](@ref) Formulation
 with only Active Power.
 """
 function PSI.construct_device!(
@@ -1481,7 +1481,7 @@ function PSI.construct_device!(
     network_model::PSI.NetworkModel{S},
 ) where {
     H <: PSY.HydroTurbine,
-    D <: HydroEnergyBlockOptimization,
+    D <: HydroWaterFactorModel,
     S <: PM.AbstractActivePowerModel,
 }
     devices = PSI.get_available_components(model, sys)
@@ -1490,7 +1490,7 @@ function PSI.construct_device!(
         container,
         HydroTurbineFlowRateVariable,
         devices,
-        HydroEnergyBlockOptimization(),
+        HydroWaterFactorModel(),
     )
 
     PSI.add_variables!(container, PSI.ActivePowerVariable, devices, D())
@@ -1540,7 +1540,7 @@ function PSI.construct_device!(
     network_model::PSI.NetworkModel{S},
 ) where {
     H <: PSY.HydroTurbine,
-    D <: HydroEnergyBlockOptimization,
+    D <: HydroWaterFactorModel,
     S <: PM.AbstractActivePowerModel,
 }
     devices = PSI.get_available_components(model, sys)

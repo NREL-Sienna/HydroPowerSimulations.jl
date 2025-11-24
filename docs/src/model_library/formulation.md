@@ -19,7 +19,7 @@ Hydro generation formulations define the optimization models that describe hydro
  5. [`HydroTurbineBilinearDispatch`](#HydroTurbineBilinearDispatch)
  6. [`HydroEnergyModelReservoir`](#HydroEnergyModelReservoir)
  7. [`HydroWaterModelReservoir`](#HydroWaterModelReservoir)
- 8. [`HydroEnergyBlockOptimization`](#HydroEnergyBlockOptimization)
+ 8. [`HydroWaterFactorModel`](#HydroWaterFactorModel)
 
 ## `HydroDispatchRunOfRiver`
 
@@ -494,14 +494,14 @@ For each hydro reservoir creates the constraints to track the energy storage.
 
 * * *
 
-## `HydroEnergyBlockOptimization`
+## `HydroWaterFactorModel`
 
 Formulation type to constrain hydropower production with an energy block optimization representation of the energy storage capacity and water inflow time series of a reservoir for [`PowerSystems.HydroReservoir`](@extref) and [`PowerSystems.HydroTurbine`](@extref). This model operates with water levels (volumes) and uses a bilinear power production relationship that accounts for the hydraulic head variation with reservoir level.
 
 The formulation models the relationship between turbine flow rate, reservoir water level, and power production, allowing for more accurate representation of hydro operations when water level significantly affects power output.
 
 ```@docs; canonical=false
-HydroEnergyBlockOptimization
+HydroWaterFactorModel
 ```
 
 **Variables:**
