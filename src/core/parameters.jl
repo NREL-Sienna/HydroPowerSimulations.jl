@@ -9,6 +9,18 @@ Parameter to define energy budget time series for hydro generators
 struct EnergyBudgetTimeSeriesParameter <: PSI.TimeSeriesParameter end
 
 """
+Parameter to define water storage target level time series for hydro reservoirs.
+It will depend on the ReservoirDataType specified for the reservoir, and can be head in meters or volume in cubic meters.
+"""
+struct WaterTargetTimeSeriesParameter <: PSI.TimeSeriesParameter end
+
+"""
+Parameter to define water budget time series for hydro reservoirs.
+The timeseries must be specified in average water flow in cubic meters per second.
+"""
+struct WaterBudgetTimeSeriesParameter <: PSI.TimeSeriesParameter end
+
+"""
 Parameter to define energy inflow to storage or reservoir time series
 """
 struct InflowTimeSeriesParameter <: PSI.TimeSeriesParameter end

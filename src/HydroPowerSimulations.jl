@@ -12,6 +12,7 @@ export HydroCommitmentRunOfRiver
 export HydroWaterFactorModel
 export HydroWaterModelReservoir
 export HydroTurbineBilinearDispatch
+export HydroTurbineWaterLinearDispatch
 export HydroEnergyModelReservoir
 export HydroTurbineEnergyDispatch
 export HydroTurbineEnergyCommitment
@@ -32,6 +33,8 @@ export HydroEnergyOutput
 ######## Hydro parameters #######
 export EnergyTargetTimeSeriesParameter
 export EnergyBudgetTimeSeriesParameter
+export WaterTargetTimeSeriesParameter
+export WaterBudgetTimeSeriesParameter
 export InflowTimeSeriesParameter
 export OutflowTimeSeriesParameter
 export ReservoirTargetParameter
