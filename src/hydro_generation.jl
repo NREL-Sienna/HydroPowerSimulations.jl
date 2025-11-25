@@ -388,7 +388,7 @@ function PSI.get_default_time_series_names(
     ::Type{HydroEnergyModelReservoir},
 )
     return Dict{Type{<:PSI.TimeSeriesParameter}, String}(
-        EnergyTargetTimeSeriesParameter => "energy_target",
+        EnergyTargetTimeSeriesParameter => "storage_target",
         InflowTimeSeriesParameter => "inflow",
         EnergyBudgetTimeSeriesParameter => "hydro_budget",
     )
