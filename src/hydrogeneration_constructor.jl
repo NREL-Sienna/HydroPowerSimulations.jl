@@ -1629,6 +1629,18 @@ function PSI.construct_device!(
         devices,
         R(),
     )
+    PSI.add_variables!(
+        container,
+        HydroWaterShortageVariable,
+        devices,
+        R(),
+    )
+    PSI.add_variables!(
+        container,
+        HydroWaterSurplusVariable,
+        devices,
+        R(),
+    )
 
     PSI.add_parameters!(container, InflowTimeSeriesParameter, devices, model)
     PSI.add_parameters!(container, OutflowTimeSeriesParameter, devices, model)
@@ -1738,6 +1750,7 @@ function PSI.construct_device!(
     end
 
     PSI.add_feedforward_constraints!(container, model, devices)
+    PSI.objective_function!(container, devices, model, S)
 
     return
 end
