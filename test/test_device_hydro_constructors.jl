@@ -649,6 +649,99 @@ end
     )
 end
 
+@testset "Solve HydroWaterModelReservoir with Budget" begin
+    sys = PSB.build_system(
+        PSITestSystems,
+        "c_sys5_hy_turbine_head";
+        force_build = true,
+        add_single_time_series = true,
+    )
+    res = only(get_components(HydroReservoir, sys))
+    inflow_array = get_time_series_array(SingleTimeSeries, res, "inflow")
+    tstamp = timestamp(inflow_array)
+    vals = values(inflow_array)
+    budget_array = TimeArray(tstamp, vals .* 0.5)
+    budget_ts = SingleTimeSeries("hydro_budget", budget_array)
+    add_time_series!(sys, res, budget_ts)
+    transform_single_time_series!(sys, Hour(24), Hour(24))
+
+    template = ProblemTemplate(NetworkModel(CopperPlatePowerModel))
+    set_device_model!(template, ThermalStandard, ThermalDispatchNoMin)
+    set_device_model!(template, PowerLoad, StaticPowerLoad)
+    set_device_model!(template, HydroTurbine, HydroTurbineWaterLinearDispatch)
+    reservoir_model = DeviceModel(
+        HydroReservoir,
+        HydroWaterModelReservoir;
+        attributes = Dict("hydro_target" => false, "hydro_budget" => true),
+    )
+    set_device_model!(template, reservoir_model)
+
+    model = DecisionModel(
+        template,
+        sys;
+        name = "UC",
+        optimizer = HiGHS_optimizer,
+        system_to_file = false,
+        store_variable_names = true,
+        optimizer_solve_log_print = false,
+    )
+    @test build!(model; output_dir = mktempdir()) == PSI.ModelBuildStatus.BUILT
+    @test solve!(model) == IS.Simulation.RunStatus.SUCCESSFULLY_FINALIZED
+
+    sol = OptimizationProblemResults(model)
+    flow = read_expression(sol, "TotalHydroFlowRateReservoirOutgoing__HydroReservoir")[
+        !,
+        "value",
+    ]
+    @test sum(flow) <= sum(vals) / 4.0
+end
+
+@testset "Solve HydroWaterModelReservoir with Target" begin
+    sys = PSB.build_system(
+        PSITestSystems,
+        "c_sys5_hy_turbine_head";
+        force_build = true,
+        add_single_time_series = true,
+    )
+    res = only(get_components(HydroReservoir, sys))
+    hydro_cost = HydroReservoirCost(1e5, 0.0, 0.0)
+    set_operation_cost!(res, hydro_cost)
+    inflow_array = get_time_series_array(SingleTimeSeries, res, "inflow")
+    tstamp = timestamp(inflow_array)
+    vals = values(inflow_array)
+    head_array = TimeArray(tstamp, 490.0 * ones(length(vals)))
+    target_ts = SingleTimeSeries("hydro_target", head_array)
+    add_time_series!(sys, res, target_ts)
+    transform_single_time_series!(sys, Hour(24), Hour(24))
+
+    template = ProblemTemplate(NetworkModel(CopperPlatePowerModel))
+    set_device_model!(template, ThermalStandard, ThermalDispatchNoMin)
+    set_device_model!(template, PowerLoad, StaticPowerLoad)
+    set_device_model!(template, HydroTurbine, HydroTurbineWaterLinearDispatch)
+    reservoir_model = DeviceModel(
+        HydroReservoir,
+        HydroWaterModelReservoir;
+        attributes = Dict("hydro_target" => true, "hydro_budget" => false),
+    )
+    set_device_model!(template, reservoir_model)
+
+    model = DecisionModel(
+        template,
+        sys;
+        name = "UC",
+        optimizer = HiGHS_optimizer,
+        system_to_file = false,
+        store_variable_names = true,
+        optimizer_solve_log_print = false,
+    )
+    @test build!(model; output_dir = mktempdir()) == PSI.ModelBuildStatus.BUILT
+    @test solve!(model) == IS.Simulation.RunStatus.SUCCESSFULLY_FINALIZED
+
+    sol = OptimizationProblemResults(model)
+    head = read_variable(sol, "HydroReservoirHeadVariable__HydroReservoir")[!, "value"]
+    @test head[24] >= 490
+end
+
 #####################################################
 ######## HydroWaterModelReservoir Cascading #########
 #####################################################
