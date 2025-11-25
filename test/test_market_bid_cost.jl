@@ -1,7 +1,10 @@
 # we're including several files from PowerSimulations/test/test_utils.
 # those make this work: if things break, look there.
 HYDRO_DEVICE_TO_FORMULATION =
-    Dict{Type{<:PSY.Device}, Type{<:PSI.AbstractDeviceFormulation}}(
+    Dict{
+        Type{<:Device},
+        Union{Type{<:PowerSimulations.AbstractDeviceFormulation}, DeviceModel},
+    }(
         HydroDispatch => HydroCommitmentRunOfRiver,
     )
 
@@ -51,7 +54,10 @@ build_func = build_sys_hydro
 nonzero_min_gen_cost = false # we assume min gen cost is 0 for hydro.
 @testset for device_model in device_models
     device_to_formulation =
-        Dict{Type{<:Device}, Type{<:PowerSimulations.AbstractDeviceFormulation}}(
+        Dict{
+            Type{<:Device},
+            Union{Type{<:PowerSimulations.AbstractDeviceFormulation}, DeviceModel},
+        }(
             comp_type => device_model,
         )
     test_case_to_inputs = Dict(

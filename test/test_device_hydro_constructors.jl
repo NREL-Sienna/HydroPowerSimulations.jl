@@ -300,8 +300,8 @@ end
         ),
     ]
     test_results = Dict{Any, Float64}(
-        (DCPPowerModel, HydroEnergyModelReservoir, true) => 150759.0,
-        (DCPPowerModel, HydroEnergyModelReservoir, false) => 144109.0,
+        (DCPPowerModel, HydroEnergyModelReservoir, true) => 141061.0,
+        (DCPPowerModel, HydroEnergyModelReservoir, false) => 136136.0,
     )
 
     for reservoir_model in models
@@ -339,7 +339,7 @@ end
     device_model = PSI.DeviceModel(HydroDispatch, HydroDispatchRunOfRiverBudget;
         attributes = Dict("hydro_budget_interval" => Hour(24)))
 
-    sys = PSB.build_system(PSITestSystems, "c_sys5_hy")
+    sys = PSB.build_system(PSITestSystems, "c_sys5_hy"; add_single_time_series = true)
     hy = only(get_components(HydroDispatch, sys))
     max_power = get_max_active_power(hy)
     resolution = Dates.Hour(1)
@@ -347,7 +347,6 @@ end
     data = ones(length(tstamp)) / (get_base_power(sys) * max_power)
     ts = SingleTimeSeries("hydro_budget", TimeArray(tstamp, data))
     add_time_series!(sys, hy, ts)
-    remove_time_series!(sys, Deterministic)
     transform_single_time_series!(sys, Hour(24), Hour(24))
 
     model = DecisionModel(MockOperationProblem, CopperPlatePowerModel, sys)
@@ -359,7 +358,7 @@ end
 @testset "Solve Hydro Dispatch Run Of River" begin
     output_dir = mktempdir(; cleanup = true)
 
-    c_sys5_hy = PSB.build_system(PSITestSystems, "c_sys5_hy")
+    c_sys5_hy = PSB.build_system(PSITestSystems, "c_sys5_hy"; add_single_time_series = true)
 
     hydro_budget = 24
     eps = 1e-6
@@ -371,7 +370,7 @@ end
     data = ones(length(tstamp)) / (get_base_power(c_sys5_hy) * max_power)
     ts = SingleTimeSeries("hydro_budget", TimeArray(tstamp, data))
     add_time_series!(c_sys5_hy, first(get_components(HydroDispatch, c_sys5_hy)), ts)
-    remove_time_series!(c_sys5_hy, Deterministic)
+    #remove_time_series!(c_sys5_hy, Deterministic)
     transform_single_time_series!(c_sys5_hy, Hour(24), Hour(24))
 
     template_uc = ProblemTemplate()
@@ -419,7 +418,12 @@ end
     )
 
     c_sys5_bat =
-        PSB.build_system(PSITestSystems, "c_sys5_hydro_pump_energy"; add_reserves = true)
+        PSB.build_system(
+            PSITestSystems,
+            "c_sys5_hydro_pump_energy";
+            add_reserves = true,
+            add_single_time_series = true,
+        )
 
     hy_pump = first(PSY.get_components(HydroPumpTurbine, c_sys5_bat))
 
@@ -447,7 +451,7 @@ end
         hy_pump,
         PSY.SingleTimeSeries("capacity", tarray_cap),
     )
-    remove_time_series!(c_sys5_bat, Deterministic)
+    #remove_time_series!(c_sys5_bat, Deterministic)
     transform_single_time_series!(c_sys5_bat, Hour(24), Hour(24))
 
     model = DecisionModel(MockOperationProblem, CopperPlatePowerModel, c_sys5_bat)
@@ -460,7 +464,12 @@ end
     output_dir = mktempdir(; cleanup = true)
 
     c_sys5_bat =
-        PSB.build_system(PSITestSystems, "c_sys5_hydro_pump_energy"; add_reserves = true)
+        PSB.build_system(
+            PSITestSystems,
+            "c_sys5_hydro_pump_energy";
+            add_reserves = true,
+            add_single_time_series = true,
+        )
 
     hy_pump = first(PSY.get_components(HydroPumpTurbine, c_sys5_bat))
 
@@ -488,7 +497,7 @@ end
         hy_pump,
         PSY.SingleTimeSeries("capacity", tarray_cap),
     )
-    remove_time_series!(c_sys5_bat, Deterministic)
+    #remove_time_series!(c_sys5_bat, Deterministic)
     transform_single_time_series!(c_sys5_bat, Hour(24), Hour(24))
 
     template_uc = ProblemTemplate()
@@ -618,7 +627,7 @@ end
 
     res = OptimizationProblemResults(model)
 
-    moi_tests(model, 240, 0, 168, 168, 72, false)
+    moi_tests(model, 288, 0, 168, 168, 72, false)
     psi_checkobjfun_test(model, AffExpr)
 
     df_outflow = read_expression(res, "TotalHydroFlowRateTurbineOutgoing__HydroTurbine")
@@ -773,7 +782,7 @@ end
 
     res = OptimizationProblemResults(model)
 
-    moi_tests(model, 408, 0, 216, 216, 120, false)
+    moi_tests(model, 504, 0, 216, 216, 120, false)
     psi_checkobjfun_test(model, AffExpr)
 end
 
