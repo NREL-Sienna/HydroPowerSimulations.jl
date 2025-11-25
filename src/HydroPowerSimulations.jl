@@ -22,6 +22,8 @@ export HydroPumpEnergyDispatch
 export WaterSpillageVariable
 export HydroEnergyShortageVariable
 export HydroEnergySurplusVariable
+export HydroWaterShortageVariable
+export HydroWaterSurplusVariable
 export HydroReservoirHeadVariable
 export HydroReservoirVolumeVariable
 export HydroTurbineFlowRateVariable
