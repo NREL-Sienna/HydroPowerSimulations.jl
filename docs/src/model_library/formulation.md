@@ -465,7 +465,11 @@ In addition the incoming turbine power expression ``p^\text{hy,in}`` handles the
 
 **Attributes:**
 
-During the model setup, the attribute `hydro_budget = true` can be used to set-up a budget constraint with the full horizon of the simulation. The attribute `storage_target = true` can be used to set-up a storage target constraint at the end of the simulation horizon. It is not recommended to set both attributes to true simultaneously to avoid infeasibility issues.
+During the model setup, the attribute `hydro_budget = true` can be used to set-up a budget constraint with the full horizon of the simulation. The attribute `energy_target = true` can be used to set-up a storage target constraint at the end of the simulation horizon. It is not recommended to set both attributes to true simultaneously to avoid infeasibility issues.
+
+!!! note
+    
+    The `energy_target` attribute will only set-up a constraint on the target at the end of horizon. When running simulation be careful that the target constraint is imposed on the end of the horizon and not end of the interval.
 
 **Constraints:**
 
@@ -545,7 +549,11 @@ The incoming turbine flow expression ``f^\text{hy,in}`` handles the total water 
 
 **Attributes:**
 
-During the model setup, the attribute `hydro_budget = true` can be used to set-up a budget constraint with the full horizon of the simulation. The attribute `storage_target = true` can be used to set-up a storage target constraint at the end of the simulation horizon. It is not recommended to set both attributes to true simultaneously to avoid infeasibility issues.
+During the model setup, the attribute `hydro_budget = true` can be used to set-up a budget constraint with the full horizon of the simulation. The attribute `hydro_target = true` can be used to set-up a storage target constraint at the end of the simulation horizon. The `storage_target` is only available for `HEAD` type reservoir models. It is not recommended to set both attributes to true simultaneously to avoid infeasibility issues.
+
+!!! note
+    
+    The `hydro_target` attribute will only set-up a constraint on the target at the end of horizon. When running simulation be careful that the target constraint is imposed on the end of the horizon and not end of the interval.
 
 **Constraints:**
 
