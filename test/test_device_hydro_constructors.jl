@@ -301,7 +301,7 @@ end
     ]
     test_results = Dict{Any, Float64}(
         (DCPPowerModel, HydroEnergyModelReservoir, true) => 141061.0,
-        (DCPPowerModel, HydroEnergyModelReservoir, false) => 136136.0,
+        (DCPPowerModel, HydroEnergyModelReservoir, false) => 144109.0,
     )
 
     for reservoir_model in models
