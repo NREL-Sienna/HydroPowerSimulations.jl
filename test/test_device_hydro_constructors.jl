@@ -326,7 +326,7 @@ end
                 ED,
                 [MOI.OPTIMAL, MOI.LOCALLY_SOLVED],
                 test_results[(net, formulation, energy_target)],
-                1000,
+                10000, #update to 10k to handle the difference in Mac and Ubuntu. Likely a HiGHS issue.
             )
         end
     end
