@@ -9,9 +9,10 @@ export MediumTermHydroPlanning
 export HydroDispatchRunOfRiver
 export HydroDispatchRunOfRiverBudget
 export HydroCommitmentRunOfRiver
-export HydroEnergyBlockOptimization
+export HydroWaterFactorModel
 export HydroWaterModelReservoir
 export HydroTurbineBilinearDispatch
+export HydroTurbineWaterLinearDispatch
 export HydroEnergyModelReservoir
 export HydroTurbineEnergyDispatch
 export HydroTurbineEnergyCommitment
@@ -21,6 +22,8 @@ export HydroPumpEnergyDispatch
 export WaterSpillageVariable
 export HydroEnergyShortageVariable
 export HydroEnergySurplusVariable
+export HydroWaterShortageVariable
+export HydroWaterSurplusVariable
 export HydroReservoirHeadVariable
 export HydroReservoirVolumeVariable
 export HydroTurbineFlowRateVariable
@@ -32,6 +35,8 @@ export HydroEnergyOutput
 ######## Hydro parameters #######
 export EnergyTargetTimeSeriesParameter
 export EnergyBudgetTimeSeriesParameter
+export WaterTargetTimeSeriesParameter
+export WaterBudgetTimeSeriesParameter
 export InflowTimeSeriesParameter
 export OutflowTimeSeriesParameter
 export ReservoirTargetParameter
@@ -44,10 +49,12 @@ export InitialReservoirVolume
 
 ######## Hydro Constraints #######
 export EnergyTargetConstraint
+export WaterTargetConstraint
 export ActivePowerPumpReservationConstraint
 export ActivePowerPumpVariableLimitsConstraint
 export EnergyCapacityTimeSeriesLimitsConstraint
 export EnergyBudgetConstraint
+export WaterBudgetConstraint
 export ReservoirLevelLimitConstraint
 export ReservoirLevelTargetConstraint
 export TurbinePowerOutputConstraint
