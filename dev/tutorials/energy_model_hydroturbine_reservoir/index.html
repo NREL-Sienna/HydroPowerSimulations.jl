@@ -169,10 +169,11 @@ Resolution: 60 minutes
 
 PowerSimulations Problem Expressions Results
 ┌───────────────────────────────────────────┐
-│ ProductionCostExpression__ThermalStandard │
-│ ActivePowerBalance__System                │
-│ ActivePowerBalance__ACBus                 │
 │ ProductionCostExpression__HydroTurbine    │
+│ ActivePowerBalance__System                │
+│ PTDFBranchFlow__Line                      │
+│ ActivePowerBalance__ACBus                 │
+│ ProductionCostExpression__ThermalStandard │
 └───────────────────────────────────────────┘
 
 PowerSimulations Problem Parameters Results
@@ -183,30 +184,29 @@ PowerSimulations Problem Parameters Results
 
 PowerSimulations Problem Variables Results
 ┌─────────────────────────────────────────────┐
-│ HydroEnergyShortageVariable__HydroReservoir │
-│ HydroEnergySurplusVariable__HydroReservoir  │
-│ FlowActivePowerVariable__Line               │
-│ ActivePowerVariable__ThermalStandard        │
 │ WaterSpillageVariable__HydroReservoir       │
-│ EnergyVariable__HydroReservoir              │
 │ ActivePowerVariable__HydroTurbine           │
+│ HydroEnergySurplusVariable__HydroReservoir  │
+│ HydroEnergyShortageVariable__HydroReservoir │
+│ EnergyVariable__HydroReservoir              │
+│ ActivePowerVariable__ThermalStandard        │
 └─────────────────────────────────────────────┘</span></code></pre><p>Use <a href="https://nrel-sienna.github.io/InfrastructureSystems.jl/stable/InfrastructureSystems/#InfrastructureSystems.Optimization.read_variable-Tuple%7BInfrastructureSystems.Optimization.OptimizationProblemResults%2C%20Vararg%7BAny%7D%7D"><code>read_variable</code></a> to read in the dispatch variable results for the hydro:</p><pre><code class="language-julia-repl hljs" style="display:block;">julia&gt; var =
            read_variable(res, &quot;ActivePowerVariable__HydroTurbine&quot;; table_format = TableFormat.WIDE)</code><code class="nohighlight hljs ansi" style="display:block;"><span class="sgr1">24×2 DataFrame
  Row │ DateTime             HydroEnergyReservoir_turbine
      │<span class="sgr90"> DateTime             Union{Missing, Float64}
 ─────┼───────────────────────────────────────────────────
    1 │ 2024-01-01T00:00:00                      235.666
-   2 │ 2024-01-01T01:00:00                       92.1153
+   2 │ 2024-01-01T01:00:00                      490.435
    3 │ 2024-01-01T02:00:00                       70.2281
    4 │ 2024-01-01T03:00:00                       43.449
-   5 │ 2024-01-01T04:00:00                      616.599
+   5 │ 2024-01-01T04:00:00                      649.142
    6 │ 2024-01-01T05:00:00                       58.8662
    7 │ 2024-01-01T06:00:00                       88.0143
-   8 │ 2024-01-01T07:00:00                      700.0
+   8 │ 2024-01-01T07:00:00                      126.928
   ⋮  │          ⋮                        ⋮
   18 │ 2024-01-01T17:00:00                      330.088
   19 │ 2024-01-01T18:00:00                      393.03
-  20 │ 2024-01-01T19:00:00                      700.0
+  20 │ 2024-01-01T19:00:00                      387.851
   21 │ 2024-01-01T20:00:00                      355.0
   22 │ 2024-01-01T21:00:00                      301.586
   23 │ 2024-01-01T22:00:00                      256.825
@@ -217,19 +217,19 @@ PowerSimulations Problem Variables Results
      │<span class="sgr90"> DateTime             Union{Missing, Float64}
 ─────┼──────────────────────────────────────────────────────
    1 │ 2024-01-01T00:00:00                        2390.05
-   2 │ 2024-01-01T01:00:00                        2452.61
-   3 │ 2024-01-01T02:00:00                        2473.82
-   4 │ 2024-01-01T03:00:00                        2521.04
-   5 │ 2024-01-01T04:00:00                        1993.59
-   6 │ 2024-01-01T05:00:00                        1986.53
-   7 │ 2024-01-01T06:00:00                        1956.43
-   8 │ 2024-01-01T07:00:00                        1402.72
+   2 │ 2024-01-01T01:00:00                        2054.29
+   3 │ 2024-01-01T02:00:00                        2075.5
+   4 │ 2024-01-01T03:00:00                        2122.72
+   5 │ 2024-01-01T04:00:00                        1562.72
+   6 │ 2024-01-01T05:00:00                        1555.67
+   7 │ 2024-01-01T06:00:00                        1525.56
+   8 │ 2024-01-01T07:00:00                        1544.93
   ⋮  │          ⋮                          ⋮
-  18 │ 2024-01-01T17:00:00                         662.76
-  19 │ 2024-01-01T18:00:00                         521.933
+  18 │ 2024-01-01T17:00:00                         350.611
+  19 │ 2024-01-01T18:00:00                         209.783
   20 │ 2024-01-01T19:00:00                         114.517
   21 │ 2024-01-01T20:00:00                          70.3882
   22 │ 2024-01-01T21:00:00                          53.7675
   23 │ 2024-01-01T22:00:00                         109.338
   24 │ 2024-01-01T23:00:00                           0.0
-</span><span class="sgr36">                                              9 rows omitted</span></span></code></pre><p>Note that since we have ignored the energy targets in the reservoir model, the optimal solution decides to deplete the reservoir.</p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../single_stage_model/">« Operation problem with HydroDispatchRunOfRiver</a><a class="docs-footer-nextpage" href="../water_model_hydroturbine_reservoir/">Water Hydro Reservoir Operation »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.16.1 on <span class="colophon-date" title="Monday 8 December 2025 04:57">Monday 8 December 2025</span>. Using Julia version 1.12.2.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+</span><span class="sgr36">                                              9 rows omitted</span></span></code></pre><p>Note that since we have ignored the energy targets in the reservoir model, the optimal solution decides to deplete the reservoir.</p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../single_stage_model/">« Operation problem with HydroDispatchRunOfRiver</a><a class="docs-footer-nextpage" href="../water_model_hydroturbine_reservoir/">Water Hydro Reservoir Operation »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.16.1 on <span class="colophon-date" title="Monday 8 December 2025 06:28">Monday 8 December 2025</span>. Using Julia version 1.12.2.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
