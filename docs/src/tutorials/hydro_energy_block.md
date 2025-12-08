@@ -53,11 +53,11 @@ set_device_model!(template, ThermalStandard, ThermalBasicDispatch)
 set_device_model!(template, PowerLoad, StaticPowerLoad)
 ```
 
-but, now we also include the HydroReservoir and HydroTurbine using [`HydroEnergyBlockOptimization`](@ref):
+but, now we also include the HydroReservoir and HydroTurbine using [`HydroWaterFactorModel`](@ref):
 
 ```@repl op_problem
-set_device_model!(template, HydroReservoir, HydroEnergyBlockOptimization)
-set_device_model!(template, HydroTurbine, HydroEnergyBlockOptimization)
+set_device_model!(template, HydroReservoir, HydroWaterFactorModel)
+set_device_model!(template, HydroTurbine, HydroWaterFactorModel)
 ```
 
 With the template properly set-up, we construct, build and solve the optimization problem:

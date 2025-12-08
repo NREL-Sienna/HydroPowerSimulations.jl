@@ -17,9 +17,10 @@ Hydro generation formulations define the optimization models that describe hydro
  3. [`HydroCommitmentRunOfRiver`](#HydroCommitmentRunOfRiver)
  4. [`HydroTurbineEnergyDispatch`](#HydroTurbineEnergyDispatch)
  5. [`HydroTurbineBilinearDispatch`](#HydroTurbineBilinearDispatch)
- 6. [`HydroEnergyModelReservoir`](#HydroEnergyModelReservoir)
- 7. [`HydroWaterModelReservoir`](#HydroWaterModelReservoir)
- 8. [`HydroEnergyBlockOptimization`](#HydroEnergyBlockOptimization)
+ 6. [`HydroTurbineWaterLinearDispatch`](#HydroTurbineWaterLinearDispatch)
+ 7. [`HydroEnergyModelReservoir`](#HydroEnergyModelReservoir)
+ 8. [`HydroWaterModelReservoir`](#HydroWaterModelReservoir)
+ 9. [`HydroWaterFactorModel`](#HydroWaterFactorModel)
 
 ## `HydroDispatchRunOfRiver`
 
@@ -334,6 +335,71 @@ where ``h`` is the effective hydraulic head (above the intake), the ``\text{inH}
 
 * * *
 
+## `HydroTurbineWaterLinearDispatch`
+
+```@docs; canonical=false
+HydroTurbineWaterLinearDispatch
+```
+
+**Variables:**
+
+  - [`PowerSimulations.ActivePowerVariable`](@extref):
+    
+      + Bounds: [0.0, ]
+      + Symbol: ``p^\text{hy}``
+
+  - [`PowerSimulations.ReactivePowerVariable`](@extref):
+    
+      + Bounds: [0.0, ]
+      + Symbol: ``q^\text{hy}``
+  - [`HydroTurbineFlowRateVariable`](@ref):
+    
+      + Bounds: [0.0, ]
+      + Symbol: ``f^\text{hy}``
+
+**Expressions added:**
+
+  - [`TotalHydroFlowRateTurbineOutgoing`](@ref):
+    
+      + Symbol: ``f^\text{hy,out}``
+
+The [`TotalHydroFlowRateTurbineOutgoing`](@ref) is computed as the total water flow outgoing of a turbine. This is helpful if the turbine is feed by multiple upstream reservoirs.
+
+**Static Parameters:**
+
+  - ``P^\text{hy,min}`` = `PowerSystems.get_active_power_limits(device).min`
+  - ``P^\text{hy,max}`` = `PowerSystems.get_active_power_limits(device).max`
+  - ``Q^\text{hy,min}`` = `PowerSystems.get_reactive_power_limits(device).min`
+  - ``Q^\text{hy,max}`` = `PowerSystems.get_reactive_power_limits(device).max`
+  - ``F^\text{hy, max}`` = `PowerSystems.get_outflow_limits(device).max`
+  - ``F^\text{hy, min}`` = `PowerSystems.get_outflow_limits(device).min`
+  - ``\text{powH}`` = `PowerSystems.get_powerhouse_elevation(device)`
+
+**Objective:**
+
+Add a cost to the objective function depending on the defined cost structure of the hydro turbine by adding it to its `ProductionCostExpression`.
+
+**Expressions:**
+
+Adds $p^\text{hy}$ to the `PowerSimulations.ActivePowerBalance` expression and $q^\text{hy}$ to the `PowerSimulations.ReactivePowerBalance`, to be used in the supply-balance constraint depending on the network model used.
+
+**Constraints:**
+
+For each hydro turbine creates the range constraints for its active, reactive power and water flow depending on its static parameters. By defining the set ``\mathcal{R}^{up}`` as the set of upstream reservoirs connected to the turbine, the turbine power output relationship can be added.
+
+```math
+\begin{align*}
+&  P^\text{hy,min} \le p^\text{hy}_t \le P^\text{hy,max}, \quad \forall t\in \{1, \dots, T\} \\
+&  Q^\text{hy,min} \le q^\text{hy}_t \le Q^\text{hy,max}, \quad \forall t\in \{1, \dots, T\} \\
+&  F^\text{hy,min} \le f^\text{hy}_t \le F^\text{hy,max}, \quad \forall t\in \{1, \dots, T\} \\
+&  p^\text{hy} = 10^{-6} \cdot \text{SysBasePower}^{-1} \cdot \rho g \sum_{r \in \mathcal{R}^{up}} f^\text{hy}_{r,t} \left(\text{inH} - \text{powH} \right) 
+\end{align*}
+```
+
+where  ``\text{inH}`` is the intake elevation (in meters above the sea level), ``\text{powH}`` is the powerhouse elevation (in meters above the sea level), ``g = 9.81~ \text{m/s}^2`` is the gravitational constant, and ``\rho = 1000~ \text{kg/m}^3`` is the water density. Finally, the term ``10^{-6} \cdot \text{SysBasePower}^{-1}`` is used to transform the power in Watts into per-unit. The method assumes that the hydraulic head is always the intake elevation for the power conversion.
+
+* * *
+
 ## `HydroEnergyModelReservoir`
 
 ```@docs; canonical=false
@@ -399,7 +465,11 @@ In addition the incoming turbine power expression ``p^\text{hy,in}`` handles the
 
 **Attributes:**
 
-During the model setup, the attribute `hydro_budget = true` can be used to set-up a budget constraint with the full horizon of the simulation. The attribute `storage_target = true` can be used to set-up a storage target constraint at the end of the simulation horizon. It is not recommended to set both attributes to true simultaneously to avoid infeasibility issues.
+During the model setup, the attribute `hydro_budget = true` can be used to set-up a budget constraint with the full horizon of the simulation. The attribute `energy_target = true` can be used to set-up a storage target constraint at the end of the simulation horizon. It is not recommended to set both attributes to true simultaneously to avoid infeasibility issues.
+
+!!! note
+    
+    The `energy_target` attribute will only set-up a constraint on the target at the end of horizon. When running simulation be careful that the target constraint is imposed on the end of the horizon and not end of the interval.
 
 **Constraints:**
 
@@ -479,7 +549,11 @@ The incoming turbine flow expression ``f^\text{hy,in}`` handles the total water 
 
 **Attributes:**
 
-During the model setup, the attribute `hydro_budget = true` can be used to set-up a budget constraint with the full horizon of the simulation. The attribute `storage_target = true` can be used to set-up a storage target constraint at the end of the simulation horizon. It is not recommended to set both attributes to true simultaneously to avoid infeasibility issues.
+During the model setup, the attribute `hydro_budget = true` can be used to set-up a budget constraint with the full horizon of the simulation. The attribute `hydro_target = true` can be used to set-up a storage target constraint at the end of the simulation horizon. The `storage_target` is only available for `HEAD` type reservoir models. It is not recommended to set both attributes to true simultaneously to avoid infeasibility issues.
+
+!!! note
+    
+    The `hydro_target` attribute will only set-up a constraint on the target at the end of horizon. When running simulation be careful that the target constraint is imposed on the end of the horizon and not end of the interval.
 
 **Constraints:**
 
@@ -494,14 +568,14 @@ For each hydro reservoir creates the constraints to track the energy storage.
 
 * * *
 
-## `HydroEnergyBlockOptimization`
+## `HydroWaterFactorModel`
 
 Formulation type to constrain hydropower production with an energy block optimization representation of the energy storage capacity and water inflow time series of a reservoir for [`PowerSystems.HydroReservoir`](@extref) and [`PowerSystems.HydroTurbine`](@extref). This model operates with water levels (volumes) and uses a bilinear power production relationship that accounts for the hydraulic head variation with reservoir level.
 
 The formulation models the relationship between turbine flow rate, reservoir water level, and power production, allowing for more accurate representation of hydro operations when water level significantly affects power output.
 
 ```@docs; canonical=false
-HydroEnergyBlockOptimization
+HydroWaterFactorModel
 ```
 
 **Variables:**

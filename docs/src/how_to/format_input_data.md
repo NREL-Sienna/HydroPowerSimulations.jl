@@ -25,7 +25,7 @@ Water models still have their data specified in power units, but the `powerhouse
 
 ### TimeSeries data
 
-[`HydroTurbineBilinearDispatch`](@ref) and [`HydroEnergyBlockOptimization`](@ref) models for turbine do not require time series input data.
+[`HydroTurbineBilinearDispatch`](@ref) and [`HydroWaterFactorModel`](@ref) models for turbine do not require time series input data.
 
 # Reservoir Data
 
