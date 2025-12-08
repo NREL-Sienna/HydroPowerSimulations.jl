@@ -16,7 +16,6 @@ using TimeSeries
 using Dates
 ```
 
-
 ## Data
 
 !!! note
@@ -36,9 +35,9 @@ We will modify the cheapest unit Brighton to have time-varying fuel cost. First 
 brighton = get_component(ThermalStandard, sys, "Brighton")
 old_thermal_cost = get_operation_cost(brighton)
 new_fuel_curve = FuelCurve(;
-   value_curve = LinearCurve(8.0), # Typical plant of 8 MMBTU/MWh heat rate. Piecewise heat rates can be used if needed.
-   power_units = UnitSystem.NATURAL_UNITS,
-   fuel_cost = 1.0 # $/MMBTU default fuel cost to start
+    value_curve = LinearCurve(8.0), # Typical plant of 8 MMBTU/MWh heat rate. Piecewise heat rates can be used if needed.
+    power_units = UnitSystem.NATURAL_UNITS,
+    fuel_cost = 1.0, # $/MMBTU default fuel cost to start
 )
 new_thermal_cost = ThermalGenerationCost(;
     variable = new_fuel_curve,
@@ -52,7 +51,11 @@ set_operation_cost!(brighton, new_thermal_cost)
 Now we create a timeseries with random fuel prices. We first grab an existing timeseries:
 
 ```@repl op_problem_mbc
-existing_ts = get_time_series_array(SingleTimeSeries, first(get_components(PowerLoad, sys)), "max_active_power")
+existing_ts = get_time_series_array(
+    SingleTimeSeries,
+    first(get_components(PowerLoad, sys)),
+    "max_active_power",
+)
 tstamps = timestamp(existing_ts)
 ```
 
@@ -61,7 +64,7 @@ And add the timeseries with the `set_fuel_cost!` method.
 ```@repl op_problem_mbc
 fuel_cost_values = rand(length(tstamps)) .+ 1.0 # Random fuel cost between 1.0 and 2.0 $/MMBTU
 fuel_cost_tarray = TimeArray(tstamps, fuel_cost_values)
-fuel_cost_ts = SingleTimeSeries(name = "fuel_cost", data = fuel_cost_tarray)
+fuel_cost_ts = SingleTimeSeries(; name = "fuel_cost", data = fuel_cost_tarray)
 set_fuel_cost!(sys, brighton, fuel_cost_ts)
 ```
 
@@ -70,7 +73,11 @@ set_fuel_cost!(sys, brighton, fuel_cost_ts)
 We again grab the timestamps from an existing time series:
 
 ```@repl op_problem_mbc
-existing_ts = get_time_series_array(SingleTimeSeries, first(get_components(PowerLoad, sys)), "max_active_power")
+existing_ts = get_time_series_array(
+    SingleTimeSeries,
+    first(get_components(PowerLoad, sys)),
+    "max_active_power",
+)
 tstamps = timestamp(existing_ts)
 ```
 
@@ -97,7 +104,7 @@ psd3 = PiecewiseStepData([0.0, 600.0], [500.0])
 # Cheap the first 10 hours, moderate next 4 hours, expensive last 34 hours
 total_step_data = vcat([psd1 for x in 1:10], [psd2 for x in 1:4], [psd3 for x in 1:34])
 mbid_tarray = TimeArray(tstamps, total_step_data)
-ts_mbid = SingleTimeSeries(name = "variable_cost", data = mbid_tarray)
+ts_mbid = SingleTimeSeries(; name = "variable_cost", data = mbid_tarray)
 
 set_variable_cost!(sys, hy, ts_mbid, UnitSystem.NATURAL_UNITS)
 ```
@@ -107,7 +114,7 @@ It is also needed to create the initial input time series for market bid. That i
 ```@repl op_problem_mbc
 zero_input = zeros(length(tstamps))
 zero_tarray = TimeArray(tstamps, zero_input)
-ts_zero = SingleTimeSeries(name = "variable_cost_initial_input", data = zero_tarray)
+ts_zero = SingleTimeSeries(; name = "variable_cost_initial_input", data = zero_tarray)
 set_incremental_initial_input!(sys, hy, ts_zero)
 ```
 
@@ -122,7 +129,13 @@ transform_single_time_series!(sys, Hour(24), Hour(24))
 And create the necessary templates for the system:
 
 ```@repl op_problem_mbc
-template = ProblemTemplate(NetworkModel(CopperPlatePowerModel ;use_slacks = true, duals = [CopperPlateBalanceConstraint]))
+template = ProblemTemplate(
+    NetworkModel(
+        CopperPlatePowerModel;
+        use_slacks = true,
+        duals = [CopperPlateBalanceConstraint],
+    ),
+)
 set_device_model!(template, ThermalStandard, ThermalBasicUnitCommitment)
 set_device_model!(template, HydroDispatch, HydroDispatchRunOfRiver)
 set_device_model!(template, PowerLoad, StaticPowerLoad)
@@ -149,11 +162,16 @@ And exploring results we confirm that the hydro is not dispatched when is more e
 
 ```@repl op_problem_mbc
 res = OptimizationProblemResults(model)
-hy_p = read_variable(res, "ActivePowerVariable__HydroDispatch"; table_format = TableFormat.WIDE);
-show(hy_p, allrows = true)
+hy_p = read_variable(
+    res,
+    "ActivePowerVariable__HydroDispatch";
+    table_format = TableFormat.WIDE,
+);
+show(hy_p; allrows = true)
 ```
 
 ```@repl op_problem_mbc
-dual_price = read_dual(res, "CopperPlateBalanceConstraint__System"; table_format = TableFormat.WIDE);
-show(dual_price, allrows = true)
+dual_price =
+    read_dual(res, "CopperPlateBalanceConstraint__System"; table_format = TableFormat.WIDE);
+show(dual_price; allrows = true)
 ```
