@@ -168,3 +168,133 @@ function build_sys_hydro(
     )
     return sys
 end
+
+function run_fixed_forced_outage_sim_with_timeseries(;
+    sys,
+    networks,
+    optimizers,
+    outage_status_timeseries,
+    device_type,
+    device_names,
+    renewable_formulation,
+)
+    sys_em = deepcopy(sys)
+    sys_d1 = deepcopy(sys)
+    sys_d2 = deepcopy(sys)
+    transform_single_time_series!(sys_d1, Day(2), Day(1))
+    transform_single_time_series!(sys_d2, Hour(4), Hour(1))
+    event_model = EventModel(
+        FixedForcedOutage,
+        PSI.ContinuousCondition();
+        timeseries_mapping = Dict(
+            :outage_status => "outage_profile_1",
+        ),
+    )
+    template_d1 = get_template_basic_uc_simulation()
+    #pop!(PSI.get_device_models(template_d1), :HydroTurbine)
+    pop!(PSI.get_device_models(template_d1), :HydroReservoir)
+    set_network_model!(template_d1, NetworkModel(networks[1]))
+    template_d2 = get_template_basic_uc_simulation()
+    #pop!(PSI.get_device_models(template_d2), :HydroTurbine)
+    pop!(PSI.get_device_models(template_d2), :HydroReservoir)
+    set_network_model!(template_d2, NetworkModel(networks[2]))
+    template_em = get_template_nomin_ed_simulation(networks[3])
+    #pop!(PSI.get_device_models(template_em), :HydroTurbine)
+    pop!(PSI.get_device_models(template_em), :HydroReservoir)
+
+    set_device_model!(template_d1, RenewableDispatch, renewable_formulation)
+    set_device_model!(template_d2, RenewableDispatch, renewable_formulation)
+    set_device_model!(template_em, RenewableDispatch, renewable_formulation)
+    set_device_model!(template_em, ThermalStandard, ThermalBasicDispatch)
+    set_service_model!(template_d1, ServiceModel(ConstantReserve{ReserveUp}, RangeReserve))
+    set_service_model!(template_d2, ServiceModel(ConstantReserve{ReserveUp}, RangeReserve))
+    set_device_model!(template_em, InterruptiblePowerLoad, PowerLoadDispatch)
+    set_device_model!(template_d1, InterruptiblePowerLoad, PowerLoadDispatch)
+    set_device_model!(template_d2, InterruptiblePowerLoad, PowerLoadDispatch)
+    set_device_model!(template_em, HydroDispatch, HydroDispatchRunOfRiver)
+    set_device_model!(template_d1, HydroDispatch, HydroDispatchRunOfRiver)
+    set_device_model!(template_d2, HydroDispatch, HydroDispatchRunOfRiver)
+    pump_model = DeviceModel(
+        HydroPumpTurbine,
+        HydroPumpEnergyDispatch;
+        attributes = Dict{String, Any}("energy_target" => true),
+    )
+    set_device_model!(template_em, pump_model)
+    set_device_model!(template_d1, pump_model)
+    set_device_model!(template_d2, pump_model)
+
+    set_device_model!(template_d1, Line, StaticBranch)
+    set_device_model!(template_d2, Line, StaticBranch)
+    set_device_model!(template_em, Line, StaticBranch)
+
+    for sys in [sys_d1, sys_d2, sys_em]
+        for name in device_names
+            g = get_component(device_type, sys, name)
+            transition_data = PSY.FixedForcedOutage(;
+                outage_status = 0.0,
+            )
+            add_supplemental_attribute!(sys, g, transition_data)
+            PSY.add_time_series!(
+                sys,
+                transition_data,
+                PSY.SingleTimeSeries("outage_profile_1", outage_status_timeseries),
+            )
+        end
+    end
+
+    models = SimulationModels(;
+        decision_models = [
+            DecisionModel(
+                template_d1,
+                sys_d1;
+                name = "D1",
+                initialize_model = false,
+                optimizer = optimizers[1],
+            ),
+            DecisionModel(
+                template_d2,
+                sys_d2;
+                name = "D2",
+                initialize_model = false,
+                optimizer = optimizers[2],
+                store_variable_names = true,
+            ),
+        ],
+        emulation_model = EmulationModel(
+            template_em,
+            sys_em;
+            name = "EM",
+            optimizer = optimizers[3],
+            calculate_conflict = true,
+            store_variable_names = true,
+        ),
+    )
+    sequence = SimulationSequence(;
+        models = models,
+        ini_cond_chronology = InterProblemChronology(),
+        feedforwards = Dict(
+            "EM" => [# This FeedForward will force the commitment to be kept in the emulator
+                SemiContinuousFeedforward(;
+                    component_type = ThermalStandard,
+                    source = OnVariable,
+                    affected_values = [ActivePowerVariable],
+                ),
+            ],
+        ),
+        events = [event_model],
+    )
+
+    sim = Simulation(;
+        name = "no_cache",
+        steps = 1,
+        models = models,
+        sequence = sequence,
+        simulation_folder = mktempdir(; cleanup = true),
+    )
+    build_out = build!(sim; console_level = Logging.Error)
+    @test build_out == PSI.SimulationBuildStatus.BUILT
+    execute_out = execute!(sim; in_memory = true)
+    @test execute_out == PSI.RunStatus.SUCCESSFULLY_FINALIZED
+    results = SimulationResults(sim; ignore_status = true)
+    return sim, results
+end

@@ -117,6 +117,7 @@ include("hydro_generation.jl")
 include("hydrogeneration_constructor.jl")
 include("hydro_decision_model.jl")
 include("feedforwards.jl")
+include("contingency_model.jl")
 
 # Utils
 include("utils.jl")

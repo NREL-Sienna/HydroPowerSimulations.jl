@@ -426,32 +426,6 @@ end
         )
 
     hy_pump = first(PSY.get_components(HydroPumpTurbine, c_sys5_bat))
-
-    ### Add Time Series ###
-    DayAhead = collect(
-        DateTime("1/1/2024  0:00:00", "d/m/y  H:M:S"):Hour(1):DateTime(
-            "1/1/2024  23:00:00",
-            "d/m/y  H:M:S",
-        ),
-    )
-
-    hydro_max_power = 0.8 * ones(48)
-    hydro_max_cap = 0.9 * ones(48)
-    tstamps = vcat(DayAhead, DayAhead .+ Day(1))
-    tarray_power = TimeArray(tstamps, hydro_max_power)
-    tarray_cap = TimeArray(tstamps, hydro_max_cap)
-
-    PSY.add_time_series!(
-        c_sys5_bat,
-        hy_pump,
-        PSY.SingleTimeSeries("max_active_power", tarray_power),
-    )
-    PSY.add_time_series!(
-        c_sys5_bat,
-        hy_pump,
-        PSY.SingleTimeSeries("capacity", tarray_cap),
-    )
-    #remove_time_series!(c_sys5_bat, Deterministic)
     transform_single_time_series!(c_sys5_bat, Hour(24), Hour(24))
 
     model = DecisionModel(MockOperationProblem, CopperPlatePowerModel, c_sys5_bat)
@@ -473,31 +447,6 @@ end
 
     hy_pump = first(PSY.get_components(HydroPumpTurbine, c_sys5_bat))
 
-    ### Add Time Series ###
-    DayAhead = collect(
-        DateTime("1/1/2024  0:00:00", "d/m/y  H:M:S"):Hour(1):DateTime(
-            "1/1/2024  23:00:00",
-            "d/m/y  H:M:S",
-        ),
-    )
-
-    hydro_max_power = 0.8 * ones(48)
-    hydro_max_cap = 0.9 * ones(48)
-    tstamps = vcat(DayAhead, DayAhead .+ Day(1))
-    tarray_power = TimeArray(tstamps, hydro_max_power)
-    tarray_cap = TimeArray(tstamps, hydro_max_cap)
-
-    PSY.add_time_series!(
-        c_sys5_bat,
-        hy_pump,
-        PSY.SingleTimeSeries("max_active_power", tarray_power),
-    )
-    PSY.add_time_series!(
-        c_sys5_bat,
-        hy_pump,
-        PSY.SingleTimeSeries("capacity", tarray_cap),
-    )
-    #remove_time_series!(c_sys5_bat, Deterministic)
     transform_single_time_series!(c_sys5_bat, Hour(24), Hour(24))
 
     template_uc = ProblemTemplate()
