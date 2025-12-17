@@ -100,15 +100,12 @@ end
         renewable_formulation = RenewableFullDispatch,
     )
     # Test outage constraints are built for both ActivePowerVariable and ActivePowerPumpVariable:
-    costraints = sim.models.decision_models[1].internal.container.constraints
-    @test haskey(
-        costraints,
+    model = first(PSI.get_decision_models(PSI.get_models(sim)))
+    event_constraint_keys = [
         PSI.ConstraintKey{PSI.ActivePowerOutageConstraint, HydroPumpTurbine}(""),
-    )
-    @test haskey(
-        costraints,
         PSI.ConstraintKey{HPS.ActivePowerPumpOutageConstraint, HydroPumpTurbine}(""),
-    )
+    ]
+    psi_constraint_test(model, event_constraint_keys)
 
     em = get_emulation_problem_results(res)
     status = read_realized_variable(
