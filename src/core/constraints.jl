@@ -179,3 +179,8 @@ struct ReservoirHeadToVolumeConstraint <: PSI.ConstraintType end
 Feedforward constraint to limit the water level budget for reservoir formulations.
 """
 struct FeedForwardWaterLevelBudgetConstraint <: PSI.ConstraintType end
+
+"""
+Constraint to limit the active power pump variable during an event
+"""
+struct ActivePowerPumpOutageConstraint <: PSI.EventConstraint end

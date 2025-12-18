@@ -12,6 +12,7 @@ using InfrastructureSystems
 using Test
 using Logging
 import OrderedCollections: OrderedDict
+import JuMP.Containers: DenseAxisArray, SparseAxisArray
 using DataFrames
 using DataFramesMeta
 
