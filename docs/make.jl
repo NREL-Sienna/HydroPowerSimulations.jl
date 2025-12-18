@@ -12,6 +12,7 @@ pages = OrderedDict(
     "Welcome Page" => "index.md",
     "Tutorials" => Any[
         "Operation problem with HydroDispatchRunOfRiver" => "tutorials/single_stage_model.md",
+        "HydroDispatch with Market Bid Cost" => "tutorials/hydro_with_marketbidcost.md",
         "Energy Hydro Reservoir Operation" => "tutorials/energy_model_hydroturbine_reservoir.md",
         "Water Hydro Reservoir Operation" => "tutorials/water_model_hydroturbine_reservoir.md",
         "Hydro Pump Turbine Operation" => "tutorials/hydro_pump_turbine.md",
