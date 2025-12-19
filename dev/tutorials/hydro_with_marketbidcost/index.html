@@ -146,47 +146,47 @@
  2024-01-02T21:00:00
  2024-01-02T22:00:00
  2024-01-02T23:00:00</code></pre><p>And add the timeseries with the <code>set_fuel_cost!</code> method.</p><pre><code class="language-julia-repl hljs" style="display:block;">julia&gt; fuel_cost_values = rand(length(tstamps)) .+ 1.0 # Random fuel cost between 1.0 and 2.0 $/MMBTU</code><code class="nohighlight hljs ansi" style="display:block;">48-element Vector{Float64}:
- 1.9169339356070347
- 1.5908358500484585
- 1.9755348587916206
- 1.12118631656875
- 1.1750269244637392
- 1.9391175032644181
- 1.9720284087121187
- 1.9139786805401686
- 1.493071670094312
- 1.1317492599008232
+ 1.1128913084726564
+ 1.5529154849363676
+ 1.141467180554721
+ 1.9518061127416866
+ 1.1510686185184715
+ 1.5618508075509456
+ 1.1155709342736457
+ 1.4184354539706345
+ 1.3896775410037399
+ 1.5165227108518502
  ⋮
- 1.0877995962829679
- 1.671515217174064
- 1.9904283767988402
- 1.9344559329121038
- 1.6573464513821397
- 1.6320743466342567
- 1.2950332984992192
- 1.9004429314592794
- 1.5077911741257402</code><br/><code class="language-julia-repl hljs" style="display:block;">julia&gt; fuel_cost_tarray = TimeArray(tstamps, fuel_cost_values)</code><code class="nohighlight hljs ansi" style="display:block;">48×1 TimeSeries.TimeArray{Float64, 1, Dates.DateTime, Vector{Float64}} 2024-01-01T00:00:00 to 2024-01-02T23:00:00
+ 1.4598550605260465
+ 1.8168912235483803
+ 1.55520503162789
+ 1.363295106751827
+ 1.441075659991462
+ 1.2171260572938698
+ 1.5142199838105221
+ 1.3418964011344976
+ 1.5692518647200342</code><br/><code class="language-julia-repl hljs" style="display:block;">julia&gt; fuel_cost_tarray = TimeArray(tstamps, fuel_cost_values)</code><code class="nohighlight hljs ansi" style="display:block;">48×1 TimeSeries.TimeArray{Float64, 1, Dates.DateTime, Vector{Float64}} 2024-01-01T00:00:00 to 2024-01-02T23:00:00
 ┌─────────────────────┬─────────┐
 │<span class="sgr1">                     │ A       │
 ├─────────────────────┼─────────┤
-│ 2024-01-01T00:00:00 │ 1.91693 │
-│ 2024-01-01T01:00:00 │ 1.59084 │
-│ 2024-01-01T02:00:00 │ 1.97553 │
-│ 2024-01-01T03:00:00 │ 1.12119 │
-│ 2024-01-01T04:00:00 │ 1.17503 │
-│ 2024-01-01T05:00:00 │ 1.93912 │
-│ 2024-01-01T06:00:00 │ 1.97203 │
-│ 2024-01-01T07:00:00 │ 1.91398 │
+│ 2024-01-01T00:00:00 │ 1.11289 │
+│ 2024-01-01T01:00:00 │ 1.55292 │
+│ 2024-01-01T02:00:00 │ 1.14147 │
+│ 2024-01-01T03:00:00 │ 1.95181 │
+│ 2024-01-01T04:00:00 │ 1.15107 │
+│ 2024-01-01T05:00:00 │ 1.56185 │
+│ 2024-01-01T06:00:00 │ 1.11557 │
+│ 2024-01-01T07:00:00 │ 1.41844 │
 │          ⋮          │    ⋮    │
-│ 2024-01-02T17:00:00 │ 1.99043 │
-│ 2024-01-02T18:00:00 │ 1.93446 │
-│ 2024-01-02T19:00:00 │ 1.65735 │
-│ 2024-01-02T20:00:00 │ 1.63207 │
-│ 2024-01-02T21:00:00 │ 1.29503 │
-│ 2024-01-02T22:00:00 │ 1.90044 │
-│ 2024-01-02T23:00:00 │ 1.50779 │
+│ 2024-01-02T17:00:00 │ 1.55521 │
+│ 2024-01-02T18:00:00 │  1.3633 │
+│ 2024-01-02T19:00:00 │ 1.44108 │
+│ 2024-01-02T20:00:00 │ 1.21713 │
+│ 2024-01-02T21:00:00 │ 1.51422 │
+│ 2024-01-02T22:00:00 │  1.3419 │
+│ 2024-01-02T23:00:00 │ 1.56925 │
 └─────────────────────┴─────────┘
-<span class="sgr36">                  33 rows omitted</span></span></code><br/><code class="language-julia-repl hljs" style="display:block;">julia&gt; fuel_cost_ts = SingleTimeSeries(; name = &quot;fuel_cost&quot;, data = fuel_cost_tarray)</code><code class="nohighlight hljs ansi" style="display:block;">InfrastructureSystems.SingleTimeSeries(&quot;fuel_cost&quot;, 48×1 TimeSeries.TimeArray{Float64, 1, Dates.DateTime, Vector{Float64}} 2024-01-01T00:00:00 to 2024-01-02T23:00:00, Dates.Millisecond(3600000), nothing, InfrastructureSystems.InfrastructureSystemsInternal(Base.UUID(&quot;deec3c48-9c2e-4451-b2bf-902333d66f0e&quot;), nothing, nothing, nothing))</code><br/><code class="language-julia-repl hljs" style="display:block;">julia&gt; set_fuel_cost!(sys, brighton, fuel_cost_ts)</code><code class="nohighlight hljs ansi" style="display:block;">FuelCurve:
+<span class="sgr36">                  33 rows omitted</span></span></code><br/><code class="language-julia-repl hljs" style="display:block;">julia&gt; fuel_cost_ts = SingleTimeSeries(; name = &quot;fuel_cost&quot;, data = fuel_cost_tarray)</code><code class="nohighlight hljs ansi" style="display:block;">InfrastructureSystems.SingleTimeSeries(&quot;fuel_cost&quot;, 48×1 TimeSeries.TimeArray{Float64, 1, Dates.DateTime, Vector{Float64}} 2024-01-01T00:00:00 to 2024-01-02T23:00:00, Dates.Millisecond(3600000), nothing, InfrastructureSystems.InfrastructureSystemsInternal(Base.UUID(&quot;8298c082-04a0-43a5-8b72-1c3cb30eac5c&quot;), nothing, nothing, nothing))</code><br/><code class="language-julia-repl hljs" style="display:block;">julia&gt; set_fuel_cost!(sys, brighton, fuel_cost_ts)</code><code class="nohighlight hljs ansi" style="display:block;">FuelCurve:
   value_curve: InfrastructureSystems.LinearCurve (a type of InfrastructureSystems.InputOutputCurve) where function is: f(x) = 8.0 x + 0.0
   power_units: InfrastructureSystems.UnitSystemModule.UnitSystem.NATURAL_UNITS = 2
   fuel_cost: InfrastructureSystems.StaticTimeSeriesKey(InfrastructureSystems.SingleTimeSeries, &quot;fuel_cost&quot;, Dates.DateTime(&quot;2024-01-01T00:00:00&quot;), Dates.Millisecond(3600000), 48, Dict{String, Any}())
@@ -326,7 +326,7 @@
 │ 2024-01-02T22:00:00 │ PiecewiseStepData([0.0, 600.0], [500.0]) │
 │ 2024-01-02T23:00:00 │ PiecewiseStepData([0.0, 600.0], [500.0]) │
 └─────────────────────┴──────────────────────────────────────────┘
-<span class="sgr36">                                                   33 rows omitted</span></span></code><br/><code class="language-julia-repl hljs" style="display:block;">julia&gt; ts_mbid = SingleTimeSeries(; name = &quot;variable_cost&quot;, data = mbid_tarray)</code><code class="nohighlight hljs ansi" style="display:block;">InfrastructureSystems.SingleTimeSeries(&quot;variable_cost&quot;, 48×1 TimeSeries.TimeArray{InfrastructureSystems.PiecewiseStepData, 1, Dates.DateTime, Vector{InfrastructureSystems.PiecewiseStepData}} 2024-01-01T00:00:00 to 2024-01-02T23:00:00, Dates.Millisecond(3600000), nothing, InfrastructureSystems.InfrastructureSystemsInternal(Base.UUID(&quot;2a2e8238-3485-448d-881e-00c16244fe2a&quot;), nothing, nothing, nothing))</code><br/><code class="language-julia-repl hljs" style="display:block;">julia&gt; set_variable_cost!(sys, hy, ts_mbid, UnitSystem.NATURAL_UNITS)</code></pre><p>It is also needed to create the initial input time series for market bid. That is the cost at 0 power at each time step. We will use zero for this example.</p><pre><code class="language-julia-repl hljs" style="display:block;">julia&gt; zero_input = zeros(length(tstamps))</code><code class="nohighlight hljs ansi" style="display:block;">48-element Vector{Float64}:
+<span class="sgr36">                                                   33 rows omitted</span></span></code><br/><code class="language-julia-repl hljs" style="display:block;">julia&gt; ts_mbid = SingleTimeSeries(; name = &quot;variable_cost&quot;, data = mbid_tarray)</code><code class="nohighlight hljs ansi" style="display:block;">InfrastructureSystems.SingleTimeSeries(&quot;variable_cost&quot;, 48×1 TimeSeries.TimeArray{InfrastructureSystems.PiecewiseStepData, 1, Dates.DateTime, Vector{InfrastructureSystems.PiecewiseStepData}} 2024-01-01T00:00:00 to 2024-01-02T23:00:00, Dates.Millisecond(3600000), nothing, InfrastructureSystems.InfrastructureSystemsInternal(Base.UUID(&quot;d887601b-bc83-41d0-aa46-123f4e859aba&quot;), nothing, nothing, nothing))</code><br/><code class="language-julia-repl hljs" style="display:block;">julia&gt; set_variable_cost!(sys, hy, ts_mbid, UnitSystem.NATURAL_UNITS)</code></pre><p>It is also needed to create the initial input time series for market bid. That is the cost at 0 power at each time step. We will use zero for this example.</p><pre><code class="language-julia-repl hljs" style="display:block;">julia&gt; zero_input = zeros(length(tstamps))</code><code class="nohighlight hljs ansi" style="display:block;">48-element Vector{Float64}:
  0.0
  0.0
  0.0
@@ -367,7 +367,7 @@
 │ 2024-01-02T22:00:00 │ 0.0 │
 │ 2024-01-02T23:00:00 │ 0.0 │
 └─────────────────────┴─────┘
-<span class="sgr36">              33 rows omitted</span></span></code><br/><code class="language-julia-repl hljs" style="display:block;">julia&gt; ts_zero = SingleTimeSeries(; name = &quot;variable_cost_initial_input&quot;, data = zero_tarray)</code><code class="nohighlight hljs ansi" style="display:block;">InfrastructureSystems.SingleTimeSeries(&quot;variable_cost_initial_input&quot;, 48×1 TimeSeries.TimeArray{Float64, 1, Dates.DateTime, Vector{Float64}} 2024-01-01T00:00:00 to 2024-01-02T23:00:00, Dates.Millisecond(3600000), nothing, InfrastructureSystems.InfrastructureSystemsInternal(Base.UUID(&quot;3eb61da4-4e12-4d09-9790-90e5d51c856a&quot;), nothing, nothing, nothing))</code><br/><code class="language-julia-repl hljs" style="display:block;">julia&gt; set_incremental_initial_input!(sys, hy, ts_zero)</code><code class="nohighlight hljs ansi" style="display:block;">InfrastructureSystems.StaticTimeSeriesKey(InfrastructureSystems.SingleTimeSeries, &quot;variable_cost_initial_input&quot;, Dates.DateTime(&quot;2024-01-01T00:00:00&quot;), Dates.Millisecond(3600000), 48, Dict{String, Any}())</code></pre><h2 id="Running-the-single-stage-problem"><a class="docs-heading-anchor" href="#Running-the-single-stage-problem">Running the single-stage problem</a><a id="Running-the-single-stage-problem-1"></a><a class="docs-heading-anchor-permalink" href="#Running-the-single-stage-problem" title="Permalink"></a></h2><p>We first transform the single time series to a 24 hour forecast</p><pre><code class="language-julia-repl hljs" style="display:block;">julia&gt; transform_single_time_series!(sys, Hour(24), Hour(24))</code></pre><p>And create the necessary templates for the system:</p><pre><code class="language-julia-repl hljs" style="display:block;">julia&gt; template = ProblemTemplate(
+<span class="sgr36">              33 rows omitted</span></span></code><br/><code class="language-julia-repl hljs" style="display:block;">julia&gt; ts_zero = SingleTimeSeries(; name = &quot;variable_cost_initial_input&quot;, data = zero_tarray)</code><code class="nohighlight hljs ansi" style="display:block;">InfrastructureSystems.SingleTimeSeries(&quot;variable_cost_initial_input&quot;, 48×1 TimeSeries.TimeArray{Float64, 1, Dates.DateTime, Vector{Float64}} 2024-01-01T00:00:00 to 2024-01-02T23:00:00, Dates.Millisecond(3600000), nothing, InfrastructureSystems.InfrastructureSystemsInternal(Base.UUID(&quot;8a9b1d04-15c5-4b47-b63a-c782fc846ef4&quot;), nothing, nothing, nothing))</code><br/><code class="language-julia-repl hljs" style="display:block;">julia&gt; set_incremental_initial_input!(sys, hy, ts_zero)</code><code class="nohighlight hljs ansi" style="display:block;">InfrastructureSystems.StaticTimeSeriesKey(InfrastructureSystems.SingleTimeSeries, &quot;variable_cost_initial_input&quot;, Dates.DateTime(&quot;2024-01-01T00:00:00&quot;), Dates.Millisecond(3600000), 48, Dict{String, Any}())</code></pre><h2 id="Running-the-single-stage-problem"><a class="docs-heading-anchor" href="#Running-the-single-stage-problem">Running the single-stage problem</a><a id="Running-the-single-stage-problem-1"></a><a class="docs-heading-anchor-permalink" href="#Running-the-single-stage-problem" title="Permalink"></a></h2><p>We first transform the single time series to a 24 hour forecast</p><pre><code class="language-julia-repl hljs" style="display:block;">julia&gt; transform_single_time_series!(sys, Hour(24), Hour(24))</code></pre><p>And create the necessary templates for the system:</p><pre><code class="language-julia-repl hljs" style="display:block;">julia&gt; template = ProblemTemplate(
            NetworkModel(
                CopperPlatePowerModel;
                use_slacks = true,
@@ -419,16 +419,16 @@ Resolution: 60 minutes
 <span class="sgr1">PowerSimulations Problem Auxiliary variables Results
 ┌──────────────────────────────────┐
 │ TimeDurationOn__ThermalStandard  │
-│ TimeDurationOff__ThermalStandard │
 │ HydroEnergyOutput__HydroDispatch │
+│ TimeDurationOff__ThermalStandard │
 └──────────────────────────────────┘
 
  PowerSimulations Problem Expressions Results
 ┌────────────────────────────────────────────┐
-│ ActivePowerBalance__System                 │
-│ FuelConsumptionExpression__ThermalStandard │
 │ ProductionCostExpression__ThermalStandard  │
 │ ProductionCostExpression__HydroDispatch    │
+│ ActivePowerBalance__System                 │
+│ FuelConsumptionExpression__ThermalStandard │
 └────────────────────────────────────────────┘
 
  PowerSimulations Problem Duals Results
@@ -438,21 +438,21 @@ Resolution: 60 minutes
 
           PowerSimulations Problem Parameters Results
 ┌──────────────────────────────────────────────────────────────┐
+│ ActivePowerTimeSeriesParameter__PowerLoad                    │
 │ FuelCostParameter__ThermalStandard                           │
-│ IncrementalPiecewiseLinearBreakpointParameter__HydroDispatch │
 │ ActivePowerTimeSeriesParameter__HydroDispatch                │
 │ IncrementalPiecewiseLinearSlopeParameter__HydroDispatch      │
-│ ActivePowerTimeSeriesParameter__PowerLoad                    │
+│ IncrementalPiecewiseLinearBreakpointParameter__HydroDispatch │
 └──────────────────────────────────────────────────────────────┘
 
 PowerSimulations Problem Variables Results
 ┌──────────────────────────────────────┐
-│ OnVariable__ThermalStandard          │
 │ SystemBalanceSlackDown__System       │
-│ ActivePowerVariable__HydroDispatch   │
-│ StartVariable__ThermalStandard       │
 │ ActivePowerVariable__ThermalStandard │
+│ StartVariable__ThermalStandard       │
+│ ActivePowerVariable__HydroDispatch   │
 │ SystemBalanceSlackUp__System         │
+│ OnVariable__ThermalStandard          │
 │ StopVariable__ThermalStandard        │
 └──────────────────────────────────────┘</span></code><br/><code class="language-julia-repl hljs" style="display:block;">julia&gt; hy_p = read_variable(
            res,
@@ -473,7 +473,7 @@ PowerSimulations Problem Variables Results
    9 │ 2024-01-01T08:00:00       124.577
   10 │ 2024-01-01T09:00:00       373.731
   11 │ 2024-01-01T10:00:00       402.304
-  12 │ 2024-01-01T11:00:00       405.733
+  12 │ 2024-01-01T11:00:00       282.93
   13 │ 2024-01-01T12:00:00       401.161
   14 │ 2024-01-01T13:00:00       244.583
   15 │ 2024-01-01T14:00:00         0.0
@@ -490,19 +490,19 @@ PowerSimulations Problem Variables Results
  Row │ DateTime             4
      │<span class="sgr90"> DateTime             Float64?
 ─────┼───────────────────────────────
-   1 │ 2024-01-01T00:00:00  1533.55
-   2 │ 2024-01-01T01:00:00  1272.67
-   3 │ 2024-01-01T02:00:00  1580.43
-   4 │ 2024-01-01T03:00:00   896.949
-   5 │ 2024-01-01T04:00:00   940.022
-   6 │ 2024-01-01T05:00:00  1551.29
-   7 │ 2024-01-01T06:00:00  1577.62
-   8 │ 2024-01-01T07:00:00  1531.18
+   1 │ 2024-01-01T00:00:00  1500.0
+   2 │ 2024-01-01T01:00:00  1242.33
+   3 │ 2024-01-01T02:00:00   913.174
+   4 │ 2024-01-01T03:00:00  1561.44
+   5 │ 2024-01-01T04:00:00   920.855
+   6 │ 2024-01-01T05:00:00  1249.48
+   7 │ 2024-01-01T06:00:00  1400.0
+   8 │ 2024-01-01T07:00:00  1134.75
    9 │ 2024-01-01T08:00:00  1500.0
-  10 │ 2024-01-01T09:00:00   905.399
-  11 │ 2024-01-01T10:00:00  1411.29
-  12 │ 2024-01-01T11:00:00  1223.54
-  13 │ 2024-01-01T12:00:00  1263.05
+  10 │ 2024-01-01T09:00:00  1213.22
+  11 │ 2024-01-01T10:00:00  1089.65
+  12 │ 2024-01-01T11:00:00  1000.0
+  13 │ 2024-01-01T12:00:00  1410.44
   14 │ 2024-01-01T13:00:00  1400.0
   15 │ 2024-01-01T14:00:00  3000.0
   16 │ 2024-01-01T15:00:00  3000.0
@@ -513,4 +513,4 @@ PowerSimulations Problem Variables Results
   21 │ 2024-01-01T20:00:00  3000.0
   22 │ 2024-01-01T21:00:00  3000.0
   23 │ 2024-01-01T22:00:00  3000.0
-  24 │ 2024-01-01T23:00:00  1516.78</span></span></code></pre></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../single_stage_model/">« Operation problem with HydroDispatchRunOfRiver</a><a class="docs-footer-nextpage" href="../energy_model_hydroturbine_reservoir/">Energy Hydro Reservoir Operation »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.16.1 on <span class="colophon-date" title="Thursday 18 December 2025 05:14">Thursday 18 December 2025</span>. Using Julia version 1.12.3.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+  24 │ 2024-01-01T23:00:00  1500.0</span></span></code></pre></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../single_stage_model/">« Operation problem with HydroDispatchRunOfRiver</a><a class="docs-footer-nextpage" href="../energy_model_hydroturbine_reservoir/">Energy Hydro Reservoir Operation »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.16.1 on <span class="colophon-date" title="Friday 19 December 2025 18:08">Friday 19 December 2025</span>. Using Julia version 1.12.3.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
