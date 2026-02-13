@@ -17,6 +17,7 @@ export HydroEnergyModelReservoir
 export HydroTurbineEnergyDispatch
 export HydroTurbineEnergyCommitment
 export HydroPumpEnergyDispatch
+export HydroPumpEnergyCommitment
 
 ######## Hydro Variables ########
 export WaterSpillageVariable
@@ -27,6 +28,8 @@ export HydroWaterSurplusVariable
 export HydroReservoirHeadVariable
 export HydroReservoirVolumeVariable
 export HydroTurbineFlowRateVariable
+export HydroBalanceShortageVariable
+export HydroBalanceSurplusVariable
 export ActivePowerPumpVariable
 
 ######## Hydro Aux Variables ########
