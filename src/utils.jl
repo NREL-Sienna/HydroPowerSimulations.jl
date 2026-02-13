@@ -7,7 +7,7 @@ function get_available_reservoirs(sys::System)
 end
 
 function get_available_turbines(
-    d::HydroReservoir,
+    d::PSY.HydroReservoir,
     ::Type{U},
 ) where {U <: Union{TotalHydroPowerReservoirIncoming, TotalHydroFlowRateReservoirIncoming}}
     return filter(
@@ -17,7 +17,7 @@ function get_available_turbines(
 end
 
 function get_available_turbines(
-    d::HydroReservoir,
+    d::PSY.HydroReservoir,
     ::Type{U},
 ) where {U <: Union{TotalHydroPowerReservoirOutgoing, TotalHydroFlowRateReservoirOutgoing}}
     return filter(
