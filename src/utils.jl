@@ -1,4 +1,4 @@
-function get_available_reservoirs(sys::System)
+function get_available_reservoirs(sys::PSY.System)
     return PSY.get_components(
         x -> (PSY.get_available(x)),
         PSY.HydroReservoir,
