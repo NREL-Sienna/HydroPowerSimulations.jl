@@ -329,12 +329,11 @@ function make_tutorials()
                 outputfile = string("generated_", replace("$file", ".jl" => ""))
 
                 # Generate markdown
-                # Use a named @example block so variables persist across code cells
                 Literate.markdown(infile_path,
                     tutorial_outputdir;
                     name = outputfile,
                     credit = false,
-                    flavor = Literate.DocumenterFlavor(; name = outputfile),
+                    flavor = Literate.DocumenterFlavor(),
                     documenter = true,
                     postprocess = (
                         content -> add_download_links(
