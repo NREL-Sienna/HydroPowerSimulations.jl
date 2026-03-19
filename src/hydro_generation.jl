@@ -121,20 +121,20 @@ PSI.get_variable_upper_bound(::PSI.ReactivePowerVariable, d::PSY.HydroPumpTurbin
 
 
 ############## EnergyShortageVariable, HydroReservoir ####################
-PSI.get_variable_binary(::HydroEnergyShortageVariable, ::Type{<:PSY.HydroReservoir}, ::HydroEnergyModelReservoir) = false
-PSI.get_variable_lower_bound(::HydroEnergyShortageVariable, d::PSY.HydroReservoir, ::HydroEnergyModelReservoir) = 0.0
-PSI.get_variable_upper_bound(::HydroEnergyShortageVariable, d::PSY.HydroReservoir, ::HydroEnergyModelReservoir) = PSY.get_storage_level_limits(d).max
-PSI.get_variable_binary(::HydroWaterShortageVariable, ::Type{<:PSY.HydroReservoir}, ::HydroWaterModelReservoir) = false
-PSI.get_variable_lower_bound(::HydroWaterShortageVariable, d::PSY.HydroReservoir, ::HydroWaterModelReservoir) = 0.0
-PSI.get_variable_upper_bound(::HydroWaterShortageVariable, d::PSY.HydroReservoir, ::HydroWaterModelReservoir) = PSY.get_storage_level_limits(d).max
+PSI.get_variable_binary(::HydroEnergyShortageVariable, ::Type{<:PSY.HydroReservoir}, ::AbstractHydroReservoirFormulation) = false
+PSI.get_variable_lower_bound(::HydroEnergyShortageVariable, d::PSY.HydroReservoir, ::AbstractHydroReservoirFormulation) = 0.0
+PSI.get_variable_upper_bound(::HydroEnergyShortageVariable, d::PSY.HydroReservoir, ::AbstractHydroReservoirFormulation) = PSY.get_storage_level_limits(d).max
+PSI.get_variable_binary(::HydroWaterShortageVariable, ::Type{<:PSY.HydroReservoir}, ::AbstractHydroReservoirFormulation) = false
+PSI.get_variable_lower_bound(::HydroWaterShortageVariable, d::PSY.HydroReservoir, ::AbstractHydroReservoirFormulation) = 0.0
+PSI.get_variable_upper_bound(::HydroWaterShortageVariable, d::PSY.HydroReservoir, ::AbstractHydroReservoirFormulation) = PSY.get_storage_level_limits(d).max
 
 ############## HydroEnergySurplusVariable, HydroReservoir ####################
-PSI.get_variable_binary(::HydroEnergySurplusVariable, ::Type{<:PSY.HydroReservoir}, ::HydroEnergyModelReservoir) = false
-PSI.get_variable_upper_bound(::HydroEnergySurplusVariable, d::PSY.HydroReservoir, ::HydroEnergyModelReservoir) = 0.0
-PSI.get_variable_lower_bound(::HydroEnergySurplusVariable, d::PSY.HydroReservoir, ::HydroEnergyModelReservoir) = - PSY.get_storage_level_limits(d).max
-PSI.get_variable_binary(::HydroWaterSurplusVariable, ::Type{<:PSY.HydroReservoir}, ::HydroWaterModelReservoir) = false
-PSI.get_variable_upper_bound(::HydroWaterSurplusVariable, d::PSY.HydroReservoir, ::HydroWaterModelReservoir) = 0.0
-PSI.get_variable_lower_bound(::HydroWaterSurplusVariable, d::PSY.HydroReservoir, ::HydroWaterModelReservoir) = - PSY.get_storage_level_limits(d).max
+PSI.get_variable_binary(::HydroEnergySurplusVariable, ::Type{<:PSY.HydroReservoir}, ::AbstractHydroReservoirFormulation) = false
+PSI.get_variable_upper_bound(::HydroEnergySurplusVariable, d::PSY.HydroReservoir, ::AbstractHydroReservoirFormulation) = 0.0
+PSI.get_variable_lower_bound(::HydroEnergySurplusVariable, d::PSY.HydroReservoir, ::AbstractHydroReservoirFormulation) = - PSY.get_storage_level_limits(d).max
+PSI.get_variable_binary(::HydroWaterSurplusVariable, ::Type{<:PSY.HydroReservoir}, ::AbstractHydroReservoirFormulation) = false
+PSI.get_variable_upper_bound(::HydroWaterSurplusVariable, d::PSY.HydroReservoir, ::AbstractHydroReservoirFormulation) = 0.0
+PSI.get_variable_lower_bound(::HydroWaterSurplusVariable, d::PSY.HydroReservoir, ::AbstractHydroReservoirFormulation) = - PSY.get_storage_level_limits(d).max
 
 ############## BalanceShortageVariable, HydroReservoir ####################
 PSI.get_variable_binary(::HydroBalanceShortageVariable, ::Type{<:PSY.HydroReservoir}, ::AbstractHydroFormulation) = false
@@ -207,6 +207,10 @@ PSI.get_multiplier_value(::PSI.TimeSeriesParameter, d::PSY.HydroGen, ::PSI.Fixed
 # next 2 needed to avoid ambiguity errors
 PSI.get_multiplier_value(::PSI.AbstractPiecewiseLinearBreakpointParameter, d::PSY.HydroGen, ::PSI.FixedOutput) = PSY.get_max_active_power(d)
 PSI.get_multiplier_value(::PSI.AbstractPiecewiseLinearBreakpointParameter, d::PSY.HydroGen, ::AbstractHydroFormulation) = PSY.get_max_active_power(d)
+
+PSI.get_parameter_multiplier(::ReservoirTargetParameter, ::PSY.HydroReservoir, ::HydroWaterModelReservoir) = 1.0
+PSI.get_parameter_multiplier(::ReservoirTargetParameter, ::PSY.HydroReservoir, ::HydroEnergyModelReservoir) = 1.0
+PSI.get_initial_parameter_value(::ReservoirTargetParameter, d::PSY.HydroReservoir, ::AbstractHydroFormulation) = PSY.get_initial_storage(d)
 
 PSI.get_parameter_multiplier(::PSI.VariableValueParameter, d::PSY.HydroGen, ::AbstractHydroFormulation) = 1.0
 PSI.get_initial_parameter_value(::PSI.VariableValueParameter, d::PSY.HydroGen, ::AbstractHydroFormulation) = 1.0
@@ -815,7 +819,7 @@ function PSI.add_constraints!(
     for ic in initial_conditions
         device = PSI.get_component(ic)
         name = PSY.get_name(device)
-        param = PSI.get_parameter_column_values(param_container, name)
+        param = PSI.get_parameter_column_refs(param_container, name)
         if PSI.get_use_slacks(model)
             surplus_var =
                 PSI.get_variable(container, HydroBalanceSurplusVariable(), V)[name, 1]
@@ -927,7 +931,7 @@ function PSI.add_constraints!(
             JuMP.delete_upper_bound.(shortage_var[name, :])
             JuMP.set_upper_bound.(shortage_var[name, :], 0.0)
         end
-        param = PSI.get_parameter_column_values(param_container, name)
+        param = PSI.get_parameter_column_refs(param_container, name)
         for t in time_steps
             constraint[name, t] = JuMP.@constraint(
                 container.JuMPmodel,
@@ -982,7 +986,7 @@ function PSI.add_constraints!(
             JuMP.delete_upper_bound.(shortage_var[name, :])
             JuMP.set_upper_bound.(shortage_var[name, :], 0.0)
         end
-        param = PSI.get_parameter_column_values(param_container, name)
+        param = PSI.get_parameter_column_refs(param_container, name)
         t_end = time_steps[end]
         constraint[name, t_end] = JuMP.@constraint(
             container.JuMPmodel,
@@ -1042,7 +1046,9 @@ function PSI.add_constraints!(
             JuMP.delete_upper_bound.(shortage_var[name, :])
             JuMP.set_upper_bound.(shortage_var[name, :], 0.0)
         end
-        param = PSI.get_parameter_column_values(param_container, name)
+        JuMP.fix.(shortage_var[name, 1:(end - 1)], 0.0; force = true)
+        JuMP.fix.(surplus_var[name, 1:(end - 1)], 0.0; force = true)
+        param = PSI.get_parameter_column_refs(param_container, name)
         t_end = time_steps[end]
         constraint[name, t_end] = JuMP.@constraint(
             container.JuMPmodel,
@@ -1260,7 +1266,7 @@ function PSI.add_constraints!(
 
     for d in devices
         name = PSY.get_name(d)
-        param = PSI.get_parameter_column_values(param_container, name)
+        param = PSI.get_parameter_column_refs(param_container, name)
         constraint[name] = JuMP.@constraint(
             container.JuMPmodel,
             sum([variable_out[name, t] for t in time_steps]) <=
@@ -1296,7 +1302,7 @@ function PSI.add_constraints!(
         else
             slack_var = 0.0
         end
-        param = PSI.get_parameter_column_values(param_container, name)
+        param = PSI.get_parameter_column_refs(param_container, name)
         constraint[name] = JuMP.@constraint(
             container.JuMPmodel,
             sum([variable_out[name, t] for t in time_steps]) <=
@@ -1318,7 +1324,7 @@ function PSI.add_constraints!(
             Dates.Millisecond(resolution).value
         for d in devices
             name = PSY.get_name(d)
-            param = PSI.get_parameter_column_values(param_container, name)
+            param = PSI.get_parameter_column_refs(param_container, name)
             constraint_aux[name] = JuMP.@constraint(
                 container.JuMPmodel,
                 sum([variable_out[name, t] for t in 1:interval_length]) <=
@@ -1363,7 +1369,7 @@ function PSI.add_constraints!(
         else
             slack_var = 0.0
         end
-        param = PSI.get_parameter_column_values(param_container, name)
+        param = PSI.get_parameter_column_refs(param_container, name)
         constraint[name] = JuMP.@constraint(
             container.JuMPmodel,
             sum([total_power_out[name, t] for t in time_steps]) <=
@@ -1401,7 +1407,7 @@ function PSI.add_constraints!(
 
     for d in devices
         name = PSY.get_name(d)
-        param = PSI.get_parameter_column_values(param_container, name)
+        param = PSI.get_parameter_column_refs(param_container, name)
         constraint[name] = JuMP.@constraint(
             container.JuMPmodel,
             sum([total_flow_out[name, t] for t in time_steps]) <=
@@ -2607,15 +2613,13 @@ function PSI.add_proportional_cost!(
         op_cost_data = PSY.get_operation_cost(d)
         cost_term = PSI.proportional_cost(op_cost_data, U(), d, V())
         iszero(cost_term) && continue
-        for t in PSI.get_time_steps(container)
-            PSI._add_proportional_term!(
-                container,
-                U(),
-                d,
-                cost_term * multiplier * base_p,
-                t,
-            )
-        end
+        PSI._add_proportional_term!(
+            container,
+            U(),
+            d,
+            cost_term * multiplier * base_p,
+            PSI.get_time_steps(container)[end],
+        )
     end
     return
 end

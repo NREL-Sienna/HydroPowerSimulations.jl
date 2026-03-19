@@ -29,7 +29,7 @@ struct ReservoirTargetFeedforward <: PSI.AbstractAffectFeedforward
         source::Type{T},
         affected_values::Vector{DataType},
         target_period::Int,
-        penalty_cost::Float64,
+        penalty_cost::Float64 = 5.0e10,
         meta = ISOPT.CONTAINER_KEY_EMPTY_META,
     ) where {T}
         values_vector = Vector{PSI.VariableKey}(undef, length(affected_values))
@@ -84,7 +84,7 @@ function PSI.add_feedforward_constraints!(
     ::PSI.DeviceModel{T, U},
     devices::IS.FlattenIteratorWrapper{T},
     ff::ReservoirTargetFeedforward,
-) where {T <: PSY.HydroGen, U <: AbstractHydroFormulation}
+) where {T <: PSY.HydroReservoir, U <: AbstractHydroFormulation}
     time_steps = PSI.get_time_steps(container)
     parameter_type = PSI.get_default_parameter_type(ff, T)
     param = PSI.get_parameter_array(container, parameter_type(), T)
@@ -128,7 +128,7 @@ function PSI._add_feedforward_arguments!(
     model::PSI.DeviceModel{T, U},
     devices::IS.FlattenIteratorWrapper{T},
     ff::ReservoirTargetFeedforward,
-) where {T <: PSY.HydroGen, U <: AbstractHydroFormulation}
+) where {T <: PSY.HydroReservoir, U <: AbstractHydroFormulation}
     parameter_type = PSI.get_default_parameter_type(ff, T)
     PSI.add_parameters!(container, parameter_type, ff, model, devices)
     # Enabling this FF requires the addition of an extra variable
