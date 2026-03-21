@@ -127,9 +127,9 @@
 ┌─────────────────────────────────┬──────────────────┐
 │<span class="sgr1"> Parameter Name                  </span>│<span class="sgr1"> Time Series Name </span>│
 ├─────────────────────────────────┼──────────────────┤
-│ EnergyTargetTimeSeriesParameter │ storage_target   │
-│ InflowTimeSeriesParameter       │ inflow           │
 │ EnergyBudgetTimeSeriesParameter │ hydro_budget     │
+│ InflowTimeSeriesParameter       │ inflow           │
+│ EnergyTargetTimeSeriesParameter │ storage_target   │
 └─────────────────────────────────┴──────────────────┘
 
 No FeedForwards Assigned</code><br/><code class="language-julia-repl hljs" style="display:block;">julia&gt; set_device_model!(template, reservoir_model)</code></pre><p>With the template properly set-up, we construct, build and solve the optimization problem:</p><pre><code class="language-julia-repl hljs" style="display:block;">julia&gt; model = DecisionModel(template, sys; optimizer = HiGHS.Optimizer)</code><code class="nohighlight hljs ansi" style="display:block;"><span class="sgr36"><span class="sgr1">[ Info: </span></span>Overriding time_series_cache_size because time series is stored in memory
@@ -169,27 +169,27 @@ Resolution: 60 minutes
 
 <span class="sgr1">PowerSimulations Problem Expressions Results</span>
 ┌───────────────────────────────────────────┐
+│ ProductionCostExpression__HydroTurbine    │
 │ PTDFBranchFlow__Line                      │
 │ ActivePowerBalance__ACBus                 │
 │ ProductionCostExpression__ThermalStandard │
-│ ProductionCostExpression__HydroTurbine    │
 │ ActivePowerBalance__System                │
 └───────────────────────────────────────────┘
 
 <span class="sgr1"> PowerSimulations Problem Parameters Results</span>
 ┌───────────────────────────────────────────┐
-│ InflowTimeSeriesParameter__HydroReservoir │
 │ ActivePowerTimeSeriesParameter__PowerLoad │
+│ InflowTimeSeriesParameter__HydroReservoir │
 └───────────────────────────────────────────┘
 
 <span class="sgr1">  PowerSimulations Problem Variables Results</span>
 ┌─────────────────────────────────────────────┐
-│ ActivePowerVariable__HydroTurbine           │
-│ WaterSpillageVariable__HydroReservoir       │
-│ HydroEnergyShortageVariable__HydroReservoir │
-│ EnergyVariable__HydroReservoir              │
 │ ActivePowerVariable__ThermalStandard        │
+│ ActivePowerVariable__HydroTurbine           │
+│ EnergyVariable__HydroReservoir              │
 │ HydroEnergySurplusVariable__HydroReservoir  │
+│ HydroEnergyShortageVariable__HydroReservoir │
+│ WaterSpillageVariable__HydroReservoir       │
 └─────────────────────────────────────────────┘</code></pre><p>Use <a href="https://nrel-sienna.github.io/InfrastructureSystems.jl/stable/InfrastructureSystems/#InfrastructureSystems.Optimization.read_variable-Tuple%7BInfrastructureSystems.Optimization.OptimizationProblemResults%2C%20Vararg%7BAny%7D%7D"><code>read_variable</code></a> to read in the dispatch variable results for the hydro:</p><pre><code class="language-julia-repl hljs" style="display:block;">julia&gt; var =
            read_variable(res, &quot;ActivePowerVariable__HydroTurbine&quot;; table_format = TableFormat.WIDE)</code><code class="nohighlight hljs ansi" style="display:block;"><span class="sgr1">24×2 DataFrame</span>
 <span class="sgr1"> Row </span>│<span class="sgr1"> DateTime             HydroEnergyReservoir_turbine </span>

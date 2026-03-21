@@ -165,9 +165,9 @@ Resolution: 60 minutes
 
 <span class="sgr1"> PowerSimulations Problem Variables Results</span>
 ┌───────────────────────────────────────────┐
-│ ActivePowerVariable__HydroPumpTurbine     │
-│ ActivePowerPumpVariable__HydroPumpTurbine │
 │ ActivePowerVariable__ThermalStandard      │
+│ ActivePowerPumpVariable__HydroPumpTurbine │
+│ ActivePowerVariable__HydroPumpTurbine     │
 │ ReservationVariable__HydroPumpTurbine     │
 └───────────────────────────────────────────┘</code></pre><p>Use <a href="https://nrel-sienna.github.io/InfrastructureSystems.jl/stable/InfrastructureSystems/#InfrastructureSystems.Optimization.read_variable-Tuple%7BInfrastructureSystems.Optimization.OptimizationProblemResults%2C%20Vararg%7BAny%7D%7D"><code>read_variable</code></a> to read in the dispatch variable results for the hydro:</p><pre><code class="language-julia-repl hljs" style="display:block;">julia&gt; var = read_variable(
            res,

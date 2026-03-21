@@ -137,31 +137,31 @@ Resolution: 60 minutes
 
 <span class="sgr1">     PowerSimulations Problem Expressions Results</span>
 ┌─────────────────────────────────────────────────────┐
+│ ProductionCostExpression__HydroTurbine              │
 │ PTDFBranchFlow__Line                                │
-│ TotalHydroFlowRateReservoirIncoming__HydroReservoir │
 │ ActivePowerBalance__ACBus                           │
 │ ProductionCostExpression__ThermalStandard           │
-│ ProductionCostExpression__HydroTurbine              │
+│ TotalHydroFlowRateReservoirIncoming__HydroReservoir │
 │ ActivePowerBalance__System                          │
-│ TotalHydroFlowRateTurbineOutgoing__HydroTurbine     │
 │ TotalHydroFlowRateReservoirOutgoing__HydroReservoir │
+│ TotalHydroFlowRateTurbineOutgoing__HydroTurbine     │
 └─────────────────────────────────────────────────────┘
 
 <span class="sgr1"> PowerSimulations Problem Parameters Results</span>
 ┌────────────────────────────────────────────┐
-│ InflowTimeSeriesParameter__HydroReservoir  │
 │ ActivePowerTimeSeriesParameter__PowerLoad  │
+│ InflowTimeSeriesParameter__HydroReservoir  │
 │ OutflowTimeSeriesParameter__HydroReservoir │
 └────────────────────────────────────────────┘
 
 <span class="sgr1">   PowerSimulations Problem Variables Results</span>
 ┌──────────────────────────────────────────────┐
-│ HydroWaterShortageVariable__HydroReservoir   │
+│ ActivePowerVariable__ThermalStandard         │
 │ ActivePowerVariable__HydroTurbine            │
 │ HydroReservoirHeadVariable__HydroReservoir   │
 │ HydroWaterSurplusVariable__HydroReservoir    │
+│ HydroWaterShortageVariable__HydroReservoir   │
 │ HydroReservoirVolumeVariable__HydroReservoir │
-│ ActivePowerVariable__ThermalStandard         │
 │ WaterSpillageVariable__HydroReservoir        │
 └──────────────────────────────────────────────┘</code></pre><p>Use <a href="https://nrel-sienna.github.io/InfrastructureSystems.jl/stable/InfrastructureSystems/#InfrastructureSystems.Optimization.read_variable-Tuple%7BInfrastructureSystems.Optimization.OptimizationProblemResults%2C%20Vararg%7BAny%7D%7D"><code>read_variable</code></a> to read in the dispatch variable results for the hydro:</p><pre><code class="language-julia-repl hljs" style="display:block;">julia&gt; var =
            read_variable(res, &quot;ActivePowerVariable__HydroTurbine&quot;; table_format = TableFormat.WIDE)</code><code class="nohighlight hljs ansi" style="display:block;"><span class="sgr1">24×2 DataFrame</span>
