@@ -1,6 +1,10 @@
 using Documenter, HydroPowerSimulations
 import DataStructures: OrderedDict
 using DocumenterInterLinks
+using Literate
+
+# UPDATE FOR CURRENT MODULE NAME HERE
+const _DOCS_BASE_URL = "https://nrel-sienna.github.io/HydroPowerSimulations.jl/stable"
 
 links = InterLinks(
     "PowerSystems" => "https://nrel-sienna.github.io/PowerSystems.jl/stable/",
@@ -8,15 +12,18 @@ links = InterLinks(
     "InfrastructureSystems" => "https://nrel-sienna.github.io/InfrastructureSystems.jl/stable/",
 )
 
+include(joinpath(@__DIR__, "make_tutorials.jl"))
+make_tutorials()
+
 pages = OrderedDict(
     "Welcome Page" => "index.md",
     "Tutorials" => Any[
-        "Operation problem with HydroDispatchRunOfRiver" => "tutorials/single_stage_model.md",
-        "HydroDispatch with Market Bid Cost" => "tutorials/hydro_with_marketbidcost.md",
-        "Energy Hydro Reservoir Operation" => "tutorials/energy_model_hydroturbine_reservoir.md",
-        "Water Hydro Reservoir Operation" => "tutorials/water_model_hydroturbine_reservoir.md",
-        "Hydro Pump Turbine Operation" => "tutorials/hydro_pump_turbine.md",
-        "HydroEnergyBlock model usage" => "tutorials/hydro_energy_block.md",
+        "Operation problem with HydroDispatchRunOfRiver" => "tutorials/generated_single_stage_model.md",
+        "HydroDispatch with Market Bid Cost" => "tutorials/generated_hydro_with_marketbidcost.md",
+        "Energy Hydro Reservoir Operation" => "tutorials/generated_energy_model_hydroturbine_reservoir.md",
+        "Water Hydro Reservoir Operation" => "tutorials/generated_water_model_hydroturbine_reservoir.md",
+        "Hydro Pump Turbine Operation" => "tutorials/generated_hydro_pump_turbine.md",
+        "HydroWaterFactorModel model usage" => "tutorials/generated_hydro_energy_block.md",
     ],
     "How to..." => Any[
         "...format input data for Hydro models" => "how_to/format_input_data.md",
